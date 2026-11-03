@@ -1,122 +1,118 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import * as api from './api'
+import { applyEvent } from './reducer'
+import type { Message, Thread } from './types'
+import ChatView from './components/ChatView'
+import InputBox from './components/InputBox'
+import Sidebar from './components/Sidebar'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [threads, setThreads] = useState<Thread[]>([])
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [streaming, setStreaming] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
+
+  const refreshThreads = useCallback(async () => {
+    setThreads(await api.listThreads())
+  }, [])
+
+  useEffect(() => {
+    refreshThreads().catch((e) => setError(String(e)))
+  }, [refreshThreads])
+
+  const stop = useCallback(() => {
+    abortRef.current?.abort()
+    abortRef.current = null
+  }, [])
+
+  const newChat = () => {
+    stop()
+    setActiveId(null)
+    setMessages([])
+    setError(null)
+  }
+
+  const selectThread = async (id: string) => {
+    if (id === activeId) return
+    stop()
+    setError(null)
+    setActiveId(id)
+    setMessages([])
+    try {
+      setMessages(await api.getMessages(id))
+    } catch (e) {
+      setError(String(e))
+    }
+  }
+
+  const removeThread = async (id: string) => {
+    if (!window.confirm('删除这个会话?')) return
+    try {
+      await api.deleteThread(id)
+      if (id === activeId) newChat()
+      await refreshThreads()
+    } catch (e) {
+      setError(String(e))
+    }
+  }
+
+  const send = async (text: string) => {
+    setError(null)
+    let id = activeId
+    if (!id) {
+      try {
+        const thread = await api.createThread()
+        id = thread.id
+        setActiveId(id)
+        setThreads((prev) => [thread, ...prev])
+      } catch (e) {
+        setError(String(e))
+        return
+      }
+    }
+    setMessages((prev) => [...prev, { role: 'user', content: text }])
+
+    const ctrl = new AbortController()
+    abortRef.current = ctrl
+    setStreaming(true)
+    try {
+      await api.streamChat(
+        id,
+        text,
+        (ev) => {
+          if (ctrl.signal.aborted) return
+          if (ev.event === 'error') setError(ev.data.message)
+          else setMessages((prev) => applyEvent(prev, ev))
+        },
+        ctrl.signal,
+      )
+    } catch (e) {
+      if (!ctrl.signal.aborted) setError(String(e))
+    } finally {
+      if (abortRef.current === ctrl) abortRef.current = null
+      setStreaming(false)
+      refreshThreads().catch(() => {})
+    }
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <div className="flex h-screen bg-gray-50 text-gray-900">
+      <Sidebar
+        threads={threads}
+        activeId={activeId}
+        onSelect={selectThread}
+        onNew={newChat}
+        onDelete={removeThread}
+      />
+      <main className="flex min-w-0 flex-1 flex-col">
+        <ChatView messages={messages} streaming={streaming} />
+        {error && (
+          <div className="mx-auto w-full max-w-3xl px-4 pb-2 text-sm text-red-600">{error}</div>
+        )}
+        <InputBox streaming={streaming} onSend={send} onStop={stop} />
+      </main>
+    </div>
   )
 }
-
-export default App
