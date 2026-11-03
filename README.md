@@ -21,6 +21,18 @@ npm install
 npm run dev                   # http://localhost:5173, /api is proxied to :8000
 ```
 
+## Using TT Switch (local OpenAI-compatible proxy)
+
+pi reaches models through the TT Switch proxy. Reuse its provider settings in `backend/.env`
+(values come from `~/.pi/agent/models.json`, provider `tencent-intranet`):
+
+```
+OPENAI_BASE_URL=http://127.0.0.1:15721/pi/tencent-intranet/v1
+OPENAI_API_KEY=<apiKey of that provider>
+OPENAI_MODEL=hy4-preview-ioa        # any model id listed under that provider
+```
+TT Switch must be running (it listens on 127.0.0.1:15721). `.env` is git-ignored.
+
 ## Test (backend)
 
 ```bash
