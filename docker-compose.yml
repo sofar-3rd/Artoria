@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: sagent-pg
+    environment:
+      POSTGRES_USER: sagent
+      POSTGRES_PASSWORD: sagent
+      POSTGRES_DB: sagent
+    ports:
+      - "5433:5432"
+    volumes:
+      - sagent_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sagent -d sagent"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  sagent_pg_data:
