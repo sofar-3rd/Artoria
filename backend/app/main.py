@@ -9,7 +9,7 @@ from psycopg_pool import AsyncConnectionPool
 from app.agent import build_agent, build_chat_model
 from app.config import settings
 from app.db import engine
-from app.routers import threads
+from app.routers import chat, threads
 
 
 def create_app(model: BaseChatModel | None = None) -> FastAPI:
@@ -35,6 +35,7 @@ def create_app(model: BaseChatModel | None = None) -> FastAPI:
 
     app = FastAPI(title="sagent", lifespan=lifespan)
     app.include_router(threads.router, prefix="/api")
+    app.include_router(chat.router, prefix="/api")
     return app
 
 
