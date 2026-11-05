@@ -9,7 +9,8 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 ADMIN_URL = "postgresql://sagent:sagent@localhost:5433/sagent"
-TEST_URL = "postgresql://sagent:sagent@localhost:5433/sagent_test"
+TEST_DB = "sagent_rag_test"
+TEST_URL = f"postgresql://sagent:sagent@localhost:5433/{TEST_DB}"
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 
 # Must be set before any `app` module is imported.
@@ -21,10 +22,10 @@ os.environ["OPENAI_API_KEY"] = "test-key"
 def _test_database():
     with psycopg.connect(ADMIN_URL, autocommit=True) as conn:
         exists = conn.execute(
-            "SELECT 1 FROM pg_database WHERE datname = 'sagent_test'"
+            "SELECT 1 FROM pg_database WHERE datname = %s", (TEST_DB,)
         ).fetchone()
         if not exists:
-            conn.execute("CREATE DATABASE sagent_test")
+            conn.execute(f"CREATE DATABASE {TEST_DB}")
     subprocess.run(
         [sys.executable, "-m", "alembic", "upgrade", "head"],
         cwd=BACKEND_DIR,

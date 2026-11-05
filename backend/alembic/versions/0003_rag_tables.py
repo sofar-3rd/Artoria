@@ -1,15 +1,19 @@
 """rag tables
 
-Revision ID: 0002
+Revision ID: 0003
 Revises: 0001
+
+The parent is 0001 only because this branch does not contain the telemetry migration yet
+(0002 on the main checkout). When the two branches are merged, change `down_revision` to "0002";
+otherwise alembic sees two heads (0002 and 0003) and refuses to upgrade.
 """
 import sqlalchemy as sa
 from alembic import op
 from pgvector.sqlalchemy import Vector
 from sqlalchemy.dialects.postgresql import TSVECTOR
 
-revision = "0002"
-down_revision = "0001"
+revision = "0003"
+down_revision = "0001"  # becomes "0002" once the telemetry migration is merged
 branch_labels = None
 depends_on = None
 
