@@ -23,7 +23,7 @@ export default function ChatView({ messages, streaming }: Props) {
           <div className="pt-24 text-center text-gray-400">有什么可以帮你的?</div>
         )}
         {messages.map((m, i) => (
-          <MessageBubble key={i} message={m} />
+          <MessageBubble key={i} message={m} streaming={streaming && i === messages.length - 1} />
         ))}
         {waiting && <div className="text-sm text-gray-400">思考中...</div>}
         <div ref={bottomRef} />

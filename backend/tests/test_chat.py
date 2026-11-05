@@ -119,3 +119,20 @@ async def test_chat_validation_and_404(running_app):
         assert r.status_code == 422
         r = await c.post(f"/api/threads/{uuid.uuid4()}/chat", json={"message": "hi"})
         assert r.status_code == 404
+
+
+async def test_reasoning_events_precede_tokens(running_app):
+    msg = AIMessage(
+        content="final answer",
+        additional_kwargs={"reasoning_content": "think a|think b"},
+    )
+    async with running_app([msg]) as (_, c):
+        tid = await new_thread(c)
+        _, events = await chat(c, tid, "hi")
+        names = [n for n, _ in events]
+        assert names[-1] == "done"
+        assert "".join(d["text"] for n, d in events if n == "reasoning") == "think athink b"
+        assert max(i for i, n in enumerate(names) if n == "reasoning") < min(
+            i for i, n in enumerate(names) if n == "token"
+        )
+        assert "".join(d["text"] for n, d in events if n == "token") == "final answer"

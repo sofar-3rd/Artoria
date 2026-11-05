@@ -16,9 +16,11 @@ export interface Message {
   role: 'user' | 'assistant'
   content: string
   tool_calls?: ToolCall[]
+  reasoning?: string
 }
 
 export type StreamEvent =
+  | { event: 'reasoning'; data: { text: string } }
   | { event: 'token'; data: { text: string } }
   | { event: 'tool_call'; data: { id: string; name: string; args: Record<string, unknown> } }
   | { event: 'tool_result'; data: { id: string; name: string; result: string } }

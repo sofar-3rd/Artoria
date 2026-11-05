@@ -7,6 +7,19 @@ const hasResolvedCall = (m: Message) =>
 export function applyEvent(messages: Message[], ev: StreamEvent): Message[] {
   const last = messages[messages.length - 1]
   switch (ev.event) {
+    case 'reasoning': {
+      // Thinking belongs to the assistant item of the current model step.
+      if (last?.role === 'assistant' && !last.content && !last.tool_calls?.length) {
+        return [
+          ...messages.slice(0, -1),
+          { ...last, reasoning: (last.reasoning ?? '') + ev.data.text },
+        ]
+      }
+      return [
+        ...messages,
+        { role: 'assistant', content: '', tool_calls: [], reasoning: ev.data.text },
+      ]
+    }
     case 'token': {
       if (last?.role === 'assistant' && !last.tool_calls?.length) {
         return [...messages.slice(0, -1), { ...last, content: last.content + ev.data.text }]

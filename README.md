@@ -48,4 +48,4 @@ Tests use database `sagent_test` on the same Postgres and a scripted fake model.
 | GET | `/api/threads` | list, newest first |
 | DELETE | `/api/threads/{id}` | delete session and its checkpoints |
 | GET | `/api/threads/{id}/messages` | history incl. tool calls |
-| POST | `/api/threads/{id}/chat` | body `{message}`; SSE events `token`, `tool_call`, `tool_result`, `done`, `error` |
+| POST | `/api/threads/{id}/chat` | body `{message}`; SSE events `reasoning`, `token`, `tool_call`, `tool_result`, `done`, `error` |

@@ -40,6 +40,9 @@ async def run_chat(
                     isinstance(chunk, AIMessageChunk)
                     and meta.get("langgraph_node") == "model"
                 ):
+                    thought = chunk.additional_kwargs.get("reasoning_content")
+                    if thought:
+                        yield sse("reasoning", {"text": thought})
                     piece = text_of(chunk.content)
                     if piece:
                         yield sse("token", {"text": piece})

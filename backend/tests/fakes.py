@@ -28,6 +28,14 @@ class Scripted(BaseChatModel):
 
     def _stream(self, messages, stop=None, run_manager=None, **kwargs):
         msg = self._next()
+        reasoning = msg.additional_kwargs.get("reasoning_content")
+        if reasoning:
+            for piece in reasoning.split("|"):
+                yield ChatGenerationChunk(
+                    message=AIMessageChunk(
+                        content="", additional_kwargs={"reasoning_content": piece}
+                    )
+                )
         words = msg.content.split(" ") if msg.content else []
         for i, word in enumerate(words):
             suffix = " " if i < len(words) - 1 else ""
