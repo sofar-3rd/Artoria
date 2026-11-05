@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-04",
+  "setup": "工具开始后 SIGKILL; SqliteSaver + durability=sync; 两条路径从同一 checkpoint 独立恢复",
+  "versions": {"langchain": "1.4.8", "langgraph": "1.2.19", "langchain-openai": "1.7.3"},
+  "paths": {
+    "new_human": {"input": "HumanMessage(重试)", "request_roles": ["user", "assistant", "user"]},
+    "resume_none": {"input": null, "request_roles": ["user", "assistant", "tool"]}
+  },
+  "models": [
+    {
+      "model": "gpt-6-luna",
+      "source": "results/live-f32d5025/summary.json",
+      "new_human": {"http": 400, "tool_attempts": 0},
+      "resume_none": {"http": 200, "tool_attempts": 1}
+    },
+    {
+      "model": "gpt-6.1-sol",
+      "source": "results/live-f14364f2/summary.json",
+      "new_human": {"http": 400, "tool_attempts": 0},
+      "resume_none": {"http": 200, "tool_attempts": 1}
+    },
+    {
+      "model": "hy4-preview-ioa",
+      "source": "results/live-1f62efd6/summary.json",
+      "new_human": {"http": 200, "tool_attempts": 1, "note": "模型生成新调用, 旧调用仍缺结果"},
+      "resume_none": {"http": 200, "tool_attempts": 1}
+    }
+  ],
+  "conclusion": "新输入不是恢复; 恢复未完成工具执行应传 None。新消息可能在报错前已持久化, 工具重跑需幂等。",
+  "limitations": "实测通过项目代理, 不是 OpenAI 官方直连; GPT 的 400 原文为 Invalid request parameters, 未明确点名缺少 ToolMessage。HY 原始记录未保存响应码, 200 表示 SDK 调用成功。"
+}
