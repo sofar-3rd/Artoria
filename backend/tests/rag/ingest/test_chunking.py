@@ -1,7 +1,10 @@
+from pathlib import Path
+
 import pytest
 
 from app.rag.ingest.chunking import ChunkConfig, chunk_markdown, scan_fences, scan_headings
 
+DESIGN_DOC = Path.home() / "Documents/obsidian/sagent/2026-11-05-rag-knowledge-base-design.md"
 CFG = ChunkConfig(target_tokens=60, max_tokens=80, overlap_tokens=0, min_chunk_chars=20)
 count = len  # tests use characters as tokens
 
@@ -79,6 +82,35 @@ def test_tiny_fragments_are_merged():
     text = "# A\n\n" + "正文内容足够长的一段话用于测试。" * 4 + "\n\n## B\n\nx\n"
     cs = chunks(text)
     assert all(len(c.content) >= CFG.min_chunk_chars or len(cs) == 1 for c in cs)
+
+
+def test_offsets_hold_when_length_function_is_not_chars():
+    # chunk_overlap is in tokens but offsets are in chars: LangChain's add_start_index returns -1 here.
+    text = "# A\n\n" + "".join(f"第{i}条说明了一件事情,需要认真对待。" for i in range(60))
+    cfg = ChunkConfig(target_tokens=60, max_tokens=90, overlap_tokens=15, min_chunk_chars=10)
+    cs = chunk_markdown(text, "T", "", cfg, lambda s: len(s) // 2).chunks
+    assert len(cs) > 3
+    for c in cs:
+        assert c.start >= 0 and text[c.start:c.end] == c.content
+
+
+def test_every_non_space_char_is_covered_and_overlap_is_bounded():
+    doc = open(DESIGN_DOC, encoding="utf-8").read() if DESIGN_DOC.exists() else None
+    if doc is None:
+        pytest.skip("design doc not available")
+    cfg = ChunkConfig()
+    cs = chunk_markdown(doc, "T", "", cfg, lambda s: int(len(s) / 2.1)).chunks
+    covered = bytearray(len(doc))
+    for c in cs:
+        covered[c.start:c.end] = b"\x01" * (c.end - c.start)
+    gaps = [i for i, ch in enumerate(doc) if not covered[i] and not ch.isspace()]
+    assert gaps == []
+    for a, b in zip(cs, cs[1:]):
+        assert a.end - b.start <= cfg.overlap_tokens * 3
+    for c in cs:
+        if c.content.count("```") % 2 == 0 and c.content == doc[c.start:c.end]:
+            continue
+        assert c.content.count("```") % 2 == 0  # repaired chunks are valid snippets
 
 
 def test_chunk_indexes_are_sequential():

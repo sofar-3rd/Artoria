@@ -117,7 +117,6 @@ def chunk_markdown(
         chunk_size=cfg.target_tokens,
         chunk_overlap=cfg.overlap_tokens,
         length_function=count_tokens,
-        add_start_index=True,
     )
 
     def index_text(path: str, content: str) -> str:
@@ -131,9 +130,16 @@ def chunk_markdown(
         if count_tokens(index_text(path, sec)) <= cfg.max_tokens:
             spans.append((a, b))
             continue
-        for d in splitter.create_documents([sec]):
-            s = a + d.metadata["start_index"]
-            spans.append((s, s + len(d.page_content)))
+        # Do not trust `add_start_index`: LangChain searches from `prev_start + prev_len - chunk_overlap`,
+        # and `chunk_overlap` is in tokens while offsets are in chars, so find() can return -1.
+        floor = 0
+        for piece in splitter.split_text(sec):
+            i = sec.find(piece, floor)
+            if i == -1:
+                i = sec.find(piece)
+            assert i != -1, "splitter piece is not a verbatim slice of the section"
+            spans.append((a + i, a + i + len(piece)))
+            floor = i + 1
 
     merged: list[list[int]] = []
     for s, e in spans:
