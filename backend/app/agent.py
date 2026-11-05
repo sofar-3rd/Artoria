@@ -39,6 +39,7 @@ def build_chat_model() -> ReasoningChatOpenAI:
         api_key=settings.openai_api_key,
         base_url=settings.openai_base_url or None,
         streaming=True,
+        stream_usage=settings.openai_stream_usage,
     )
 
 

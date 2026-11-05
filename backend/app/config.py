@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     openai_base_url: str | None = None
     openai_model: str = "gpt-4o-mini"
+    # Providers honour `stream_options={"include_usage": true}`; some proxies 400 on it.
+    openai_stream_usage: bool = True
 
     recursion_limit: int = 12
     max_message_chars: int = 4000
