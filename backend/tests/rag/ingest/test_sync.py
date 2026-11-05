@@ -217,6 +217,25 @@ def make_pdf(lines):
     return buf.getvalue()
 
 
+async def test_loading_and_chunking_run_off_the_event_loop_thread(tmp_path):
+    import threading
+    loop_thread = threading.get_ident()
+    seen = set()
+
+    def counting(s: str) -> int:
+        seen.add(threading.get_ident())
+        return len(s)
+
+    w(tmp_path, "a.md", "# A\n\n" + "alpha body text is here\n\n" * 20)
+    emb = HashEmbedder()
+    store = Store(SessionLocal)
+    import uuid
+    kb = await store.create_kb(f"kb-{uuid.uuid4().hex[:6]}", "d", f"dir:{tmp_path}", "main", "", emb.model, emb.dim)
+    await Syncer(store, emb, lambda k: DirSource(tmp_path), CFG, counting).sync(kb.name)
+    assert seen, "the token counter was never called"
+    assert loop_thread not in seen  # CPU-bound work must not block the event loop (SSE streams share it)
+
+
 async def test_pdf_is_loaded_chunked_and_indexed(tmp_path):
     (tmp_path / "guide.pdf").write_bytes(make_pdf(["Deployment Guide", "Run kubectl rollout undo to roll back."]))
     store, kb, syncer, emb = await setup(tmp_path)
