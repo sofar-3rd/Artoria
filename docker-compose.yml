@@ -1,6 +1,11 @@
 services:
   postgres:
-    image: postgres:16
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.postgres
+      args:
+        APT_MIRROR: ${APT_MIRROR:-}
+    image: sagent-pg:local
     container_name: sagent-pg
     environment:
       POSTGRES_USER: sagent
