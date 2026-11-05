@@ -38,6 +38,22 @@ def test_markdown_title_falls_back_to_stem():
     assert load("guides/deploy.md", b"just text").title == "deploy"
 
 
+def test_crlf_front_matter_is_stripped_and_title_used():
+    raw = b"---\r\ntitle: My Doc\r\n---\r\n# Heading\r\n\r\nBody.\r\n"
+    doc, _ = load_with_meta("a.md", raw)
+    assert doc.title == "My Doc"
+    assert "title:" not in doc.markdown and "\r" not in doc.markdown
+
+
+def test_bom_is_dropped():
+    assert load("a.md", b"\xef\xbb\xbf# Hello\n\nbody").title == "Hello"
+
+
+def test_non_utf8_markdown_is_rejected():
+    with pytest.raises(ValueError, match="not valid UTF-8"):
+        load("a.md", b"# T\n\n\xff\xfe bad")
+
+
 def test_empty_markdown_raises():
     with pytest.raises(EmptyDocument):
         load("a.md", b"   \n")

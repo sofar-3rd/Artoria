@@ -21,7 +21,11 @@ def first_h1(body: str) -> str | None:
 
 
 def load_markdown(path: str, raw: bytes) -> tuple[LoadedDoc, str]:
-    text = raw.decode("utf-8", errors="replace")
+    try:
+        text = raw.decode("utf-8-sig")  # strict; also drops a BOM
+    except UnicodeDecodeError as exc:
+        raise ValueError(f"not valid UTF-8: {path}") from exc
+    text = text.replace("\r\n", "\n").replace("\r", "\n")  # offsets and front matter assume LF
     meta, body = split_front_matter(text)
     if not body.strip():
         raise EmptyDocument(path)
