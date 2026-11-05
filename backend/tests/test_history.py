@@ -1,3 +1,4 @@
+import pytest
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
 from app.history import CANCELLED_TEXT, cancel_messages, find_dangling, text_of, to_view
@@ -48,3 +49,21 @@ def test_find_dangling_and_cancel():
     assert cancelled[0].tool_call_id == "c1"
     assert cancelled[0].content == CANCELLED_TEXT
     assert find_dangling(msgs + cancelled) == []
+
+
+@pytest.mark.parametrize("latest, expected", [
+    (AIMessage(content="done"), []),
+    (AIMessage(content="", tool_calls=[{**CALL, "id": "c2"}]), ["c2"]),
+])
+def test_find_dangling_only_considers_latest_ai_message(latest, expected):
+    msgs = [AIMessage(content="", tool_calls=[CALL]), HumanMessage("next"), latest]
+    assert [call["id"] for call in find_dangling(msgs)] == expected
+
+
+def test_find_dangling_matches_partial_parallel_results():
+    msgs = [
+        AIMessage(content="", tool_calls=[CALL, {**CALL, "id": "c2"}]),
+        ToolMessage(content="3", tool_call_id="c2"),
+    ]
+    assert [call["id"] for call in find_dangling(msgs)] == ["c1"]
+    assert find_dangling(msgs + [ToolMessage(content="3", tool_call_id="c1")]) == []

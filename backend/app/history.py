@@ -48,15 +48,14 @@ def to_view(messages: list[BaseMessage]) -> list[dict]:
 
 
 def find_dangling(messages: list[BaseMessage]) -> list[dict]:
-    """Return tool calls that have no matching ToolMessage."""
-    answered = {m.tool_call_id for m in messages if isinstance(m, ToolMessage)}
-    return [
-        tc
-        for m in messages
-        if isinstance(m, AIMessage)
-        for tc in m.tool_calls
-        if tc["id"] not in answered
-    ]
+    """Return unanswered calls from the latest AIMessage; earlier history must be valid."""
+    answered = set()
+    for m in reversed(messages):
+        if isinstance(m, ToolMessage):
+            answered.add(m.tool_call_id)
+        elif isinstance(m, AIMessage):
+            return [tc for tc in m.tool_calls if tc["id"] not in answered]
+    return []
 
 
 def cancel_messages(dangling: list[dict]) -> list[ToolMessage]:
