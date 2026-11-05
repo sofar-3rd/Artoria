@@ -31,3 +31,7 @@ class EmbeddingModelMismatch(RagError):
 class EmptyDocument(RagError):
     def __init__(self, path: str):
         super().__init__(f"no extractable text in '{path}' (scanned PDF?)")
+
+
+class SourceUnavailable(RagError):
+    """The document source cannot be read (missing directory, bad subdir) or looks wrongly empty."""

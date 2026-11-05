@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from app.rag.core.errors import SourceUnavailable
 from app.rag.ingest.sources import DirSource, GitSource, make_source
 
 
@@ -30,6 +31,20 @@ async def test_dir_source_revision_changes_with_content(tmp_path):
     assert r1 != r2
 
 
+async def test_dir_source_missing_directory_raises(tmp_path):
+    with pytest.raises(SourceUnavailable):
+        await DirSource(tmp_path / "does-not-exist").snapshot()
+
+
+async def test_dir_source_existing_empty_directory_is_a_valid_empty_snapshot(tmp_path):
+    assert (await DirSource(tmp_path).snapshot()).files == {}
+
+
+async def test_make_source_with_missing_subdir_raises(tmp_path):
+    with pytest.raises(SourceUnavailable):
+        await make_source(f"dir:{tmp_path}", "main", "nope", tmp_path / "c").snapshot()
+
+
 def git(cwd: Path, *args: str) -> str:
     return subprocess.run(
         ["git", "-c", "user.name=t", "-c", "user.email=t@t", *args],
@@ -53,6 +68,16 @@ async def test_git_source_clones_and_follows_new_commits(tmp_path):
     git(origin, "add", "."); git(origin, "commit", "-q", "-m", "c2")
     s2 = await src.snapshot()
     assert s2.revision != s1.revision and s2.read("a.md") == b"# A2"
+
+
+async def test_git_source_missing_subdir_raises(tmp_path):
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    git(origin, "init", "-q", "-b", "main")
+    write(origin, "docs/a.md", b"# A")
+    git(origin, "add", "."); git(origin, "commit", "-q", "-m", "c1")
+    with pytest.raises(SourceUnavailable):
+        await GitSource(str(origin), "main", "dcos", tmp_path / "cache").snapshot()
 
 
 def test_make_source_picks_dir_for_local_directory(tmp_path):
