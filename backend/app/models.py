@@ -22,3 +22,6 @@ class Thread(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+
+
+import app.rag.persistence.models  # noqa: E402,F401  (register tables on Base.metadata)

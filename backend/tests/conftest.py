@@ -42,7 +42,10 @@ def count_checkpoints(thread_id: str) -> int:
 
 def _truncate() -> None:
     with psycopg.connect(TEST_URL, autocommit=True) as conn:
-        conn.execute("TRUNCATE threads, checkpoints, checkpoint_blobs, checkpoint_writes")
+        conn.execute(
+            "TRUNCATE threads, checkpoints, checkpoint_blobs, checkpoint_writes, "
+            "chunks, documents, knowledge_bases CASCADE"
+        )
 
 
 @pytest.fixture
