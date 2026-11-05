@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -81,6 +82,23 @@ async def test_symlinks_are_not_followed(tmp_path):
     (kb / "dir-link").symlink_to(outside, target_is_directory=True)
     snap = await DirSource(kb).snapshot()
     assert list(snap.files) == ["a.md"]
+
+
+@pytest.mark.skipif(not hasattr(os, "mkfifo"), reason="needs POSIX FIFOs")
+def test_fifo_named_like_a_document_is_skipped_not_opened(tmp_path):
+    # open() on a FIFO blocks forever and cannot be interrupted inside a worker thread, so run the scan
+    # in a child process with a hard timeout instead of risking a hung test run.
+    (tmp_path / "a.md").write_bytes(b"# A")
+    os.mkfifo(tmp_path / "pipe.md")
+    code = (
+        "import sys; from pathlib import Path; from app.rag.ingest.sources.dir import scan; "
+        "print(sorted(scan(Path(sys.argv[1]))))"
+    )
+    done = subprocess.run(
+        [sys.executable, "-c", code, str(tmp_path)], capture_output=True, text=True, timeout=20,
+    )
+    assert done.returncode == 0, done.stderr
+    assert done.stdout.strip() == "['a.md']"
 
 
 @pytest.mark.skipif(os.geteuid() == 0, reason="root can read everything")

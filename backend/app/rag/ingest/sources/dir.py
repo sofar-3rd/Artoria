@@ -40,7 +40,8 @@ def scan(root: Path) -> dict[str, str]:
         )
         for name in sorted(filenames):
             path = Path(dirpath) / name
-            if name.startswith(".") or path.is_symlink():
+            # Only regular files: opening a FIFO or socket named *.md would block this thread forever.
+            if name.startswith(".") or path.is_symlink() or not path.is_file():
                 continue
             if path.suffix.lower() in SUPPORTED_EXTENSIONS:
                 files[path.relative_to(root).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
