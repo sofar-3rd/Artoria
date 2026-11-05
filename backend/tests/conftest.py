@@ -49,6 +49,15 @@ def _truncate() -> None:
         )
 
 
+@pytest.fixture(autouse=True)
+def _clean_rag_tables(request):
+    """Start every rag test from empty rag tables, so tests neither depend on order nor on earlier failures."""
+    if "tests/rag" in str(request.node.fspath).replace("\\", "/"):
+        with psycopg.connect(TEST_URL, autocommit=True) as conn:
+            conn.execute("TRUNCATE chunks, documents, knowledge_bases CASCADE")
+    yield
+
+
 @pytest.fixture
 def running_app():
     from tests.fakes import Scripted

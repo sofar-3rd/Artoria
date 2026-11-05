@@ -25,8 +25,12 @@ async def test_cascade_delete_and_vector_roundtrip():
                        end_char=4, content="body", embedding=[0.1] * 1024))
         await s.flush()
         await s.execute(text("UPDATE chunks SET tsv = " + fts.tsvector_sql("t")), {"t": "回滚部署"})
-        n = (await s.execute(text("SELECT count(*) FROM chunks WHERE tsv @@ to_tsquery('jiebacfg','回滚')"))).scalar()
+        n = (await s.execute(
+            text(f"SELECT count(*) FROM chunks WHERE kb_id = :kb AND tsv @@ {fts.tsquery_or_sql('q')}"),
+            {"kb": kb.id, "q": "回滚"},
+        )).scalar()
         assert n == 1
+        kb_id = kb.id
         await s.delete(kb); await s.commit()
-        left = (await s.execute(text("SELECT count(*) FROM chunks"))).scalar()
+        left = (await s.execute(text("SELECT count(*) FROM chunks WHERE kb_id = :kb"), {"kb": kb_id})).scalar()
         assert left == 0
