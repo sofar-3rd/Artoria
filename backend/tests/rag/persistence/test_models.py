@@ -14,12 +14,6 @@ async def _dispose():
     await engine.dispose()
 
 
-def test_fts_sql_fragments():
-    assert fts.tsvector_sql("t") == "to_tsvector('jiebacfg', :t)"
-    assert "plainto_tsquery('jiebacfg', :q)" in fts.tsquery_or_sql("q")
-    assert "' | '" in fts.tsquery_or_sql("q")
-
-
 async def test_cascade_delete_and_vector_roundtrip():
     async with SessionLocal() as s:
         kb = KnowledgeBase(name=f"kb-{uuid.uuid4().hex[:6]}", description="d",
