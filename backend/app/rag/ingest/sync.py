@@ -42,8 +42,15 @@ class Syncer:
             try:
                 return await self._run(kb)
             except Exception as exc:
-                await self._store.mark_failed(kb.id, (str(exc) or type(exc).__name__)[:2000])
+                await self._record_failure(kb, exc)
                 raise
+
+    async def _record_failure(self, kb: KbRef, exc: Exception) -> None:
+        """Best effort: the caller must see the ORIGINAL error even when the bookkeeping fails too."""
+        try:
+            await self._store.mark_failed(kb.id, (str(exc) or type(exc).__name__)[:2000])
+        except Exception:
+            logger.exception("sync %s: could not record the failure %r", kb.name, exc)
 
     async def _run(self, kb: KbRef) -> SyncReport:
         snap = await self._source_factory(kb).snapshot()

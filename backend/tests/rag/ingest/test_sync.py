@@ -236,6 +236,25 @@ async def test_loading_and_chunking_run_off_the_event_loop_thread(tmp_path):
     assert loop_thread not in seen  # CPU-bound work must not block the event loop (SSE streams share it)
 
 
+class FailingBookkeepingStore(Store):
+    async def doc_shas(self, kb_id):
+        raise RuntimeError("original error")
+
+    async def mark_failed(self, kb_id, error):
+        raise ConnectionError("mark_failed also down")
+
+
+async def test_the_original_error_is_raised_even_when_recording_it_fails(tmp_path):
+    w(tmp_path, "a.md", "# A\n\nalpha body text is here\n")
+    emb = HashEmbedder()
+    store = FailingBookkeepingStore(SessionLocal)
+    import uuid
+    kb = await store.create_kb(f"kb-{uuid.uuid4().hex[:6]}", "d", f"dir:{tmp_path}", "main", "", emb.model, emb.dim)
+    syncer = Syncer(store, emb, lambda k: DirSource(tmp_path), CFG, len)
+    with pytest.raises(RuntimeError, match="original error"):
+        await syncer.sync(kb.name)
+
+
 async def test_pdf_is_loaded_chunked_and_indexed(tmp_path):
     (tmp_path / "guide.pdf").write_bytes(make_pdf(["Deployment Guide", "Run kubectl rollout undo to roll back."]))
     store, kb, syncer, emb = await setup(tmp_path)
