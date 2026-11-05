@@ -3,7 +3,12 @@ import uuid
 import pytest
 
 from app.db import SessionLocal, engine
-from app.rag.core.errors import DocumentNotFound, SyncInProgress, UnknownKnowledgeBase
+from app.rag.core.errors import (
+    DocumentNotFound,
+    KnowledgeBaseExists,
+    SyncInProgress,
+    UnknownKnowledgeBase,
+)
 from app.rag.core.types import Chunk
 from app.rag.persistence.store import Store
 from tests.rag.fakes import HashEmbedder
@@ -154,3 +159,45 @@ async def test_mark_synced_and_failed():
     info = [i for i in await store.list_kbs() if i.name == kb.name][0]
     assert info.last_error is None and info.synced_at is not None
     assert (await store.get_kb(kb.name)).last_commit == "rev1"
+
+
+async def test_equal_scores_are_ordered_by_path_then_chunk_index():
+    store = Store(SessionLocal)
+    kb = await make_kb(store)
+    # Identical content and identical vectors: every score is exactly equal, so only the tiebreaker orders them.
+    for path in ("c.md", "a.md", "b.md"):
+        await put(store, kb, path, ["same text 回滚部署"])
+    qv = await emb.embed_query("same text 回滚部署")
+    runs = {
+        tuple(h.path for h in await store.hybrid_candidates([kb.id], "回滚部署", qv, 10, 10, 60))
+        for _ in range(10)
+    }
+    assert runs == {("a.md", "b.md", "c.md")}
+
+
+async def test_create_kb_with_a_duplicate_name_raises_a_domain_error():
+    store = Store(SessionLocal)
+    kb = await make_kb(store)
+    with pytest.raises(KnowledgeBaseExists) as exc:
+        await make_kb(store, kb.name)
+    assert kb.name in str(exc.value)
+    assert [i.name for i in await store.list_kbs()].count(kb.name) == 1  # the session is still usable
+
+
+async def test_replace_document_rejects_mismatched_chunk_and_vector_counts():
+    store = Store(SessionLocal)
+    kb = await make_kb(store)
+    chunks = [mk(0, "one"), mk(1, "two")]
+    with pytest.raises(ValueError, match="2 chunks but 1 vectors"):
+        await store.replace_document(kb.id, "a.md", "A", "onetwo", "s", chunks, [[0.0] * 1024])
+    assert await store.doc_shas(kb.id) == {}  # nothing was written
+
+
+async def test_read_range_clamps_negative_arguments():
+    store = Store(SessionLocal)
+    kb = await make_kb(store)
+    await put(store, kb, "a.md", ["0123456789"])
+    doc_id = (await store.hybrid_candidates([kb.id], "0123456789", await emb.embed_query("0123456789"), 5, 5, 60))[0].doc_id
+    page = await store.read_range(uuid.UUID(doc_id), -3, 4)
+    assert (page.offset, page.text) == (0, "0123")
+    assert (await store.read_range(uuid.UUID(doc_id), 2, -5)).text == ""

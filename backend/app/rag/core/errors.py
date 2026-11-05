@@ -10,6 +10,12 @@ class UnknownKnowledgeBase(RagError):
         )
 
 
+class KnowledgeBaseExists(RagError):
+    def __init__(self, name: str):
+        self.name = name
+        super().__init__(f"knowledge base '{name}' already exists")
+
+
 class DocumentNotFound(RagError):
     def __init__(self, doc_id: str):
         super().__init__(f"document '{doc_id}' not found")

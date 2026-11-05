@@ -5,7 +5,14 @@ from dataclasses import dataclass
 from sqlalchemy import delete, func, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.rag.core.errors import DocumentNotFound, SyncInProgress, UnknownKnowledgeBase
+from sqlalchemy.exc import IntegrityError
+
+from app.rag.core.errors import (
+    DocumentNotFound,
+    KnowledgeBaseExists,
+    SyncInProgress,
+    UnknownKnowledgeBase,
+)
 from app.rag.core.types import Chunk, DocPage, Hit, KbInfo
 from app.rag.persistence import fts
 from app.rag.persistence.models import ChunkRow, Document, KnowledgeBase
@@ -40,15 +47,15 @@ def _ref(k: KnowledgeBase) -> KbRef:
 
 HYBRID_SQL = f"""
 WITH dense AS (
-  SELECT id, row_number() OVER (ORDER BY embedding <=> CAST(:qvec AS vector)) AS r
-  FROM chunks WHERE kb_id = ANY(:kb_ids)
-  ORDER BY embedding <=> CAST(:qvec AS vector) LIMIT :recall
+  SELECT c.id, row_number() OVER (ORDER BY c.embedding <=> CAST(:qvec AS vector), d.path, c.idx) AS r
+  FROM chunks c JOIN documents d ON d.id = c.doc_id WHERE c.kb_id = ANY(:kb_ids)
+  ORDER BY c.embedding <=> CAST(:qvec AS vector), d.path, c.idx LIMIT :recall
 ), q AS (SELECT {fts.tsquery_or_sql('query')} AS tq),
 sparse AS (
-  SELECT c.id, row_number() OVER (ORDER BY ts_rank_cd(c.tsv, q.tq) DESC) AS r
-  FROM chunks c, q
+  SELECT c.id, row_number() OVER (ORDER BY ts_rank_cd(c.tsv, q.tq) DESC, d.path, c.idx) AS r
+  FROM chunks c JOIN documents d ON d.id = c.doc_id, q
   WHERE c.kb_id = ANY(:kb_ids) AND c.tsv @@ q.tq
-  ORDER BY ts_rank_cd(c.tsv, q.tq) DESC LIMIT :recall
+  ORDER BY ts_rank_cd(c.tsv, q.tq) DESC, d.path, c.idx LIMIT :recall
 ), fused AS (
   SELECT coalesce(d.id, s.id) AS id,
          coalesce(1.0 / (:rrf_k + d.r), 0) + coalesce(1.0 / (:rrf_k + s.r), 0) AS score
@@ -58,7 +65,7 @@ SELECT c.id, k.name AS kb, d.id AS doc_id, d.path, d.title, c.heading_path,
        c.start_char, c.end_char, length(d.content) AS doc_chars, c.content, f.score
 FROM fused f JOIN chunks c ON c.id = f.id
 JOIN documents d ON d.id = c.doc_id JOIN knowledge_bases k ON k.id = c.kb_id
-ORDER BY f.score DESC LIMIT :limit
+ORDER BY f.score DESC, d.path, c.idx LIMIT :limit
 """
 
 UPSERT_DOC_SQL = """
@@ -103,7 +110,13 @@ class Store:
                                branch=branch, subdir=subdir, embed_model=embed_model,
                                embed_dim=embed_dim)
             s.add(kb)
-            await s.flush()
+            try:
+                await s.flush()
+            except IntegrityError as exc:
+                await s.rollback()
+                if "knowledge_bases_name_key" in str(exc.orig):
+                    raise KnowledgeBaseExists(name) from exc
+                raise
             ref = _ref(kb)
             await s.commit()
             return ref
@@ -151,6 +164,8 @@ class Store:
     async def replace_document(self, kb_id: uuid.UUID, path: str, title: str, content: str,
                                sha: str, chunks: list[Chunk],
                                vectors: list[list[float]]) -> None:
+        if len(chunks) != len(vectors):
+            raise ValueError(f"{len(chunks)} chunks but {len(vectors)} vectors for '{path}'")
         async with self._sm() as s:
             async with s.begin():
                 doc_id = (await s.execute(text(UPSERT_DOC_SQL), {
@@ -200,6 +215,7 @@ class Store:
             return DocRef(row.id, row.kb_id, row.path, row.title, row.content)
 
     async def read_range(self, doc_id: uuid.UUID, offset: int, limit: int) -> DocPage:
+        offset, limit = max(offset, 0), max(limit, 0)
         async with self._sm() as s:
             row = (await s.execute(text(PAGE_SQL), {
                 "doc_id": doc_id, "offset": offset, "lim": limit,
