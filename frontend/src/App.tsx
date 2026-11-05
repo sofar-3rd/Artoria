@@ -9,10 +9,16 @@ import Sidebar from './components/Sidebar'
 export default function App() {
   const [threads, setThreads] = useState<Thread[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [streaming, setStreaming] = useState(false)
+  // Messages per thread, so a background run keeps updating its own thread.
+  const [chats, setChats] = useState<Record<string, Message[]>>({})
+  const [streamingIds, setStreamingIds] = useState<Set<string>>(new Set())
   const [error, setError] = useState<string | null>(null)
-  const abortRef = useRef<AbortController | null>(null)
+  const ctrls = useRef<Map<string, AbortController>>(new Map())
+  const activeRef = useRef<string | null>(null)
+  activeRef.current = activeId
+
+  const messages = activeId ? (chats[activeId] ?? []) : []
+  const streaming = activeId !== null && streamingIds.has(activeId)
 
   const refreshThreads = useCallback(async () => {
     setThreads(await api.listThreads())
@@ -22,26 +28,25 @@ export default function App() {
     refreshThreads().catch((e) => setError(String(e)))
   }, [refreshThreads])
 
-  const stop = useCallback(() => {
-    abortRef.current?.abort()
-    abortRef.current = null
+  // Explicit stop (stop button, thread deletion): aborts only that thread's run.
+  const stopThread = useCallback((id: string | null) => {
+    if (id) ctrls.current.get(id)?.abort()
   }, [])
 
   const newChat = () => {
-    stop()
     setActiveId(null)
-    setMessages([])
     setError(null)
   }
 
   const selectThread = async (id: string) => {
     if (id === activeId) return
-    stop()
     setError(null)
     setActiveId(id)
-    setMessages([])
+    // A running thread already holds the live messages; do not overwrite them.
+    if (ctrls.current.has(id)) return
     try {
-      setMessages(await api.getMessages(id))
+      const loaded = await api.getMessages(id)
+      if (!ctrls.current.has(id)) setChats((prev) => ({ ...prev, [id]: loaded }))
     } catch (e) {
       setError(String(e))
     }
@@ -50,7 +55,12 @@ export default function App() {
   const removeThread = async (id: string) => {
     if (!window.confirm('删除这个会话?')) return
     try {
+      stopThread(id)
       await api.deleteThread(id)
+      setChats((prev) => {
+        const { [id]: _removed, ...rest } = prev
+        return rest
+      })
       if (id === activeId) newChat()
       await refreshThreads()
     } catch (e) {
@@ -72,27 +82,41 @@ export default function App() {
         return
       }
     }
-    setMessages((prev) => [...prev, { role: 'user', content: text }])
+    const threadId = id
+    const patch = (fn: (m: Message[]) => Message[]) =>
+      setChats((prev) => ({ ...prev, [threadId]: fn(prev[threadId] ?? []) }))
+    const setRunning = (on: boolean) =>
+      setStreamingIds((prev) => {
+        const next = new Set(prev)
+        if (on) next.add(threadId)
+        else next.delete(threadId)
+        return next
+      })
+    const report = (msg: string) => {
+      if (activeRef.current === threadId) setError(msg)
+    }
+
+    patch((prev) => [...prev, { role: 'user', content: text }])
 
     const ctrl = new AbortController()
-    abortRef.current = ctrl
-    setStreaming(true)
+    ctrls.current.set(threadId, ctrl)
+    setRunning(true)
     try {
       await api.streamChat(
-        id,
+        threadId,
         text,
         (ev) => {
           if (ctrl.signal.aborted) return
-          if (ev.event === 'error') setError(ev.data.message)
-          else setMessages((prev) => applyEvent(prev, ev))
+          if (ev.event === 'error') report(ev.data.message)
+          else patch((prev) => applyEvent(prev, ev))
         },
         ctrl.signal,
       )
     } catch (e) {
-      if (!ctrl.signal.aborted) setError(String(e))
+      if (!ctrl.signal.aborted) report(String(e))
     } finally {
-      if (abortRef.current === ctrl) abortRef.current = null
-      setStreaming(false)
+      if (ctrls.current.get(threadId) === ctrl) ctrls.current.delete(threadId)
+      setRunning(false)
       refreshThreads().catch(() => {})
     }
   }
@@ -111,7 +135,7 @@ export default function App() {
         {error && (
           <div className="mx-auto w-full max-w-3xl px-4 pb-2 text-sm text-red-600">{error}</div>
         )}
-        <InputBox streaming={streaming} onSend={send} onStop={stop} />
+        <InputBox streaming={streaming} onSend={send} onStop={() => stopThread(activeId)} />
       </main>
     </div>
   )
