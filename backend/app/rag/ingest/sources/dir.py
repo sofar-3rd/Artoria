@@ -40,6 +40,20 @@ def _sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def read_limited(path: Path, max_bytes: int | None = None) -> bytes:
+    """Read a document, never more than the size limit.
+
+    The limit is also checked when listing, but a file can grow between listing and reading (or be replaced
+    by a huge one). Reading `limit + 1` bytes is enough to know it is too large without loading it.
+    """
+    limit = settings.rag_max_document_bytes if max_bytes is None else max_bytes
+    with open(path, "rb") as handle:
+        data = handle.read(limit + 1)
+    if len(data) > limit:
+        raise SourceUnavailable(f"'{path.name}' is larger than the {_human(limit)} limit now; it was smaller when listed")
+    return data
+
+
 def scan(root: Path, max_bytes: int | None = None) -> tuple[dict[str, str], dict[str, str]]:
     """Hash every supported file under `root`; return `(files, skipped)`.
 
@@ -88,6 +102,6 @@ class DirSource:
         return Snapshot(
             revision=f"dir:{digest[:16]}",
             files=files,
-            reader=lambda rel: (self.root / rel).read_bytes(),
+            reader=lambda rel: read_limited(self.root / rel),
             skipped=skipped,
         )

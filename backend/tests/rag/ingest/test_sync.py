@@ -375,3 +375,27 @@ async def test_a_source_whose_every_file_is_oversized_is_not_treated_as_empty(tm
     grow_past_limit(tmp_path / "only.md", 2000)
     r = await syncer.sync(kb.name)  # must not raise SourceUnavailable("refusing to delete all ...")
     assert r.removed == 0 and len(await store.doc_shas(kb.id)) == 1
+
+
+async def test_a_file_that_grew_after_listing_is_a_per_file_failure_not_an_out_of_memory(tmp_path, monkeypatch):
+    from app.config import settings
+    from app.rag.core.types import Snapshot
+
+    monkeypatch.setattr(settings, "rag_max_document_bytes", 2000)
+    w(tmp_path, "grow.md", "# Small\n\nsmall at listing time\n")
+    w(tmp_path, "ok.md", "# OK\n\nfine body text is here\n")
+    emb = HashEmbedder()
+    store = Store(SessionLocal)
+    import uuid
+    kb = await store.create_kb(f"kb-{uuid.uuid4().hex[:6]}", "d", f"dir:{tmp_path}", "main", "", emb.model, emb.dim)
+
+    class GrowingSource:
+        async def snapshot(self):
+            snap = await DirSource(tmp_path).snapshot()
+            with open(tmp_path / "grow.md", "wb") as f:  # grows right after it was listed
+                f.write(b"z" * 5000)
+            return snap
+
+    r = await Syncer(store, emb, lambda k: GrowingSource(), CFG, len).sync(kb.name)
+    assert [p for p, _ in r.failed] == ["grow.md"] and "larger than" in r.failed[0][1]
+    assert list(await store.doc_shas(kb.id)) == ["ok.md"]

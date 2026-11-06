@@ -333,3 +333,48 @@ async def test_a_failure_moving_the_clone_into_place_is_a_source_problem(tmp_pat
     with pytest.raises(SourceUnavailable, match="could not move the fresh clone into place"):
         await src.snapshot()
     assert not list(src.workdir.parent.glob("*.tmp-*"))  # the temporary clone was cleaned up
+
+
+async def test_a_file_that_grows_after_listing_is_not_read_in_full(tmp_path, monkeypatch):
+    """The limit is enforced when READING too: listing says 8 bytes, the file is then replaced by a huge one."""
+    import resource
+
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "rag_max_document_bytes", 2000)
+    (tmp_path / "grow.md").write_bytes(b"# small\n")
+    snap = await DirSource(tmp_path).snapshot()
+    assert list(snap.files) == ["grow.md"]
+    with open(tmp_path / "grow.md", "wb") as f:
+        f.truncate(400 * 1024 * 1024)  # sparse: free to create, 400 MB if read_bytes() were used
+    before = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    with pytest.raises(SourceUnavailable, match="larger than the 2 KB limit now"):
+        snap.read("grow.md")
+    grown_mb = (resource.getrusage(resource.RUSAGE_SELF).ru_maxrss - before) / (1024 * 1024)  # bytes on macOS
+    assert grown_mb < 50, f"the process grew by {grown_mb:.0f} MB while refusing the file"
+
+
+def test_read_limited_reads_a_file_exactly_at_the_limit(tmp_path):
+    from app.rag.ingest.sources.dir import read_limited
+
+    (tmp_path / "edge.md").write_bytes(b"x" * 100)
+    assert read_limited(tmp_path / "edge.md", 100) == b"x" * 100
+    (tmp_path / "over.md").write_bytes(b"x" * 101)
+    with pytest.raises(SourceUnavailable):
+        read_limited(tmp_path / "over.md", 100)
+
+
+async def test_the_git_reader_enforces_the_limit_too(tmp_path, monkeypatch):
+    from app.config import settings
+
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    git(origin, "init", "-q", "-b", "main")
+    write(origin, "a.md", b"# small")
+    git(origin, "add", "."); git(origin, "commit", "-q", "-m", "c1")
+    monkeypatch.setattr(settings, "rag_max_document_bytes", 2000)
+    src = GitSource(str(origin), "main", "", tmp_path / "cache", owner="kb-1")
+    snap = await src.snapshot()
+    (src.workdir / "a.md").write_bytes(b"y" * 5000)  # the checkout changes after listing
+    with pytest.raises(SourceUnavailable, match="larger than"):
+        snap.read("a.md")

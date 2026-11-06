@@ -7,7 +7,7 @@ from pathlib import Path
 
 from app.rag.core.errors import SourceUnavailable
 from app.rag.core.types import Snapshot
-from app.rag.ingest.sources.dir import resolve_subdir, scan
+from app.rag.ingest.sources.dir import read_limited, resolve_subdir, scan
 
 
 # `ext::` and other helper transports run arbitrary commands; only the transports a document repository
@@ -54,7 +54,7 @@ class GitSource:
         revision = _git(self.workdir, "rev-parse", "HEAD")
         root = resolve_subdir(self.workdir, self.subdir)
         files, skipped = scan(root)
-        return Snapshot(revision, files, lambda rel: (root / rel).read_bytes(), skipped)
+        return Snapshot(revision, files, lambda rel: read_limited(root / rel), skipped)
 
     def _clone(self) -> None:
         """Clone into a temporary directory and move it into place, so a crash never leaves a half-written
