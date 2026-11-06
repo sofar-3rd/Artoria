@@ -10,19 +10,26 @@ from pathlib import Path
 
 NAME_RE = re.compile(r"^[A-Za-z0-9_\-\u4e00-\u9fff]{1,64}$")
 BRANCH_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/\-]{0,99}$")
+# NOTE: this pattern is NOT the defence against option injection through the host part (for example
+# `ssh://-oProxyCommand=...@host/r`): git itself refuses such hosts ("strange hostname blocked") and passes
+# `user@host` as one argument to ssh. The defences are the leading-dash refusal above, `--` before the url
+# in GitSource, and git's own checks.
 _REMOTE_RE = re.compile(r"^(https://|ssh://|git://)[^\s]+$|^[A-Za-z0-9._\-]+@[A-Za-z0-9.\-]+:[^\s]+$")
 
 
 def validate_name(name: str) -> str:
-    if not NAME_RE.match(name):
+    """Return the stripped name. `fullmatch`, not `match` + `$`: `$` also matches before a trailing newline."""
+    clean = name.strip()
+    if not NAME_RE.fullmatch(clean):
         raise ValueError("name must be 1-64 characters: letters, digits, '_', '-' or CJK characters")
-    return name
+    return clean
 
 
 def validate_branch(branch: str) -> str:
-    if not BRANCH_RE.match(branch) or ".." in branch:
+    clean = branch.strip()
+    if not BRANCH_RE.fullmatch(clean) or ".." in clean:
         raise ValueError("branch contains characters that are not allowed")
-    return branch
+    return clean
 
 
 def validate_repo_url(repo_url: str, *, local_root: str = "") -> str:
@@ -30,7 +37,7 @@ def validate_repo_url(repo_url: str, *, local_root: str = "") -> str:
     value = repo_url.strip()
     if not value or value.startswith("-"):
         raise ValueError("repo_url must be a remote git url or an allowed local directory")
-    if _REMOTE_RE.match(value):
+    if _REMOTE_RE.fullmatch(value):
         return value
     path = value.removeprefix("dir:").strip()
     if not path:

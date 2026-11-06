@@ -81,3 +81,38 @@ def test_good_subdirs(subdir, expected):
 def test_bad_subdirs(subdir):
     with pytest.raises(ValueError):
         validate_subdir(subdir)
+
+
+@pytest.mark.parametrize("bad", ["docs\n", "docs\r\n", "\ndocs", "do\ncs", "docs\x00"])
+def test_a_name_with_a_line_break_is_refused_or_cleaned_never_stored_as_is(bad):
+    # `$` matches before a trailing newline, so a `match` based check accepted "docs\n".
+    try:
+        cleaned = validate_name(bad)
+    except ValueError:
+        return
+    assert cleaned == cleaned.strip() and "\n" not in cleaned and "\x00" not in cleaned
+
+
+def test_names_and_branches_are_returned_stripped():
+    assert validate_name("  docs  ") == "docs"
+    assert validate_branch(" main ") == "main"
+
+
+@pytest.mark.parametrize("bad", ["main\nx", "ma\nin", "main\x00"])
+def test_a_branch_with_an_embedded_line_break_is_refused(bad):
+    with pytest.raises(ValueError):
+        validate_branch(bad)
+
+
+def test_a_url_with_an_embedded_line_break_is_refused():
+    for url in ("https://h/r.git\nX", "https://h/\nr.git", "git@h:o/r.git\n-x"):
+        with pytest.raises(ValueError):
+            validate_repo_url(url)
+
+
+def test_the_remote_pattern_itself_rejects_a_trailing_newline():
+    from app.rag.interfaces.validation import _REMOTE_RE
+
+    assert _REMOTE_RE.fullmatch("https://h/r.git")
+    assert not _REMOTE_RE.fullmatch("https://h/r.git\n")
+    assert not _REMOTE_RE.fullmatch("git@h:o/r.git\n")

@@ -3,6 +3,7 @@ import hmac
 import logging
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from pydantic import ValidationError
 
 from app.config import settings
 from app.rag.bootstrap import Rag
@@ -12,6 +13,8 @@ from app.schemas import KbCreate, KbDetail, KbOut
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+MAX_BODY_BYTES = 64 * 1024  # a knowledge base definition is a few hundred bytes
 
 
 def get_rag(request: Request) -> Rag:
@@ -36,7 +39,14 @@ async def list_kbs(rag: Rag = Depends(get_rag)):
 
 
 @router.post("/kbs", response_model=KbOut, status_code=201, dependencies=[Depends(require_admin)])
-async def create_kb(body: KbCreate, rag: Rag = Depends(get_rag)):
+async def create_kb(request: Request, rag: Rag = Depends(get_rag)):
+    # `require_admin` runs before this body is read: FastAPI parses a declared body model BEFORE dependencies
+    # finish, so an unauthenticated caller would otherwise get validation errors and force JSON decoding.
+    raw = await _read_limited(request)
+    try:
+        body = KbCreate.model_validate_json(raw)
+    except ValidationError as exc:
+        raise HTTPException(status_code=422, detail=[{"loc": e["loc"], "msg": e["msg"]} for e in exc.errors()]) from exc
     try:
         name = validate_name(body.name)
         branch = validate_branch(body.branch)
@@ -50,6 +60,19 @@ async def create_kb(body: KbCreate, rag: Rag = Depends(get_rag)):
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     return KbOut(name=kb.name, description=kb.description, doc_count=0, synced_at=None, last_error=None)
+
+
+async def _read_limited(request: Request) -> bytes:
+    declared = request.headers.get("content-length")
+    if declared is not None and declared.isdigit() and int(declared) > MAX_BODY_BYTES:
+        raise HTTPException(status_code=413, detail="request body too large")
+    chunks, size = [], 0
+    async for chunk in request.stream():  # also covers chunked uploads that declare no length
+        size += len(chunk)
+        if size > MAX_BODY_BYTES:
+            raise HTTPException(status_code=413, detail="request body too large")
+        chunks.append(chunk)
+    return b"".join(chunks)
 
 
 async def _info(rag: Rag, name: str):

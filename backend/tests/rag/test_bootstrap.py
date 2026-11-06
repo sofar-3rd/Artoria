@@ -40,3 +40,25 @@ def test_importing_the_app_does_not_load_torch_or_the_pdf_stack():
     )
     done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=120)
     assert done.returncode == 0, done.stdout + done.stderr
+
+
+def test_the_default_source_factory_gives_every_knowledge_base_its_own_git_checkout(tmp_path, monkeypatch):
+    """The default factory is what production uses; tests normally inject their own, so pin it here."""
+    import uuid
+
+    from app.config import settings
+    from app.rag.ingest.sources import GitSource
+    from app.rag.persistence.store import KbRef
+
+    monkeypatch.setattr(settings, "rag_clone_dir", str(tmp_path))
+    rag = build_rag(embedder=HashEmbedder(), reranker=None, count_tokens=len)
+    factory = rag.syncer._source_factory
+
+    def ref(subdir):
+        return KbRef(uuid.uuid4(), "k", "d", "https://example.com/r.git", "main", subdir, "m", 1024, None)
+
+    a, b = factory(ref("a")), factory(ref("b"))
+    assert isinstance(a, GitSource) and isinstance(b, GitSource)
+    assert a.workdir != b.workdir  # same repository, same branch: still separate checkouts
+    same = ref("a")
+    assert factory(same).workdir == factory(same).workdir  # but stable for one knowledge base

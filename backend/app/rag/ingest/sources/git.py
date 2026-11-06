@@ -1,6 +1,7 @@
 import asyncio
 import hashlib
 import os
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -30,20 +31,23 @@ def _last_line(text: str) -> str:
 
 
 class GitSource:
-    def __init__(self, url: str, branch: str, subdir: str, cache_dir: Path):
+    def __init__(self, url: str, branch: str, subdir: str, cache_dir: Path, owner: str = ""):
         # A value starting with "-" would be parsed by git as an option (for example --upload-pack=CMD).
         for label, value in (("repo url", url), ("branch", branch)):
             if not value.strip() or value.strip().startswith("-"):
                 raise ValueError(f"invalid {label}: {value!r}")
         self.url, self.branch, self.subdir = url, branch, subdir
-        key = hashlib.sha256(f"{url}@{branch}".encode()).hexdigest()[:16]
+        # One checkout PER KNOWLEDGE BASE (`owner`), not per url@branch. Two knowledge bases on one repository
+        # that shared a checkout could `reset --hard` it under each other while the first was still reading
+        # the files of its snapshot (measured: text of a newer commit indexed under an older sha). Syncs of
+        # ONE knowledge base are already serialised by the database lock, so a checkout has a single user.
+        key = hashlib.sha256(f"{owner}|{url}@{branch}".encode()).hexdigest()[:16]
         self.workdir = Path(cache_dir) / key
         resolve_subdir(self.workdir, subdir)  # validate early: an unsafe subdir fails at construction
 
     def _sync(self) -> Snapshot:
         if not (self.workdir / ".git").exists():
-            self.workdir.parent.mkdir(parents=True, exist_ok=True)
-            _git(None, "clone", "--quiet", "--branch", self.branch, "--", self.url, str(self.workdir))
+            self._clone()
         else:
             _git(self.workdir, "fetch", "--quiet", "origin", self.branch)
             _git(self.workdir, "reset", "--quiet", "--hard", f"origin/{self.branch}")
@@ -51,6 +55,20 @@ class GitSource:
         root = resolve_subdir(self.workdir, self.subdir)
         files = scan(root)
         return Snapshot(revision, files, lambda rel: (root / rel).read_bytes())
+
+    def _clone(self) -> None:
+        """Clone into a temporary directory and move it into place, so a crash never leaves a half-written
+        checkout that makes every later sync fail with "destination already exists"."""
+        self.workdir.parent.mkdir(parents=True, exist_ok=True)
+        if self.workdir.exists():  # leftover of an interrupted run: it has no .git, so it is not a checkout
+            shutil.rmtree(self.workdir)
+        tmp = self.workdir.with_name(f"{self.workdir.name}.tmp-{os.getpid()}")
+        shutil.rmtree(tmp, ignore_errors=True)
+        try:
+            _git(None, "clone", "--quiet", "--branch", self.branch, "--", self.url, str(tmp))
+            os.replace(tmp, self.workdir)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
 
     async def snapshot(self) -> Snapshot:
         return await asyncio.to_thread(self._sync)

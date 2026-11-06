@@ -255,6 +255,37 @@ async def test_the_original_error_is_raised_even_when_recording_it_fails(tmp_pat
         await syncer.sync(kb.name)
 
 
+class ShiftingSource:
+    """Lists one version of a file but serves another: the file changed (or a checkout moved) mid-sync."""
+
+    def __init__(self, root):
+        self._root = root
+
+    async def snapshot(self):
+        snap = await DirSource(self._root).snapshot()
+        listed = dict(snap.files)
+
+        def reader(path):
+            return b"# Changed\n\ncontent that no longer matches the listed sha\n"
+
+        from app.rag.core.types import Snapshot
+
+        return Snapshot(snap.revision, listed, reader)
+
+
+async def test_bytes_that_do_not_match_the_listed_sha_are_a_per_file_failure(tmp_path):
+    w(tmp_path, "a.md", "# A\n\noriginal body text is here\n")
+    emb = HashEmbedder()
+    store = Store(SessionLocal)
+    import uuid
+    kb = await store.create_kb(f"kb-{uuid.uuid4().hex[:6]}", "d", f"dir:{tmp_path}", "main", "", emb.model, emb.dim)
+    r = await Syncer(store, emb, lambda k: ShiftingSource(tmp_path), CFG, len).sync(kb.name)
+    assert [p for p, _ in r.failed] == ["a.md"] and "changed while it was being synced" in r.failed[0][1]
+    assert await store.doc_shas(kb.id) == {}  # nothing was indexed under a sha it does not match
+    info = [i for i in await store.list_kbs() if i.name == kb.name][0]
+    assert info.synced_at is None  # and the revision was not marked as done, so the next run retries
+
+
 async def test_pdf_is_loaded_chunked_and_indexed(tmp_path):
     (tmp_path / "guide.pdf").write_bytes(make_pdf(["Deployment Guide", "Run kubectl rollout undo to roll back."]))
     store, kb, syncer, emb = await setup(tmp_path)

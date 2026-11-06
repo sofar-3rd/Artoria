@@ -7,7 +7,7 @@ from app.rag.ingest.sources.git import GitSource
 __all__ = ["DirSource", "GitSource", "make_source"]
 
 
-def make_source(location: str, branch: str, subdir: str, cache_dir: Path) -> DocSource:
+def make_source(location: str, branch: str, subdir: str, cache_dir: Path, owner: str = "") -> DocSource:
     location = location.strip()
     path_part = location.removeprefix("dir:").strip()
     if not path_part:
@@ -15,4 +15,4 @@ def make_source(location: str, branch: str, subdir: str, cache_dir: Path) -> Doc
     local = Path(path_part)
     if location.startswith("dir:") or local.is_dir():
         return DirSource(resolve_subdir(local, subdir))
-    return GitSource(location, branch, subdir, cache_dir)
+    return GitSource(location, branch, subdir, cache_dir, owner)

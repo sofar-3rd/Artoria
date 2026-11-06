@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import logging
 from collections.abc import Callable
 
@@ -98,6 +99,13 @@ class Syncer:
         )
 
     def _prepare(self, snap: Snapshot, path: str):
-        doc, tags = load_with_meta(path, snap.read(path))
+        raw = snap.read(path)
+        # The sha stored with the document is what later syncs compare against. If the bytes we are about to
+        # index are not the bytes that sha was computed from (the file changed between listing and reading,
+        # or a shared checkout moved), indexing them would store text under the wrong sha and the next sync
+        # would silently never repair it. Fail the file instead; the next run retries it.
+        if hashlib.sha256(raw).hexdigest() != snap.files[path]:
+            raise SourceUnavailable(f"'{path}' changed while it was being synced; it will be retried on the next sync")
+        doc, tags = load_with_meta(path, raw)
         chunked = chunk_markdown(doc.markdown, doc.title, tags, self._cfg, self._count_tokens)
         return doc, chunked.chunks

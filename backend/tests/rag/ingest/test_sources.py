@@ -211,3 +211,37 @@ async def test_git_runs_with_a_protocol_allow_list_and_no_prompts(tmp_path, monk
     assert captured["env"]["GIT_ALLOW_PROTOCOL"] == "https:ssh:git:file"
     assert "ext" not in captured["env"]["GIT_ALLOW_PROTOCOL"].split(":")
     assert captured["env"]["GIT_TERMINAL_PROMPT"] == "0"
+
+
+def test_two_owners_of_the_same_repository_get_separate_checkouts(tmp_path):
+    a = GitSource("https://example.com/r.git", "main", "a", tmp_path, owner="kb-1")
+    b = GitSource("https://example.com/r.git", "main", "b", tmp_path, owner="kb-2")
+    again = GitSource("https://example.com/r.git", "main", "a", tmp_path, owner="kb-1")
+    assert a.workdir != b.workdir and a.workdir == again.workdir
+
+
+async def test_a_second_owner_does_not_move_the_first_owners_checkout(tmp_path):
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    git(origin, "init", "-q", "-b", "main")
+    write(origin, "a/x.md", b"# A v1"); write(origin, "b/y.md", b"# B v1")
+    git(origin, "add", "."); git(origin, "commit", "-q", "-m", "c1")
+    a = GitSource(str(origin), "main", "a", tmp_path / "cache", owner="kb-1")
+    b = GitSource(str(origin), "main", "b", tmp_path / "cache", owner="kb-2")
+    snap_a = await a.snapshot()
+    write(origin, "a/x.md", b"# A v2 newer"); git(origin, "commit", "-qam", "c2")
+    await b.snapshot()  # another knowledge base syncs the same repository at the newer commit
+    assert snap_a.read("x.md") == b"# A v1"  # the first one still reads the commit it listed
+
+
+async def test_a_half_written_checkout_directory_is_replaced_not_fatal(tmp_path):
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    git(origin, "init", "-q", "-b", "main")
+    write(origin, "a.md", b"# A")
+    git(origin, "add", "."); git(origin, "commit", "-q", "-m", "c1")
+    src = GitSource(str(origin), "main", "", tmp_path / "cache", owner="kb-1")
+    src.workdir.mkdir(parents=True)
+    (src.workdir / "leftover.txt").write_text("interrupted clone")  # a directory without .git
+    assert list((await src.snapshot()).files) == ["a.md"]
+    assert not list(src.workdir.parent.glob("*.tmp-*"))  # no temporary clone left behind

@@ -40,7 +40,7 @@ def build_rag(
     store = Store(SessionLocal)
     cache_dir = Path(settings.rag_clone_dir)
     source_factory = source_factory or (
-        lambda kb: make_source(kb.repo_url, kb.branch, kb.subdir, cache_dir)
+        lambda kb: make_source(kb.repo_url, kb.branch, kb.subdir, cache_dir, owner=str(kb.id))
     )
     cfg = ChunkConfig(
         target_tokens=settings.rag_chunk_target_tokens,

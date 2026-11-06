@@ -211,3 +211,64 @@ async def test_shutdown_waits_for_a_running_sync_before_the_pool_closes(tmp_path
             assert not finished.is_set()
     assert finished.is_set()  # leaving the lifespan blocked until the sync completed
     assert app.state.sync_running == set()
+
+
+async def test_a_name_is_stored_stripped_never_with_a_line_break(running_app, tmp_path):
+    async with running_app([], rag=fake_rag(tmp_path)) as (_, c):
+        r = await c.post("/api/kbs", json=body(name="  trimmed-kb  "), headers=H)
+        assert r.status_code == 201 and r.json()["name"] == "trimmed-kb"
+        assert (await c.post("/api/kbs", json=body(name="bad\nname"), headers=H)).status_code == 422
+        assert [k["name"] for k in (await c.get("/api/kbs")).json()] == ["trimmed-kb"]
+
+
+@pytest.mark.parametrize("content", ["{not json", "{}", '{"name": 1, "description": 2, "repo_url": 3}', "[]", ""])
+async def test_a_wrong_token_gets_403_whatever_the_body_looks_like(running_app, tmp_path, content):
+    """FastAPI parses a declared body model before dependencies finish; the unauthenticated must learn nothing."""
+    async with running_app([], rag=fake_rag(tmp_path)) as (_, c):
+        r = await c.post("/api/kbs", content=content, headers={"X-Admin-Token": "wrong", "content-type": "application/json"})
+        assert r.status_code == 403 and "json" not in r.text.lower()
+        r = await c.post("/api/kbs", content=content, headers={"content-type": "application/json"})
+        assert r.status_code == 403
+
+
+async def test_a_valid_token_with_a_bad_body_still_gets_a_useful_422(running_app, tmp_path):
+    async with running_app([], rag=fake_rag(tmp_path)) as (_, c):
+        r = await c.post("/api/kbs", content="{not json", headers={**H, "content-type": "application/json"})
+        assert r.status_code == 422
+        r = await c.post("/api/kbs", json={"description": "d"}, headers=H)
+        assert r.status_code == 422 and any("name" in str(e["loc"]) for e in r.json()["detail"])
+
+
+async def test_an_oversized_body_is_refused_with_413_even_for_the_right_token(running_app, tmp_path):
+    async with running_app([], rag=fake_rag(tmp_path)) as (_, c):
+        huge = '{"name": "' + "x" * 200_000 + '", "description": "d", "repo_url": "https://h/r.git"}'
+        r = await c.post("/api/kbs", content=huge, headers={**H, "content-type": "application/json"})
+        assert r.status_code == 413
+        assert (await c.get("/api/kbs")).json() == []
+
+
+async def test_a_chunked_upload_without_a_declared_length_is_capped_too(running_app, tmp_path):
+    async def stream():
+        for _ in range(40):
+            yield b"x" * 4096
+
+    async with running_app([], rag=fake_rag(tmp_path)) as (_, c):
+        r = await c.post("/api/kbs", content=stream(), headers={**H, "content-type": "application/json"})
+        assert r.status_code == 413
+
+
+async def test_an_oversized_declared_length_is_refused_before_the_body_is_read(running_app, tmp_path):
+    """The Content-Length check is the cheap early exit: the body must not even be consumed."""
+    consumed = []
+
+    async def stream():
+        consumed.append(True)
+        yield b"x"
+
+    async with running_app([], rag=fake_rag(tmp_path)) as (_, c):
+        r = await c.post(
+            "/api/kbs", content=stream(),
+            headers={**H, "content-type": "application/json", "content-length": str(10_000_000)},
+        )
+        assert r.status_code == 413
+        assert consumed == []
