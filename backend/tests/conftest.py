@@ -44,7 +44,8 @@ def count_checkpoints(thread_id: str) -> int:
 def _truncate() -> None:
     with psycopg.connect(TEST_URL, autocommit=True) as conn:
         conn.execute(
-            "TRUNCATE threads, checkpoints, checkpoint_blobs, checkpoint_writes, "
+            "TRUNCATE threads, turns, turn_tool_calls, "
+            "checkpoints, checkpoint_blobs, checkpoint_writes, "
             "chunks, documents, knowledge_bases CASCADE"
         )
 
@@ -63,10 +64,12 @@ def running_app():
     from tests.fakes import Scripted
 
     @asynccontextmanager
-    async def factory(script):
+    async def factory(script, model_cls=Scripted):
         from app.main import create_app
 
-        app = create_app(model=Scripted(script=script))
+        model = model_cls(script=script)
+        app = create_app(model=model)
+        app.state.test_model = model
         async with app.router.lifespan_context(app):
             _truncate()
             transport = ASGITransport(app=app)

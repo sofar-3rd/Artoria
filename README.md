@@ -12,7 +12,7 @@ docker compose up -d --wait
 cd backend
 cp .env.example .env          # set OPENAI_API_KEY (and OPENAI_BASE_URL / OPENAI_MODEL if needed)
 uv sync
-uv run alembic upgrade head   # creates the threads table; checkpoint tables are created on startup
+uv run alembic upgrade head   # app tables (threads, turns, turn_tool_calls); checkpoint tables come from startup
 uv run uvicorn app.main:app --reload --port 8000
 
 # 3. Frontend (new terminal)

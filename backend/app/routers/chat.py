@@ -2,14 +2,14 @@ import uuid
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, Request
-from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.chat_stream import run_chat
+from app.chat_stream import ChatRun
 from app.config import settings
 from app.db import get_session
 from app.models import DEFAULT_TITLE
 from app.routers.threads import get_thread_or_404
+from app.run_response import RunResponse
 from app.schemas import ChatRequest
 
 router = APIRouter()
@@ -30,7 +30,7 @@ async def chat(
     thread.updated_at = datetime.now(timezone.utc)
     await session.commit()
 
-    stream = run_chat(
+    run = ChatRun(
         request.app.state.agent, str(thread_id), body.message, settings.recursion_limit
     )
-    return StreamingResponse(stream, media_type="text/event-stream", headers=SSE_HEADERS)
+    return RunResponse(run, headers=SSE_HEADERS)

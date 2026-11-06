@@ -7,6 +7,7 @@ from psycopg.rows import dict_row
 from psycopg_pool import AsyncConnectionPool
 
 from app.agent import build_agent, build_chat_model
+from app.chat_stream import drain_wrap_ups
 from app.config import settings
 from app.db import engine
 from app.routers import chat, threads
@@ -30,6 +31,7 @@ def create_app(model: BaseChatModel | None = None) -> FastAPI:
             app.state.agent = build_agent(model or build_chat_model(), checkpointer)
             yield
         finally:
+            await drain_wrap_ups()
             await pool.close()
             await engine.dispose()
 
