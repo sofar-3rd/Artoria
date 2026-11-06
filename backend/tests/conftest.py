@@ -64,11 +64,11 @@ def running_app():
     from tests.fakes import Scripted
 
     @asynccontextmanager
-    async def factory(script, model_cls=Scripted):
+    async def factory(script, model_cls=Scripted, rag=None):
         from app.main import create_app
 
         model = model_cls(script=script)
-        app = create_app(model=model)
+        app = create_app(model=model, rag=rag)
         app.state.test_model = model
         async with app.router.lifespan_context(app):
             _truncate()

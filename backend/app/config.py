@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     db_pool_max: int = 5
 
     # RAG
+    rag_enabled: bool = False
     rag_model_dir: str = "./models"
     rag_embed_model: str = "BAAI/bge-m3"
     rag_embed_dim: int = 1024

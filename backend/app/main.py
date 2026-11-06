@@ -10,10 +10,12 @@ from app.agent import build_agent, build_chat_model
 from app.chat_stream import drain_wrap_ups
 from app.config import settings
 from app.db import engine
+from app.rag.bootstrap import Rag, build_rag
+from app.rag.interfaces.tools import build_kb_tools
 from app.routers import chat, threads
 
 
-def create_app(model: BaseChatModel | None = None) -> FastAPI:
+def create_app(model: BaseChatModel | None = None, rag: Rag | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         pool = AsyncConnectionPool(
@@ -28,7 +30,14 @@ def create_app(model: BaseChatModel | None = None) -> FastAPI:
             checkpointer = AsyncPostgresSaver(pool)
             await checkpointer.setup()
             app.state.checkpointer = checkpointer
-            app.state.agent = build_agent(model or build_chat_model(), checkpointer)
+            active_rag = rag if rag is not None else (build_rag() if settings.rag_enabled else None)
+            app.state.rag = active_rag
+            kb_tools = (
+                build_kb_tools(active_rag.catalog, active_rag.searcher, settings.rag_top_k)
+                if active_rag is not None
+                else []
+            )
+            app.state.agent = build_agent(model or build_chat_model(), checkpointer, kb_tools)
             yield
         finally:
             await drain_wrap_ups()
