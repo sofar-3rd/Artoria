@@ -13,6 +13,16 @@ from app.rag.retrieval.catalog import Catalog
 from app.rag.retrieval.search import Searcher
 
 
+class _Default:
+    """Marks an argument that was not supplied (None already has a meaning for the reranker)."""
+
+    def __repr__(self) -> str:
+        return "<default>"
+
+
+_DEFAULT = _Default()
+
+
 @dataclass
 class Rag:
     catalog: Catalog
@@ -25,16 +35,17 @@ class Rag:
 def build_rag(
     *,
     embedder: Embedder | None = None,
-    reranker: Reranker | None = None,
+    reranker: Reranker | None | _Default = _DEFAULT,
     count_tokens: Callable[[str], int] | None = None,
     source_factory: Callable[[KbRef], DocSource] | None = None,
 ) -> Rag:
     """The one place that wires concrete implementations together.
 
     Every component can be injected (tests pass fakes). Real models are imported inside the function,
-    so importing this module never loads torch.
+    so importing this module never loads torch. `reranker=None` means "no reranking" and is respected;
+    leaving it out means "use the configured reranker".
     """
-    if embedder is None or count_tokens is None:
+    if embedder is None or count_tokens is None or reranker is _DEFAULT:
         embedder, reranker, count_tokens = _real_components(embedder, reranker, count_tokens)
 
     store = Store(SessionLocal)
@@ -66,14 +77,43 @@ def build_rag(
     )
 
 
-def _real_components(embedder, reranker, count_tokens):
-    """Fill in the components that were not injected. Replaced in the real-model task.
+REQUIRED_MODEL_FILES = {
+    "bge-m3": ("config.json", "pytorch_model.bin", "tokenizer.json"),
+    "bge-reranker-v2-m3": ("config.json", "model.safetensors", "tokenizer.json"),
+}
 
-    Until then a real embedder and token counter do not exist, so anything missing is an error that
-    names exactly what is missing.
-    """
-    missing = [name for name, value in (("embedder", embedder), ("count_tokens", count_tokens)) if value is None]
-    raise RuntimeError(
-        f"missing {' and '.join(missing)}: the real bge models are not wired yet; "
-        "inject them into build_rag(), or leave RAG_ENABLED off"
-    )
+
+def check_model_files(model_dir: str, need_reranker: bool = True) -> None:
+    """Fail at start-up, with the fix in the message, instead of at the first query minutes later."""
+    root = Path(model_dir)
+    wanted = {n: f for n, f in REQUIRED_MODEL_FILES.items() if need_reranker or n != "bge-reranker-v2-m3"}
+    missing = [
+        f"{name}/{file}"
+        for name, files in wanted.items()
+        for file in files
+        if not (root / name / file).is_file()
+    ]
+    if missing:
+        raise RuntimeError(
+            f"model files not found in {root.resolve()}: {', '.join(missing)}; "
+            "run backend/scripts/download_models.py"
+        )
+
+
+def _real_components(embedder, reranker, count_tokens):
+    """Build the models for whatever was not injected. Importing them is cheap; loading is lazy."""
+    from app.rag.inference.device import resolve_device
+    from app.rag.inference.embedding import BgeM3Embedder
+    from app.rag.inference.rerank import BgeReranker
+    from app.rag.inference.tokenizer import make_token_counter
+
+    check_model_files(settings.rag_model_dir, need_reranker=reranker is _DEFAULT)
+    root = Path(settings.rag_model_dir)
+    device = resolve_device(settings.rag_device)
+    if embedder is None:
+        embedder = BgeM3Embedder(str(root / "bge-m3"), device, settings.rag_embed_batch_size)
+    if reranker is _DEFAULT:
+        reranker = BgeReranker(str(root / "bge-reranker-v2-m3"), device)
+    if count_tokens is None:
+        count_tokens = make_token_counter(str(root / "bge-m3"))
+    return embedder, reranker, count_tokens

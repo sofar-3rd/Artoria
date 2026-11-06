@@ -92,7 +92,11 @@ def test_a_command_is_required(capsys):
     assert exc.value.code == 2
 
 
-def test_without_embedder_the_cli_explains_what_to_do(monkeypatch, capsys):
-    monkeypatch.undo()  # use the real build_rag, which has no embedder yet
+def test_without_the_model_files_the_cli_explains_how_to_get_them(monkeypatch, tmp_path, capsys):
+    from app.config import settings
+
+    monkeypatch.undo()  # use the real build_rag
+    monkeypatch.setattr(settings, "rag_model_dir", str(tmp_path / "empty"))
     assert cli.main(["list"]) == 2
-    assert "RAG_ENABLED" in capsys.readouterr().err
+    err = capsys.readouterr().err
+    assert "model files not found" in err and "download_models.py" in err
