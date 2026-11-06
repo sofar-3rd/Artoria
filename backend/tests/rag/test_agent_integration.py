@@ -129,3 +129,24 @@ async def test_replacing_app_agent_tools_still_reaches_the_agent_even_with_a_rag
     async with running_app([AIMessage(content="x")], rag=make_rag()) as (app_, _):
         names = set(app_.state.agent.get_graph().nodes["tools"].data.tools_by_name)
         assert "marker_tool" in names and SEARCH in names and "calculator" not in names
+
+
+def test_a_knowledge_base_tool_cannot_silently_shadow_an_existing_tool(monkeypatch):
+    from langchain_core.tools import tool
+    from langgraph.checkpoint.memory import InMemorySaver
+
+    from app.agent import build_agent
+    from app.rag.interfaces.tools import build_kb_tools
+    from tests.fakes import Scripted
+
+    @tool
+    def read_document() -> str:
+        """A user tool that happens to share a name with a knowledge base tool."""
+        return "user's tool"
+
+    import app.agent
+
+    monkeypatch.setattr(app.agent, "TOOLS", [read_document])
+    rag = make_rag()
+    with pytest.raises(ValueError, match="duplicate tool names: read_document"):
+        build_agent(Scripted(script=[AIMessage(content="x")]), InMemorySaver(), build_kb_tools(rag.catalog, rag.searcher))

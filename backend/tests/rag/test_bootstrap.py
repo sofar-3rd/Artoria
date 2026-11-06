@@ -18,8 +18,18 @@ def test_reranker_is_optional():
 
 
 def test_without_an_embedder_the_error_says_what_to_do():
-    with pytest.raises(RuntimeError, match="RAG_ENABLED"):
+    with pytest.raises(RuntimeError, match="RAG_ENABLED") as exc:
         build_rag()
+    assert "embedder and count_tokens" in str(exc.value)
+
+
+def test_the_error_names_only_what_is_actually_missing():
+    with pytest.raises(RuntimeError) as exc:
+        build_rag(embedder=HashEmbedder())
+    assert "missing count_tokens:" in str(exc.value) and "embedder" not in str(exc.value).split(":")[0]
+    with pytest.raises(RuntimeError) as exc:
+        build_rag(count_tokens=len)
+    assert "missing embedder:" in str(exc.value)
 
 
 def test_importing_the_app_does_not_load_torch_or_the_pdf_stack():

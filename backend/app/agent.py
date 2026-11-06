@@ -61,6 +61,10 @@ def build_agent(
     Extra tools that bring knowledge base search also bring their prompt section.
     """
     all_tools = [*TOOLS, *(extra_tools or [])]
+    names = [t.name for t in all_tools]
+    duplicates = sorted({n for n in names if names.count(n) > 1})
+    if duplicates:  # create_agent keeps the last one, which would silently shadow an existing tool
+        raise ValueError(f"duplicate tool names: {', '.join(duplicates)}")
     prompt = SYSTEM_PROMPT
     if any(t.name == "search_knowledge_base" for t in all_tools):
         prompt = f"{SYSTEM_PROMPT}\n\n{KB_PROMPT}"

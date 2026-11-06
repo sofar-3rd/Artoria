@@ -65,8 +65,13 @@ def build_rag(
 
 
 def _real_components(embedder, reranker, count_tokens):
-    """Replaced in the real-model task. Until then a real embedder does not exist."""
+    """Fill in the components that were not injected. Replaced in the real-model task.
+
+    Until then a real embedder and token counter do not exist, so anything missing is an error that
+    names exactly what is missing.
+    """
+    missing = [name for name, value in (("embedder", embedder), ("count_tokens", count_tokens)) if value is None]
     raise RuntimeError(
-        "no embedder available: the real bge models are not wired yet; "
-        "inject an Embedder (and token counter) into build_rag(), or leave RAG_ENABLED off"
+        f"missing {' and '.join(missing)}: the real bge models are not wired yet; "
+        "inject them into build_rag(), or leave RAG_ENABLED off"
     )
