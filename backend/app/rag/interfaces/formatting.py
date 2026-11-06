@@ -1,4 +1,14 @@
+import re
+
 from app.rag.core.types import DocPage, KbInfo, SearchResult
+
+# Document text is untrusted: a line that looks like one of our own result markers could make the model
+# believe there is another result (with a forged path to cite). A leading backslash defuses it.
+_FORGEABLE = re.compile(r"(?m)^([ \t]*)(\[\d+\] kb: |doc: .* \| has_more: |\[truncated: call read_document)")
+
+
+def _quote(text: str) -> str:
+    return _FORGEABLE.sub(lambda m: f"{m.group(1)}\\{m.group(2)}", text)
 
 
 def format_hits(result: SearchResult, kbs: list[str]) -> str:
@@ -16,16 +26,21 @@ def format_hits(result: SearchResult, kbs: list[str]) -> str:
             f"[{n}] kb: {h.kb} | doc_id: {h.doc_id} | path: {h.path}\n"
             f"    {meta}\n"
             f"    chars: {h.start}-{h.end} of {h.doc_chars} | reranked: {str(result.reranked).lower()}\n"
-            f"{h.content}"
+            f"{_quote(h.content)}"
         )
     return "\n\n".join(blocks)
 
 
 def format_page(page: DocPage) -> str:
+    if not page.text and page.total_chars > 0 and page.offset >= page.total_chars:
+        return (
+            f"error: offset {page.offset} is past the end of '{page.path}' "
+            f"(the document has {page.total_chars} characters). Use an offset below {page.total_chars}."
+        )
     end = page.offset + len(page.text)
     out = (
         f"doc: {page.path} | title: {page.title} | chars {page.offset}-{end} "
-        f"of {page.total_chars} | has_more: {str(page.has_more).lower()}\n\n{page.text}"
+        f"of {page.total_chars} | has_more: {str(page.has_more).lower()}\n\n{_quote(page.text)}"
     )
     if page.has_more:
         out += f"\n\n[truncated: call read_document again with offset={end} to continue]"
