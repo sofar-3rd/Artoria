@@ -19,6 +19,7 @@ class Rag:
     searcher: Searcher
     syncer: Syncer
     store: Store
+    embedder: Embedder  # the model new knowledge bases are indexed with
 
 
 def build_rag(
@@ -61,6 +62,7 @@ def build_rag(
         ),
         syncer=Syncer(store, embedder, source_factory, cfg, count_tokens, settings.rag_embed_batch_size),
         store=store,
+        embedder=embedder,
     )
 
 

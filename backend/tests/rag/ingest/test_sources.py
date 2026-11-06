@@ -151,3 +151,63 @@ async def test_git_source_missing_subdir_raises(tmp_path):
 def test_make_source_picks_dir_for_local_directory(tmp_path):
     assert isinstance(make_source(str(tmp_path), "main", "", tmp_path / "c"), DirSource)
     assert isinstance(make_source("https://example.com/r.git", "main", "", tmp_path / "c"), GitSource)
+
+
+@pytest.mark.parametrize("url", ["--upload-pack=touch /tmp/pwned", "-u x", "", "   ", " --upload-pack=x", "\t-u"])
+def test_git_source_refuses_option_like_or_empty_urls(url, tmp_path):
+    with pytest.raises(ValueError, match="invalid repo url"):
+        GitSource(url, "main", "", tmp_path / "c")
+
+
+@pytest.mark.parametrize("branch", ["--config=core.sshCommand=touch /tmp/pwned", "-b", "", " --x"])
+def test_git_source_refuses_option_like_branches(branch, tmp_path):
+    with pytest.raises(ValueError, match="invalid branch"):
+        GitSource("https://example.com/r.git", branch, "", tmp_path / "c")
+
+
+async def test_git_helper_transports_are_blocked(tmp_path):
+    marker = tmp_path / "pwned"
+    src = GitSource(f"ext::sh -c touch% {marker}", "main", "", tmp_path / "cache")
+    with pytest.raises(SourceUnavailable, match="not allowed"):
+        await src.snapshot()
+    assert not marker.exists()
+
+
+async def test_git_failure_carries_gits_own_message(tmp_path):
+    with pytest.raises(SourceUnavailable) as exc:
+        await GitSource(str(tmp_path / "no-such-repo"), "main", "", tmp_path / "cache").snapshot()
+    assert "git clone failed" in str(exc.value) and "does not exist" in str(exc.value)
+
+
+async def test_the_url_is_passed_to_git_after_a_double_dash(tmp_path, monkeypatch):
+    """Defence in depth: even a value that looked harmless must reach git as an operand, never an option."""
+    from app.rag.ingest.sources import git as git_module
+
+    seen = []
+
+    def fake_git(cwd, *args):
+        seen.append(args)
+        raise SourceUnavailable("stop here")
+
+    monkeypatch.setattr(git_module, "_git", fake_git)
+    with pytest.raises(SourceUnavailable):
+        await GitSource("https://example.com/r.git", "main", "", tmp_path / "c").snapshot()
+    clone = seen[0]
+    assert clone[0] == "clone" and clone[clone.index("--") + 1] == "https://example.com/r.git"
+
+
+async def test_git_runs_with_a_protocol_allow_list_and_no_prompts(tmp_path, monkeypatch):
+    from app.rag.ingest.sources import git as git_module
+
+    captured = {}
+
+    def fake_run(cmd, **kw):
+        captured["env"] = kw["env"]
+        raise SourceUnavailable("stop here")
+
+    monkeypatch.setattr(git_module.subprocess, "run", fake_run)
+    with pytest.raises(SourceUnavailable):
+        git_module._git(None, "ls-remote", "--", "https://example.com/r.git")
+    assert captured["env"]["GIT_ALLOW_PROTOCOL"] == "https:ssh:git:file"
+    assert "ext" not in captured["env"]["GIT_ALLOW_PROTOCOL"].split(":")
+    assert captured["env"]["GIT_TERMINAL_PROMPT"] == "0"

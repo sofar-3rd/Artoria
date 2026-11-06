@@ -18,6 +18,10 @@ class Settings(BaseSettings):
 
     # RAG
     rag_enabled: bool = False
+    # Knowledge base administration over HTTP is off until a token is configured (header X-Admin-Token).
+    rag_admin_token: str = ""
+    # Local directories may be used as sources through the API only inside this directory (empty: refused).
+    rag_local_root: str = ""
     rag_model_dir: str = "./models"
     rag_embed_model: str = "BAAI/bge-m3"
     rag_embed_dim: int = 1024

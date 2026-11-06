@@ -12,7 +12,7 @@ from app.config import settings
 from app.db import engine
 from app.rag.bootstrap import Rag, build_rag
 from app.rag.interfaces.tools import build_kb_tools
-from app.routers import chat, threads
+from app.routers import chat, kb, threads
 
 
 def create_app(model: BaseChatModel | None = None, rag: Rag | None = None) -> FastAPI:
@@ -32,6 +32,8 @@ def create_app(model: BaseChatModel | None = None, rag: Rag | None = None) -> Fa
             app.state.checkpointer = checkpointer
             active_rag = rag if rag is not None else (build_rag() if settings.rag_enabled else None)
             app.state.rag = active_rag
+            app.state.sync_tasks = set()
+            app.state.sync_running = set()
             kb_tools = (
                 build_kb_tools(active_rag.catalog, active_rag.searcher, settings.rag_top_k)
                 if active_rag is not None
@@ -41,12 +43,14 @@ def create_app(model: BaseChatModel | None = None, rag: Rag | None = None) -> Fa
             yield
         finally:
             await drain_wrap_ups()
+            await kb.drain_syncs(app)
             await pool.close()
             await engine.dispose()
 
     app = FastAPI(title="sagent", lifespan=lifespan)
     app.include_router(threads.router, prefix="/api")
     app.include_router(chat.router, prefix="/api")
+    app.include_router(kb.router, prefix="/api")
     return app
 
 
