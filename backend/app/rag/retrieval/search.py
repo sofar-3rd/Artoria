@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import math
+import numbers
 from dataclasses import replace
 
 from app.rag.core.errors import EmbeddingModelMismatch
@@ -74,10 +76,19 @@ class Searcher:
             scores = await asyncio.wait_for(
                 self._reranker.rerank(query, [_rerank_text(h) for h in cands]), self._timeout_s
             )
-            if len(scores) != len(cands):
-                raise ValueError(f"reranker returned {len(scores)} scores for {len(cands)} candidates")
-        except Exception:  # includes TimeoutError: ranking must degrade, never fail the search
-            logger.exception("rerank failed; falling back to the fused order")
+            _validate_scores(scores, len(cands))
+        except Exception as exc:  # includes TimeoutError: ranking must degrade, never fail the search
+            logger.warning("rerank unavailable (%s: %s); falling back to the fused order", type(exc).__name__, exc)
             return None
         order = sorted(range(len(cands)), key=lambda i: -scores[i])  # stable: ties keep the fused order
         return [replace(cands[i], score=float(scores[i]), reranked=True) for i in order]
+
+
+def _validate_scores(scores, expected: int) -> None:
+    """A reranker that returns garbage must trigger the fallback, not a crash or a bogus 'nothing relevant'."""
+    if len(scores) != expected:
+        raise ValueError(f"reranker returned {len(scores)} scores for {expected} candidates")
+    for score in scores:
+        # numbers.Real, not (int, float): real rerankers return numpy scalars (np.float32 is not a float).
+        if isinstance(score, bool) or not isinstance(score, numbers.Real) or not math.isfinite(score):
+            raise ValueError(f"reranker returned an unusable score: {score!r}")

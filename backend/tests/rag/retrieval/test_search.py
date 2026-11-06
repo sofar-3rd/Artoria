@@ -175,3 +175,49 @@ async def test_equal_rerank_scores_keep_the_fused_order():
     reranked = await searcher(store, ConstantReranker()).search("回滚部署", [kb.name], 5)
     assert [h.content for h in reranked.hits] == [h.content for h in fused.hits]
     assert reranked.reranked is True
+
+
+class FixedScoresReranker:
+    def __init__(self, scores):
+        self._scores = scores
+
+    async def rerank(self, query, docs):
+        return self._scores
+
+
+@pytest.mark.parametrize(
+    "scores",
+    [
+        [float("nan")] * 3,
+        [0.2, float("inf"), 0.1],
+        [0.2, float("-inf"), 0.1],
+        [0.2, None, 0.1],
+        ["0.9", "0.2", "0.1"],
+        [True, False, True],
+    ],
+    ids=["nan", "+inf", "-inf", "none", "numeric-strings", "bools"],
+)
+async def test_unusable_scores_fall_back_instead_of_crashing_or_claiming_nothing_is_relevant(scores):
+    store = Store(SessionLocal)
+    kb = await seed(store, ["回滚部署甲", "回滚部署乙", "回滚部署丙"])
+    # With a threshold set, NaN used to produce reranked=True, hits=[] (a false "nothing relevant").
+    r = await searcher(store, FixedScoresReranker(scores), min_score=0.5).search("回滚部署", [kb.name], 5)
+    assert r.reranked is False and len(r.hits) == 3
+
+
+async def test_integer_scores_are_accepted():
+    store = Store(SessionLocal)
+    kb = await seed(store, ["回滚部署甲", "回滚部署乙"])
+    r = await searcher(store, FixedScoresReranker([1, 0])).search("回滚部署", [kb.name], 5)
+    assert r.reranked is True and [h.score for h in r.hits] == [1.0, 0.0]
+
+
+async def test_numpy_scalar_scores_from_a_real_model_are_accepted():
+    np = pytest.importorskip("numpy")
+    store = Store(SessionLocal)
+    kb = await seed(store, ["回滚部署甲", "回滚部署乙", "回滚部署丙"])
+    scores = [np.float32(0.2), np.float32(0.9), np.float32(0.5)]
+    r = await searcher(store, FixedScoresReranker(scores)).search("回滚部署", [kb.name], 5)
+    assert r.reranked is True
+    assert [round(h.score, 2) for h in r.hits] == [0.9, 0.5, 0.2]
+    assert all(type(h.score) is float for h in r.hits)  # plain floats leave the searcher
