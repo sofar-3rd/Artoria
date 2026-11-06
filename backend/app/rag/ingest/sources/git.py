@@ -53,8 +53,8 @@ class GitSource:
             _git(self.workdir, "reset", "--quiet", "--hard", f"origin/{self.branch}")
         revision = _git(self.workdir, "rev-parse", "HEAD")
         root = resolve_subdir(self.workdir, self.subdir)
-        files = scan(root)
-        return Snapshot(revision, files, lambda rel: (root / rel).read_bytes())
+        files, skipped = scan(root)
+        return Snapshot(revision, files, lambda rel: (root / rel).read_bytes(), skipped)
 
     def _clone(self) -> None:
         """Clone into a temporary directory and move it into place, so a crash never leaves a half-written
@@ -66,7 +66,10 @@ class GitSource:
         shutil.rmtree(tmp, ignore_errors=True)
         try:
             _git(None, "clone", "--quiet", "--branch", self.branch, "--", self.url, str(tmp))
-            os.replace(tmp, self.workdir)
+            try:
+                os.replace(tmp, self.workdir)
+            except OSError as exc:  # for example the directory appeared meanwhile: report it as a source problem
+                raise SourceUnavailable(f"could not move the fresh clone into place: {exc.strerror}") from exc
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
 

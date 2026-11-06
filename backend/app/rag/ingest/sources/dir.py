@@ -3,6 +3,7 @@ import hashlib
 import os
 from pathlib import Path
 
+from app.config import settings
 from app.rag.core.errors import SourceUnavailable
 from app.rag.core.types import Snapshot
 from app.rag.ingest.loaders import SUPPORTED_EXTENSIONS
@@ -23,9 +24,30 @@ def resolve_subdir(root: Path, subdir: str) -> Path:
     return target
 
 
-def scan(root: Path) -> dict[str, str]:
-    """Hash every supported file under `root`. Symlinks are never followed and unreadable
-    directories raise, so a permission problem cannot silently shrink the snapshot."""
+def _human(n: int) -> str:
+    for unit, size in (("GB", 1 << 30), ("MB", 1 << 20), ("KB", 1 << 10)):
+        if n >= size:
+            return f"{n / size:.1f} {unit}".replace(".0 ", " ")
+    return f"{n} bytes"
+
+
+def _sha256_file(path: Path) -> str:
+    """Hash in blocks: memory stays constant however large the file is."""
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def scan(root: Path, max_bytes: int | None = None) -> tuple[dict[str, str], dict[str, str]]:
+    """Hash every supported file under `root`; return `(files, skipped)`.
+
+    Symlinks are never followed and unreadable directories raise, so a permission problem cannot silently
+    shrink the snapshot. A file larger than `max_bytes` is not listed as a document but reported in `skipped`
+    with its reason, so the operator can see why it is missing.
+    """
+    limit = settings.rag_max_document_bytes if max_bytes is None else max_bytes
     if not root.is_dir():
         raise SourceUnavailable(f"source directory not found: {root}")
 
@@ -33,6 +55,7 @@ def scan(root: Path) -> dict[str, str]:
         raise SourceUnavailable(f"cannot read directory {err.filename}: {err.strerror}")
 
     files: dict[str, str] = {}
+    skipped: dict[str, str] = {}
     for dirpath, dirnames, filenames in os.walk(root, followlinks=False, onerror=fail):
         dirnames[:] = sorted(
             d for d in dirnames
@@ -44,8 +67,13 @@ def scan(root: Path) -> dict[str, str]:
             if name.startswith(".") or path.is_symlink() or not path.is_file():
                 continue
             if path.suffix.lower() in SUPPORTED_EXTENSIONS:
-                files[path.relative_to(root).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
-    return files
+                rel = path.relative_to(root).as_posix()
+                size = path.stat().st_size
+                if size > limit:
+                    skipped[rel] = f"file is {_human(size)}, the limit is {_human(limit)}"
+                    continue
+                files[rel] = _sha256_file(path)
+    return files, skipped
 
 
 class DirSource:
@@ -53,10 +81,13 @@ class DirSource:
         self.root = Path(root)
 
     async def snapshot(self) -> Snapshot:
-        files = await asyncio.to_thread(scan, self.root)
-        digest = hashlib.sha256(repr(sorted(files.items())).encode()).hexdigest()
+        files, skipped = await asyncio.to_thread(scan, self.root)
+        # The revision must change whenever the OUTCOME of a sync could change: a file that crosses the size
+        # limit (or comes back under it) alters `skipped` without altering `files`.
+        digest = hashlib.sha256(repr((sorted(files.items()), sorted(skipped.items()))).encode()).hexdigest()
         return Snapshot(
             revision=f"dir:{digest[:16]}",
             files=files,
             reader=lambda rel: (self.root / rel).read_bytes(),
+            skipped=skipped,
         )

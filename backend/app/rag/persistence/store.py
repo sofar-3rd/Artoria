@@ -198,6 +198,10 @@ class Store:
     async def mark_failed(self, kb_id: uuid.UUID, error: str) -> None:
         await self._update_kb(kb_id, last_error=error)
 
+    async def mark_warning(self, kb_id: uuid.UUID, message: str) -> None:
+        """Record something the operator should see after a sync that did succeed (files skipped on purpose)."""
+        await self._update_kb(kb_id, last_error=message)
+
     async def _update_kb(self, kb_id: uuid.UUID, **values) -> None:
         async with self._sm() as s:
             await s.execute(

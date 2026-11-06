@@ -32,3 +32,14 @@ def test_rag_settings_defaults():
     assert settings.rag_chunk_target_tokens == 400
     assert settings.rag_chunk_max_tokens == 512
     assert settings.rag_chunk_overlap_tokens == 50
+
+
+def test_snapshot_skipped_defaults_to_empty_and_is_independent_per_instance():
+    a, b = Snapshot("r", {}, lambda p: b""), Snapshot("r", {}, lambda p: b"")
+    assert a.skipped == {} and a.skipped is not b.skipped
+
+
+def test_sync_report_skipped_defaults_to_empty():
+    from app.rag.core.types import SyncReport
+
+    assert SyncReport("r", 0, 0, 0, 0).skipped == []

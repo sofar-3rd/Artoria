@@ -294,3 +294,84 @@ async def test_pdf_is_loaded_chunked_and_indexed(tmp_path):
     hits = await store.hybrid_candidates([kb.id], "kubectl rollout", await emb.embed_query("kubectl rollout"), 10, 10, 60)
     assert hits and hits[0].path == "guide.pdf" and hits[0].title == "guide"
 
+
+
+def grow_past_limit(path, limit):
+    path.write_bytes(b"# Big\n\n" + b"word " * (limit // 5 + 10))
+
+
+async def info_of(store, name):
+    return [i for i in await store.list_kbs() if i.name == name][0]
+
+
+async def test_an_oversized_file_is_reported_but_does_not_block_the_sync(tmp_path, monkeypatch):
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "rag_max_document_bytes", 2000)
+    w(tmp_path, "ok.md", "# OK\n\nfine body text is here\n")
+    grow_past_limit(tmp_path / "big.md", 2000)
+    store, kb, syncer, _ = await setup(tmp_path)
+    r = await syncer.sync(kb.name)
+    assert (r.added, r.failed) == (1, [])  # only ok.md; the big one is not a failure
+    assert [p for p, _ in r.skipped] == ["big.md"] and "limit is" in r.skipped[0][1]
+    info = await info_of(store, kb.name)
+    assert info.synced_at is not None  # a permanently oversized file must not keep the knowledge base "unsynced"
+    assert info.last_error and "big.md" in info.last_error  # but the operator can see it
+    assert list(await store.doc_shas(kb.id)) == ["ok.md"]
+
+
+async def test_a_document_that_grows_past_the_limit_keeps_its_last_good_version(tmp_path, monkeypatch):
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "rag_max_document_bytes", 2000)
+    w(tmp_path, "guide.md", "# Guide\n\nthe original small text\n")
+    store, kb, syncer, _ = await setup(tmp_path)
+    await syncer.sync(kb.name)
+    old_sha = (await store.doc_shas(kb.id))["guide.md"]
+    grow_past_limit(tmp_path / "guide.md", 2000)
+    r = await syncer.sync(kb.name)
+    assert r.removed == 0  # it was NOT treated as removed
+    assert (await store.doc_shas(kb.id))["guide.md"] == old_sha  # the previous version is still there
+    assert "previous version stays searchable" in r.skipped[0][1]
+
+
+async def test_the_warning_is_cleared_by_the_next_clean_sync(tmp_path, monkeypatch):
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "rag_max_document_bytes", 2000)
+    w(tmp_path, "ok.md", "# OK\n\nfine body text is here\n")
+    grow_past_limit(tmp_path / "big.md", 2000)
+    store, kb, syncer, _ = await setup(tmp_path)
+    await syncer.sync(kb.name)
+    assert (await info_of(store, kb.name)).last_error
+    (tmp_path / "big.md").unlink()
+    r = await syncer.sync(kb.name)
+    assert r.skipped == []
+    assert (await info_of(store, kb.name)).last_error is None
+
+
+async def test_a_real_failure_and_a_skipped_file_are_both_in_last_error(tmp_path, monkeypatch):
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "rag_max_document_bytes", 2000)
+    w(tmp_path, "bad.md", "   \n")
+    grow_past_limit(tmp_path / "big.md", 2000)
+    store, kb, syncer, _ = await setup(tmp_path)
+    r = await syncer.sync(kb.name)
+    assert [p for p, _ in r.failed] == ["bad.md"]
+    info = await info_of(store, kb.name)
+    assert info.synced_at is None  # a real failure still blocks `synced`
+    assert "bad.md" in info.last_error and "big.md" in info.last_error
+
+
+async def test_a_source_whose_every_file_is_oversized_is_not_treated_as_empty(tmp_path, monkeypatch):
+    """The empty-source guard looks at the whole listing, skipped files included: nothing gets wiped."""
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "rag_max_document_bytes", 2000)
+    w(tmp_path, "only.md", "# Only\n\nthe single small document\n")
+    store, kb, syncer, _ = await setup(tmp_path)
+    await syncer.sync(kb.name)
+    grow_past_limit(tmp_path / "only.md", 2000)
+    r = await syncer.sync(kb.name)  # must not raise SourceUnavailable("refusing to delete all ...")
+    assert r.removed == 0 and len(await store.doc_shas(kb.id)) == 1

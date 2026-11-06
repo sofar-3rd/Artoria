@@ -59,13 +59,19 @@ class Syncer:
             return SyncReport(snap.revision, 0, 0, 0, len(snap.files))
 
         local = await self._store.doc_shas(kb.id)
-        if not snap.files and local:
+        if not snap.files and not snap.skipped and local:
             # An empty snapshot of a populated knowledge base is a broken mount or a wrong path far more
             # often than an intentional wipe; deleting everything is an explicit action, not a sync.
+            # A source whose files were all skipped (too large) is not empty: it still lists documents.
             raise SourceUnavailable(
                 f"refusing to delete all {len(local)} documents: the source is empty"
             )
-        p = plan(snap.files, local)
+        # A document that grew past the size limit disappears from `snap.files`; the planner would call it
+        # removed and drop its last good version. Keep that version (stale but searchable) and say so: losing
+        # content silently because a file got bigger is worse than serving the older text.
+        remote = dict(snap.files)
+        kept_stale = {path: local[path] for path in snap.skipped if path in local}
+        p = plan({**remote, **kept_stale}, local)
 
         failed: list[tuple[str, str]] = []
         for path in [*p.added, *p.changed]:
@@ -78,13 +84,21 @@ class Syncer:
         if p.removed:
             await self._store.delete_documents(kb.id, p.removed)
 
+        skipped = sorted(
+            (path, reason + (" (the previous version stays searchable)" if path in kept_stale else ""))
+            for path, reason in snap.skipped.items()
+        )
         if failed:
-            summary = "; ".join(f"{path}: {err}" for path, err in failed)[:2000]
+            summary = "; ".join(f"{path}: {err}" for path, err in [*failed, *skipped])[:2000]
             await self._store.mark_failed(kb.id, summary)  # last_commit stays, so the next run retries
         else:
             await self._store.mark_synced(kb.id, snap.revision)
+            if skipped:
+                # Not a failure and it must not block `synced`: a file over the limit stays over the limit.
+                # Recorded in last_error so the operator can see it; the next clean sync clears it.
+                await self._store.mark_warning(kb.id, "; ".join(f"{path}: {r}" for path, r in skipped)[:2000])
         return SyncReport(
-            snap.revision, len(p.added), len(p.changed), len(p.removed), len(p.unchanged), failed
+            snap.revision, len(p.added), len(p.changed), len(p.removed), len(p.unchanged), failed, skipped
         )
 
     async def _index(self, kb: KbRef, snap: Snapshot, path: str) -> None:

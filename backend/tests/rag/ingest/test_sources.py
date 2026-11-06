@@ -92,7 +92,7 @@ def test_fifo_named_like_a_document_is_skipped_not_opened(tmp_path):
     os.mkfifo(tmp_path / "pipe.md")
     code = (
         "import sys; from pathlib import Path; from app.rag.ingest.sources.dir import scan; "
-        "print(sorted(scan(Path(sys.argv[1]))))"
+        "print(sorted(scan(Path(sys.argv[1]))[0]))"
     )
     done = subprocess.run(
         [sys.executable, "-c", code, str(tmp_path)], capture_output=True, text=True, timeout=20,
@@ -245,3 +245,91 @@ async def test_a_half_written_checkout_directory_is_replaced_not_fatal(tmp_path)
     (src.workdir / "leftover.txt").write_text("interrupted clone")  # a directory without .git
     assert list((await src.snapshot()).files) == ["a.md"]
     assert not list(src.workdir.parent.glob("*.tmp-*"))  # no temporary clone left behind
+
+
+async def test_a_file_over_the_size_limit_is_skipped_with_a_reason_not_listed(tmp_path, monkeypatch):
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "rag_max_document_bytes", 1024 * 1024)
+    (tmp_path / "small.md").write_bytes(b"# small")
+    with open(tmp_path / "huge.pdf", "wb") as f:
+        f.truncate(3 * 1024 * 1024)  # sparse: cheap to create, over the 1 MB limit
+    snap = await DirSource(tmp_path).snapshot()
+    assert list(snap.files) == ["small.md"]
+    assert list(snap.skipped) == ["huge.pdf"] and "3 MB" in snap.skipped["huge.pdf"] and "limit is 1 MB" in snap.skipped["huge.pdf"]
+
+
+@pytest.mark.parametrize("size,text", [(0, "0 bytes"), (999, "999 bytes"), (2048, "2 KB"), (2560, "2.5 KB"), (1 << 20, "1 MB"), (3 * (1 << 20), "3 MB"), (1536 * 1024, "1.5 MB"), (5 * (1 << 30), "5 GB")])
+def test_sizes_are_shown_in_a_unit_that_means_something(size, text):
+    from app.rag.ingest.sources.dir import _human
+
+    assert _human(size) == text
+
+
+async def test_the_revision_changes_when_a_file_crosses_the_size_limit(tmp_path, monkeypatch):
+    """Otherwise a sync would return early on 'same revision' and never notice the file became skippable (or fine)."""
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "rag_max_document_bytes", 1000)
+    (tmp_path / "ok.md").write_bytes(b"# ok")
+    (tmp_path / "grow.md").write_bytes(b"x" * 500)
+    before = (await DirSource(tmp_path).snapshot()).revision
+    (tmp_path / "grow.md").write_bytes(b"x" * 1500)  # now over the limit: leaves `files`, enters `skipped`
+    over = (await DirSource(tmp_path).snapshot()).revision
+    (tmp_path / "grow.md").unlink()
+    gone = (await DirSource(tmp_path).snapshot()).revision
+    assert len({before, over, gone}) == 3
+
+
+async def test_a_file_exactly_at_the_limit_is_still_indexed(tmp_path, monkeypatch):
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "rag_max_document_bytes", 100)
+    (tmp_path / "edge.md").write_bytes(b"x" * 100)
+    (tmp_path / "over.md").write_bytes(b"x" * 101)
+    snap = await DirSource(tmp_path).snapshot()
+    assert list(snap.files) == ["edge.md"] and list(snap.skipped) == ["over.md"]
+
+
+def test_hashing_a_large_file_does_not_load_it_into_memory(tmp_path, monkeypatch):
+    """Block hashing keeps memory constant: read_bytes() of a 200 MB file grew the process by 200 MB."""
+    import hashlib
+    import tracemalloc
+
+    from app.rag.ingest.sources.dir import _sha256_file
+
+    big = tmp_path / "big.md"
+    with open(big, "wb") as f:
+        for _ in range(64):
+            f.write(b"a" * (1024 * 1024))  # 64 MB of real bytes
+    tracemalloc.start()
+    digest = _sha256_file(big)
+    _, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    assert peak < 8 * 1024 * 1024, f"peak {peak / 1e6:.0f} MB while hashing a 64 MB file"
+    assert digest == hashlib.sha256(big.read_bytes()).hexdigest()  # same result as the one-shot hash
+
+
+async def test_the_default_limit_is_20_mb():
+    from app.config import settings
+
+    assert settings.rag_max_document_bytes == 20 * 1024 * 1024
+
+
+async def test_a_failure_moving_the_clone_into_place_is_a_source_problem(tmp_path, monkeypatch):
+    from app.rag.ingest.sources import git as git_module
+
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    git(origin, "init", "-q", "-b", "main")
+    write(origin, "a.md", b"# A")
+    git(origin, "add", "."); git(origin, "commit", "-q", "-m", "c1")
+
+    def refuse(src, dst):
+        raise OSError(66, "Directory not empty")
+
+    monkeypatch.setattr(git_module.os, "replace", refuse)
+    src = GitSource(str(origin), "main", "", tmp_path / "cache", owner="kb-1")
+    with pytest.raises(SourceUnavailable, match="could not move the fresh clone into place"):
+        await src.snapshot()
+    assert not list(src.workdir.parent.glob("*.tmp-*"))  # the temporary clone was cleaned up

@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     rag_admin_token: str = ""
     # Local directories may be used as sources through the API only inside this directory (empty: refused).
     rag_local_root: str = ""
+    # Documents larger than this are not indexed (a hostile or careless repository must not exhaust memory).
+    rag_max_document_bytes: int = 20 * 1024 * 1024
     rag_model_dir: str = "./models"
     rag_embed_model: str = "BAAI/bge-m3"
     rag_embed_dim: int = 1024

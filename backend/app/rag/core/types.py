@@ -30,6 +30,8 @@ class Snapshot:
     revision: str
     files: dict[str, str]  # path -> sha256 of raw bytes
     reader: Callable[[str], bytes] = field(repr=False)
+    # Files the source refused to list (for example larger than the size limit): path -> reason.
+    skipped: dict[str, str] = field(default_factory=dict)
 
     def read(self, path: str) -> bytes:
         return self.reader(path)
@@ -84,3 +86,5 @@ class SyncReport:
     removed: int
     unchanged: int
     failed: list[tuple[str, str]] = field(default_factory=list)
+    # Files that were not indexed on purpose (size limit). They are warnings: they never block mark_synced.
+    skipped: list[tuple[str, str]] = field(default_factory=list)
