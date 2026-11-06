@@ -77,27 +77,38 @@ def build_rag(
     )
 
 
+# Bytes each file has on huggingface.co (checked 2026-11). A file is accepted from 99% of that size: an
+# interrupted download is far smaller, while a harmless upstream re-export may differ by a few bytes.
 REQUIRED_MODEL_FILES = {
-    "bge-m3": ("config.json", "pytorch_model.bin", "tokenizer.json"),
-    "bge-reranker-v2-m3": ("config.json", "model.safetensors", "tokenizer.json"),
+    "bge-m3": {"config.json": 687, "pytorch_model.bin": 2_271_145_830, "tokenizer.json": 17_098_108},
+    "bge-reranker-v2-m3": {"config.json": 795, "model.safetensors": 2_271_071_852, "tokenizer.json": 17_098_273},
 }
+MIN_FRACTION = 0.99
 
 
 def check_model_files(model_dir: str, need_reranker: bool = True) -> None:
-    """Fail at start-up, with the fix in the message, instead of at the first query minutes later."""
+    """Fail at start-up, with the fix in the message, instead of at the first query minutes later.
+
+    Existence is not enough: a download interrupted at 50% leaves `pytorch_model.bin` in place and the
+    first query would then fail with a torch error inside a chat stream.
+    """
     root = Path(model_dir)
     wanted = {n: f for n, f in REQUIRED_MODEL_FILES.items() if need_reranker or n != "bge-reranker-v2-m3"}
-    missing = [
-        f"{name}/{file}"
-        for name, files in wanted.items()
-        for file in files
-        if not (root / name / file).is_file()
-    ]
+    missing, incomplete = [], []
+    for name, files in wanted.items():
+        for file, expected in files.items():
+            path = root / name / file
+            if not path.is_file():
+                missing.append(f"{name}/{file}")
+            elif path.stat().st_size < expected * MIN_FRACTION:
+                incomplete.append(f"{name}/{file} ({path.stat().st_size} of {expected} bytes)")
+    problems = []
     if missing:
-        raise RuntimeError(
-            f"model files not found in {root.resolve()}: {', '.join(missing)}; "
-            "run backend/scripts/download_models.py"
-        )
+        problems.append(f"model files not found in {root.resolve()}: {', '.join(missing)}")
+    if incomplete:
+        problems.append(f"incomplete model files (interrupted download?): {', '.join(incomplete)}")
+    if problems:
+        raise RuntimeError("; ".join(problems) + "; run backend/scripts/download_models.py")
 
 
 def _real_components(embedder, reranker, count_tokens):
@@ -109,7 +120,10 @@ def _real_components(embedder, reranker, count_tokens):
 
     check_model_files(settings.rag_model_dir, need_reranker=reranker is _DEFAULT)
     root = Path(settings.rag_model_dir)
-    device = resolve_device(settings.rag_device)
+    try:
+        device = resolve_device(settings.rag_device)
+    except ValueError as exc:  # same fail-fast path as missing files: the operator sees it at start-up
+        raise RuntimeError(str(exc)) from exc
     if embedder is None:
         embedder = BgeM3Embedder(str(root / "bge-m3"), device, settings.rag_embed_batch_size)
     if reranker is _DEFAULT:

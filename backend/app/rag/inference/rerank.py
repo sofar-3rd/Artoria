@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from app.rag.inference.compute import run_cpu
+from app.rag.inference.text import MAX_QUERY_CHARS, clean
 
 MAX_LENGTH = 512  # the model's limit for the query plus the passage; longer input is truncated silently
 
@@ -39,7 +40,7 @@ class BgeReranker:
     async def rerank(self, query: str, docs: list[str]) -> list[float]:
         if not docs:
             return []
-        return await run_cpu(self._score, query, docs)
+        return await run_cpu(self._score, clean(query, MAX_QUERY_CHARS), [clean(d) for d in docs])
 
     async def warm_up(self) -> None:
         await run_cpu(self._load)

@@ -138,3 +138,24 @@ async def test_normalisation_and_sigmoid_do_not_depend_on_the_library_defaults(e
     assert abs(sum(x * x for x in v) - 1.0) < 1e-3
     scores = await reranker.rerank("q", ["a", "b"])
     assert all(0.0 <= s <= 1.0 for s in scores)
+
+
+async def test_a_lone_surrogate_and_a_huge_query_no_longer_break_or_stall_the_models(embedder, reranker):
+    assert len(await embedder.embed_query("abc\ud800def")) == 1024  # used to raise TypeError: TextEncodeInput must be ...
+    scores = await reranker.rerank("q\ud800", ["回滚\ud800部署"])
+    assert len(scores) == 1 and 0.0 <= scores[0] <= 1.0
+
+    await embedder.embed_query("预热")  # the first call also pays for kernel compilation
+    typical = min([await _timed(embedder.embed_query, "怎么回滚部署") for _ in range(3)])
+    capped = min([await _timed(embedder.embed_query, "很长" * 50_000) for _ in range(3)])  # 100,000 characters in
+    # Capped to 2,000 characters the cost is a small multiple of a normal query. WITHOUT the cap it grows
+    # quadratically: 100,000 characters held the single inference thread for ~5 s while this stays far below.
+    assert capped < max(typical * 60, 1.5), f"a huge query took {capped:.2f}s vs {typical:.3f}s for a normal one"
+
+
+async def _timed(fn, *args):
+    import time
+
+    started = time.perf_counter()
+    await fn(*args)
+    return time.perf_counter() - started

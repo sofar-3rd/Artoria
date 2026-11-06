@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from app.rag.inference.compute import run_cpu
+from app.rag.inference.text import MAX_QUERY_CHARS, clean
 
 
 class BgeM3Embedder:
@@ -35,11 +36,11 @@ class BgeM3Embedder:
     async def embed_documents(self, texts: list[str]) -> list[list[float]]:
         if not texts:
             return []
-        return await run_cpu(self._encode, texts)
+        return await run_cpu(self._encode, [clean(t) for t in texts])
 
     async def embed_query(self, text: str) -> list[float]:
-        # bge-m3 needs no instruction prefix for queries.
-        return (await self.embed_documents([text]))[0]
+        # bge-m3 needs no instruction prefix for queries. A query is capped much lower than document text.
+        return (await run_cpu(self._encode, [clean(text, MAX_QUERY_CHARS)]))[0]
 
     async def warm_up(self) -> None:
         """Load the model now (on the inference thread) instead of on the first query."""
