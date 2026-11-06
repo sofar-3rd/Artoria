@@ -1,0 +1,29 @@
+# Retrieval evaluation on the MODULAR-RAG-MCP-SERVER documentation (34 documents, ~900 chunks).
+#
+#   expect: <path>   the document that answers the question
+#   must:   <phrase> a phrase the answering passage has to contain. This corpus needs it: six files are
+#                    called SKILL.md and DEV_SPEC.md repeats sections of other documents, so the right
+#                    FILE is not the right PASSAGE.
+#   expect: none     the corpus cannot answer it (measures the false-answer rate)
+#
+# Each `must` phrase occurs in EXACTLY ONE document, the expected one (checked against the corpus).
+# Questions whose answer appears in several documents were dropped: they would penalise a correct
+# answer that came from the sibling copy, not a wrong one.
+- {q: 支持哪些 LLM Provider, DeepSeek 支持 Vision 吗, expect: skills/setup/references/provider_profiles.md, must: 不支持 Vision，需选其他 provider}
+- {q: 怎么新增一个 provider, 需要遵循什么流程, expect: skills/setup/references/new_provider_guide.md, must: New Provider Scaffolding Guide}
+- {q: QA 测试计划覆盖哪些测试范围, expect: skills/qa-tester/QA_TEST_PLAN.md, must: 系统功能验证、Dashboard UI 交互}
+- {q: Hybrid Search 的核心实现思路和面试题, expect: skills/interview-prep/references/project_knowledge.md, must: 本文件供面试官（AI Agent）使用}
+- {q: 面试准备分几个 Phase, 第一个是什么, expect: skills/interview-prep/SKILL.md, must: Phase 0：知识准备}
+- {q: 简历里有哪些项目亮点可以写, expect: skills/resume-writer/references/project_highlights.md, must: 亮点 1：多阶段混合检索架构}
+- {q: skill 的 sequential 工作流和 conditional 工作流有什么区别, expect: skills/skill-creator/references/workflows.md, must: Conditional Workflows}
+- {q: 编写 skill 时输出格式有哪些模式, expect: skills/skill-creator/references/output-patterns.md, must: output patterns}
+- {q: 测试模式参考里有哪些测试写法, expect: skills/qa-tester/references/test_patterns.md, must: Test Patterns}
+- {q: project-review 这个 skill 用什么教学法带用户复习, expect: skills/project-review/SKILL.md, must: 苏格拉底式提问}
+- {q: 项目复习题库的难度怎么标注, expect: skills/project-review/references/question_bank.md, must: 难度（⭐基础}
+- {q: project-learner 的学习进度记录存在哪里, expect: skills/project-learner/SKILL.md, must: LEARNING_PROGRESS}
+- {q: QA 测试进度记录里统计了哪些测试结果, expect: skills/qa-tester/QA_TEST_PROGRESS.md, must: "Total: 0 test cases"}
+- {q: package skill 做到了什么, 怎么防止泄露密钥, expect: skills/package/SKILL.md, must: remove caches, secrets, and artifacts}
+- {q: 今天北京的天气怎么样, expect: none}
+- {q: 红烧肉怎么做才好吃, expect: none}
+- {q: 如何用 Rust 实现一个无锁队列, expect: none}
+- {q: 这个项目支持 Kubernetes 部署吗, 有 helm chart 吗, expect: none}
