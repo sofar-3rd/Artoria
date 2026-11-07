@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import * as api from './api'
 import { applyEvent } from './reducer'
+import { navigate } from './router'
 import type { Message, Thread } from './types'
 import ChatView from './components/ChatView'
 import InputBox from './components/InputBox'
 import Sidebar from './components/Sidebar'
 
-export default function App() {
+export default function ChatPage() {
   const [threads, setThreads] = useState<Thread[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
   // Messages per thread, so a background run keeps updating its own thread.
@@ -129,6 +130,7 @@ export default function App() {
         onSelect={selectThread}
         onNew={newChat}
         onDelete={removeThread}
+        onOpenTraces={() => navigate(activeId ? `/traces?thread=${activeId}` : '/traces')}
       />
       <main className="flex min-w-0 flex-1 flex-col">
         <ChatView messages={messages} streaming={streaming} />

@@ -1,5 +1,5 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source'
-import type { Message, StreamEvent, Thread } from './types'
+import type { Message, StreamEvent, Thread, TurnDetail, TurnPage, TurnStatus } from './types'
 
 const BASE = '/api'
 
@@ -20,6 +20,21 @@ export const deleteThread = async (id: string): Promise<void> => {
 
 export const getMessages = async (id: string): Promise<Message[]> =>
   (await expectOk(await fetch(`${BASE}/threads/${id}/messages`))).json()
+
+export const listTurns = async (opts: {
+  status?: TurnStatus
+  threadId?: string
+  cursor?: string | null
+}): Promise<TurnPage> => {
+  const q = new URLSearchParams({ limit: '30' })
+  if (opts.status) q.set('status', opts.status)
+  if (opts.threadId) q.set('thread_id', opts.threadId)
+  if (opts.cursor) q.set('cursor', opts.cursor)
+  return (await expectOk(await fetch(`${BASE}/traces?${q}`))).json()
+}
+
+export const getTurn = async (id: string): Promise<TurnDetail> =>
+  (await expectOk(await fetch(`${BASE}/traces/${id}`))).json()
 
 export async function streamChat(
   threadId: string,
