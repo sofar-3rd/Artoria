@@ -14,7 +14,7 @@ from app.config import settings
 from app.db import engine
 from app.rag.bootstrap import Rag, build_rag, warm_up
 from app.rag.interfaces.tools import build_kb_tools
-from app.routers import chat, kb, threads
+from app.routers import chat, kb, threads, traces
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +59,7 @@ def create_app(model: BaseChatModel | None = None, rag: Rag | None = None) -> Fa
     app.include_router(threads.router, prefix="/api")
     app.include_router(chat.router, prefix="/api")
     app.include_router(kb.router, prefix="/api")
+    app.include_router(traces.router, prefix="/api")
     return app
 
 

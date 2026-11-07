@@ -44,3 +44,47 @@ class KbOut(BaseModel):
 class KbDetail(KbOut):
     last_commit: str | None
     running: bool
+
+
+class ToolCallOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    tool_call_id: str | None
+    name: str
+    args: dict | None
+    status: str
+    seq: int
+    started_offset_ms: int
+    duration_ms: int | None
+    result_chars: int | None
+    error: str | None
+
+
+class TurnOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    thread_id: uuid.UUID
+    thread_title: str | None
+    status: str
+    started_at: datetime
+    duration_ms: int
+    ttft_ms: int | None
+    first_content_ms: int | None
+    llm_calls: int
+    tool_calls_count: int
+    input_tokens: int | None
+    output_tokens: int | None
+    total_tokens: int | None
+    model: str | None
+    error: str | None
+
+
+class TurnDetail(TurnOut):
+    tools: list[ToolCallOut]
+
+
+class TurnPage(BaseModel):
+    items: list[TurnOut]
+    next_cursor: str | None
