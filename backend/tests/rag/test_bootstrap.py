@@ -163,3 +163,52 @@ def test_an_unusable_device_fails_at_start_up_with_the_setting_named(tmp_path, m
     monkeypatch.setitem(sys.modules, "torch", torch)
     with pytest.raises(RuntimeError, match="RAG_DEVICE='cuda' but CUDA is not available"):
         build_rag()
+
+
+async def test_warm_up_loads_both_models_through_their_own_hook():
+    """Each model's first load takes ~85 s; start-up pays it so no user does."""
+    calls = []
+
+    class FakeEmbedder(HashEmbedder):
+        async def warm_up(self):
+            calls.append("embedder")
+
+    class FakeReranker:
+        async def rerank(self, query, docs):
+            return [0.5] * len(docs)
+
+        async def warm_up(self):
+            calls.append("reranker")
+
+    from app.rag.bootstrap import warm_up
+
+    await warm_up(build_rag(embedder=FakeEmbedder(), reranker=FakeReranker(), count_tokens=len))
+    assert calls == ["embedder", "reranker"]
+
+
+async def test_warm_up_tolerates_a_component_without_the_hook():
+    from app.rag.bootstrap import warm_up
+    from tests.rag.fakes import ReverseReranker  # no warm_up
+
+    await warm_up(build_rag(embedder=HashEmbedder(), reranker=ReverseReranker(), count_tokens=len))
+
+
+async def test_without_a_reranker_only_the_embedder_is_warmed():
+    calls = []
+
+    class FakeEmbedder(HashEmbedder):
+        async def warm_up(self):
+            calls.append("embedder")
+
+    from app.rag.bootstrap import warm_up
+
+    await warm_up(build_rag(embedder=FakeEmbedder(), reranker=None, count_tokens=len))
+    assert calls == ["embedder"]
+
+
+def test_the_rerank_timeout_tolerates_a_cold_load_and_start_up_warms_by_default():
+    from app.config import Settings
+
+    fresh = Settings()  # defaults, not whatever .env says
+    assert fresh.rag_rerank_timeout_s >= 120  # a cold model needs ~85 s to load
+    assert fresh.rag_load_on_start is True

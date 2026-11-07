@@ -96,6 +96,11 @@ async def rag(models_present, source_dir):
     from app.rag.ingest.sources import DirSource
 
     instance = build_rag(source_factory=lambda kb: DirSource(source_dir))
+    # Load both models up front: their first use costs ~85 s each, which would otherwise be measured as search
+    # latency and would exceed the rerank timeout.
+    from app.rag.bootstrap import warm_up
+
+    await warm_up(instance)
     yield instance
     await engine.dispose()
 

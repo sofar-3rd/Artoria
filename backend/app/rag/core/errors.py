@@ -40,4 +40,13 @@ class EmptyDocument(RagError):
 
 
 class SourceUnavailable(RagError):
-    """The document source cannot be read (missing directory, bad subdir) or looks wrongly empty."""
+    """The document source cannot be read (missing directory, bad subdir) or looks wrongly empty.
+
+    The message is redacted here rather than at each raise site: a source error can quote a repository URL,
+    and these messages are stored in `last_error`, which an unauthenticated endpoint returns.
+    """
+
+    def __init__(self, message: str):
+        from app.rag.core.redact import redact_url
+
+        super().__init__(redact_url(message))

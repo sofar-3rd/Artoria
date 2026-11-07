@@ -1,7 +1,10 @@
+import logging
 from pathlib import Path
 
 from app.rag.inference.compute import run_cpu
 from app.rag.inference.text import MAX_QUERY_CHARS, clean
+
+logger = logging.getLogger(__name__)
 
 MAX_LENGTH = 512  # the model's limit for the query plus the passage; longer input is truncated silently
 
@@ -17,6 +20,7 @@ class BgeReranker:
 
     def _load(self):
         if self._model is None:
+            logger.warning("loading the reranker model; the first load takes about a minute")
             import torch
             from sentence_transformers import CrossEncoder  # heavy import, loaded on first use
 

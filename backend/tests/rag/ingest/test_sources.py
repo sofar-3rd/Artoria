@@ -378,3 +378,37 @@ async def test_the_git_reader_enforces_the_limit_too(tmp_path, monkeypatch):
     (src.workdir / "a.md").write_bytes(b"y" * 5000)  # the checkout changes after listing
     with pytest.raises(SourceUnavailable, match="larger than"):
         snap.read("a.md")
+
+
+@pytest.mark.parametrize(
+    "text,secret",
+    [
+        ("fatal: unable to access 'https://user:SECRET@host/r.git/': failed", "SECRET"),
+        ("ssh://git:SECRET@host:22/o/r", "SECRET"),
+        ("git://u:SECRET@h/r", "SECRET"),
+        ("https://x-access-token:SECRET@host/o/r.git", "SECRET"),
+        ("error cloning https://TOKENONLY@host/o/r.git", "TOKENONLY"),
+    ],
+)
+def test_credentials_in_a_url_are_removed_from_any_message(text, secret):
+    from app.rag.core.redact import redact_url
+
+    out = redact_url(text)
+    assert secret not in out
+    assert "://" in out  # still useful: the host is there
+
+
+def test_redaction_leaves_urls_without_credentials_and_paths_with_at_signs_alone():
+    from app.rag.core.redact import redact_url
+
+    for text in ("https://host/o/r.git", "https://host/a@b/r.git", "no url here", "path/to/file@1.md"):
+        assert redact_url(text) == text
+
+
+def test_source_errors_are_redacted_wherever_they_are_constructed():
+    """The constructor redacts, so a new raise site cannot leak a credential by forgetting to."""
+    with pytest.raises(SourceUnavailable) as exc:
+        setattr(SourceUnavailable, "_probe", None) or (_ for _ in ()).throw(
+            SourceUnavailable("cannot read 'https://u:TOPSECRET@host/r.git'")
+        )
+    assert "TOPSECRET" not in str(exc.value) and "host/r.git" in str(exc.value)

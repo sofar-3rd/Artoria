@@ -1,8 +1,11 @@
+import logging
 from pathlib import Path
 
 from app.rag.inference.compute import run_cpu
 from app.rag.inference.text import MAX_QUERY_CHARS, clean
 
+
+logger = logging.getLogger(__name__)
 
 class BgeM3Embedder:
     """Dense embeddings from BAAI/bge-m3 (1024 dimensions, normalised for cosine distance)."""
@@ -18,6 +21,7 @@ class BgeM3Embedder:
 
     def _load(self):
         if self._model is None:
+            logger.warning("loading the embedding model; the first load takes about a minute")
             from sentence_transformers import SentenceTransformer  # heavy import, loaded on first use
 
             self._model = SentenceTransformer(str(self._path), device=self._device)

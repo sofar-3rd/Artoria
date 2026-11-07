@@ -86,6 +86,14 @@ REQUIRED_MODEL_FILES = {
 MIN_FRACTION = 0.99
 
 
+async def warm_up(rag: Rag) -> None:
+    """Load the models now, on the inference thread, so no user pays the ~85 s first load per model."""
+    for component in (rag.embedder, rag.searcher._reranker):
+        warmer = getattr(component, "warm_up", None)
+        if warmer is not None:
+            await warmer()
+
+
 def check_model_files(model_dir: str, need_reranker: bool = True) -> None:
     """Fail at start-up, with the fix in the message, instead of at the first query minutes later.
 

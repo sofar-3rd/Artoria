@@ -35,7 +35,11 @@ class Settings(BaseSettings):
     rag_top_k: int = 5
     rag_rrf_k: int = 60
     rag_min_rerank_score: float | None = None
-    rag_rerank_timeout_s: float = 60.0
+    # A cold model takes about 85 s to load (measured); the timeout must tolerate the first call after
+    # start-up, or a slow load looks like a broken reranker and is silently skipped.
+    rag_rerank_timeout_s: float = 180.0
+    # Load both models while the app starts instead of on the first user's query.
+    rag_load_on_start: bool = True
     rag_chunk_target_tokens: int = 400
     rag_chunk_max_tokens: int = 512
     rag_chunk_overlap_tokens: int = 50

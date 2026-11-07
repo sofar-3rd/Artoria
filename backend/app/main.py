@@ -1,3 +1,5 @@
+import logging
+import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -10,9 +12,11 @@ from app.agent import build_agent, build_chat_model
 from app.chat_stream import drain_wrap_ups
 from app.config import settings
 from app.db import engine
-from app.rag.bootstrap import Rag, build_rag
+from app.rag.bootstrap import Rag, build_rag, warm_up
 from app.rag.interfaces.tools import build_kb_tools
 from app.routers import chat, kb, threads
+
+logger = logging.getLogger(__name__)
 
 
 def create_app(model: BaseChatModel | None = None, rag: Rag | None = None) -> FastAPI:
@@ -32,6 +36,10 @@ def create_app(model: BaseChatModel | None = None, rag: Rag | None = None) -> Fa
             app.state.checkpointer = checkpointer
             active_rag = rag if rag is not None else (build_rag() if settings.rag_enabled else None)
             app.state.rag = active_rag
+            if active_rag is not None and settings.rag_load_on_start:
+                started = time.monotonic()
+                await warm_up(active_rag)
+                logger.warning("rag models loaded in %.0f s", time.monotonic() - started)
             app.state.sync_tasks = set()
             app.state.sync_running = set()
             kb_tools = (

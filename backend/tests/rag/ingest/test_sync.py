@@ -399,3 +399,62 @@ async def test_a_file_that_grew_after_listing_is_a_per_file_failure_not_an_out_o
     r = await Syncer(store, emb, lambda k: GrowingSource(), CFG, len).sync(kb.name)
     assert [p for p, _ in r.failed] == ["grow.md"] and "larger than" in r.failed[0][1]
     assert list(await store.doc_shas(kb.id)) == ["ok.md"]
+
+
+async def test_a_source_error_about_a_url_with_a_token_never_carries_the_token(tmp_path):
+    """The URL is operator input; source errors land in `last_error`, which an unauthenticated GET returns."""
+    from pathlib import Path
+
+    from app.rag.ingest.sources import git as git_module
+
+    def failing_git(cwd, *args):
+        raise SourceUnavailable("git clone failed: fatal: unable to access 'https://u:TOPSECRET@host/r.git/': no auth")
+
+    emb = HashEmbedder()
+    store = Store(SessionLocal)
+    import uuid
+    kb = await store.create_kb(f"kb-{uuid.uuid4().hex[:6]}", "d", "https://u:TOPSECRET@host/r.git", "main", "", emb.model, emb.dim)
+    original = git_module._git
+    git_module._git = failing_git
+    try:
+        with pytest.raises(SourceUnavailable) as exc:
+            await Syncer(
+                store, emb,
+                lambda k: git_module.GitSource(k.repo_url, k.branch, k.subdir, Path(tmp_path / "c"), owner=str(k.id)),
+                CFG, len,
+            ).sync(kb.name)
+    finally:
+        git_module._git = original
+    assert "TOPSECRET" not in str(exc.value) and "host/r.git" in str(exc.value)
+    info = [i for i in await store.list_kbs() if i.name == kb.name][0]
+    assert info.last_error and "TOPSECRET" not in info.last_error  # recorded by _record_failure, already redacted
+
+
+async def test_a_plain_exception_carrying_a_token_is_redacted_by_the_syncer(tmp_path):
+    """`SourceUnavailable` redacts itself; every OTHER exception type needs the Syncer's own redaction.
+
+    Example: an OSError raised by a custom reader whose message quotes a URL. `SyncReport.failed` reaches the
+    CLI and `last_error` reaches the unauthenticated API, so both are redacted by the Syncer.
+    """
+    from app.rag.core.types import Snapshot
+    from app.rag.ingest.sources import DirSource
+
+    class LeakyReadSource:
+        async def snapshot(self):
+            snap = await DirSource(tmp_path).snapshot()
+
+            def reader(path):
+                raise OSError("cannot open https://u:TOPSECRET@host/r.git/x.md")
+
+            return Snapshot(snap.revision, snap.files, reader, snap.skipped)
+
+    w(tmp_path, "a.md", "# A\n\nbody text here\n")
+    emb = HashEmbedder()
+    store = Store(SessionLocal)
+    import uuid
+    kb = await store.create_kb(f"kb-{uuid.uuid4().hex[:6]}", "d", "dir:/x", "main", "", emb.model, emb.dim)
+    r = await Syncer(store, emb, lambda k: LeakyReadSource(), CFG, len).sync(kb.name)
+    assert [p for p, _ in r.failed] == ["a.md"]
+    assert "TOPSECRET" not in r.failed[0][1] and "host/r.git" in r.failed[0][1]
+    info = [i for i in await store.list_kbs() if i.name == kb.name][0]
+    assert info.last_error and "TOPSECRET" not in info.last_error

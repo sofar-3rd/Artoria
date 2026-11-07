@@ -5,6 +5,7 @@ from collections.abc import Callable
 
 from app.rag.core.errors import EmbeddingModelMismatch, SourceUnavailable
 from app.rag.core.ports import DocSource, Embedder
+from app.rag.core.redact import redact_url
 from app.rag.core.types import Snapshot, SyncReport
 from app.rag.ingest.chunking import ChunkConfig, chunk_markdown
 from app.rag.ingest.loaders import load_with_meta
@@ -79,7 +80,7 @@ class Syncer:
                 await self._index(kb, snap, path)
             except Exception as exc:  # one bad file must not block the others
                 logger.warning("sync %s: %s failed: %s", kb.name, path, exc)
-                failed.append((path, str(exc) or type(exc).__name__))
+                failed.append((path, redact_url(str(exc) or type(exc).__name__)))
 
         if p.removed:
             await self._store.delete_documents(kb.id, p.removed)
@@ -89,14 +90,14 @@ class Syncer:
             for path, reason in snap.skipped.items()
         )
         if failed:
-            summary = "; ".join(f"{path}: {err}" for path, err in [*failed, *skipped])[:2000]
+            summary = redact_url("; ".join(f"{path}: {err}" for path, err in [*failed, *skipped]))[:2000]
             await self._store.mark_failed(kb.id, summary)  # last_commit stays, so the next run retries
         else:
             await self._store.mark_synced(kb.id, snap.revision)
             if skipped:
                 # Not a failure and it must not block `synced`: a file over the limit stays over the limit.
                 # Recorded in last_error so the operator can see it; the next clean sync clears it.
-                await self._store.mark_warning(kb.id, "; ".join(f"{path}: {r}" for path, r in skipped)[:2000])
+                await self._store.mark_warning(kb.id, redact_url("; ".join(f"{path}: {r}" for path, r in skipped))[:2000])
         return SyncReport(
             snap.revision, len(p.added), len(p.changed), len(p.removed), len(p.unchanged), failed, skipped
         )
