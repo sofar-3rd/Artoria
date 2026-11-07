@@ -227,3 +227,22 @@ async def test_wrap_up_failure_does_not_hang_the_request(running_app, monkeypatc
         assert calls == 2
         # Telemetry is still written even though closing tool calls failed.
         assert [t["status"] for t in turns_of(tid)] == ["cancelled"]
+
+
+async def test_tool_cut_off_by_cancel_is_recorded_as_cancelled(running_app, slow_tool):
+    from tests.test_telemetry import tools_of
+
+    script = [AIMessage(content="calling", tool_calls=[SLOW])]
+    async with running_app(script) as (app, c):
+        tid = await new_thread(c)
+        call = Call(app, tid)
+        await call.wait_for(slow_tool.is_set)
+        await asyncio.sleep(0.2)
+        call.disconnect.set()
+        await call.finish()
+
+        turn = turns_of(tid)[0]
+        (row,) = tools_of(turn["id"])
+        assert row["status"] == "cancelled"
+        assert row["duration_ms"] is not None and row["duration_ms"] >= 100
+        assert row["started_offset_ms"] + row["duration_ms"] <= turn["duration_ms"]

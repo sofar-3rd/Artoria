@@ -120,17 +120,22 @@ class TurnRecorder(AsyncCallbackHandler):
         self.error = (str(exc) or exc.__class__.__name__)[:ERROR_MAX_CHARS]
 
     def summary(self, status: str) -> dict[str, Any]:
-        tools = [
-            {k: v for k, v in row.items() if not k.startswith("_")}
-            for row in self._tools.values()
-        ]
+        duration_ms = self._elapsed_ms()
+        tools = []
+        for row in self._tools.values():
+            out = {k: v for k, v in row.items() if not k.startswith("_")}
+            # A tool that never reported an end was cut off with its turn.
+            if "_t0" in row and status != "ok":
+                out["status"] = "cancelled"
+                out["duration_ms"] = max(duration_ms - row["started_offset_ms"], 0)
+            tools.append(out)
         return {
             "turn": {
                 "id": self.turn_id,
                 "thread_id": self.thread_id,
                 "status": status,
                 "started_at": self.started_at,
-                "duration_ms": self._elapsed_ms(),
+                "duration_ms": duration_ms,
                 "ttft_ms": self.ttft_ms,
                 "first_content_ms": self.first_content_ms,
                 "llm_calls": self.llm_calls,
