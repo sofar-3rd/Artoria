@@ -34,6 +34,7 @@ class Rag:
 
 def build_rag(
     *,
+    sessionmaker=None,
     embedder: Embedder | None = None,
     reranker: Reranker | None | _Default = _DEFAULT,
     count_tokens: Callable[[str], int] | None = None,
@@ -48,7 +49,7 @@ def build_rag(
     if embedder is None or count_tokens is None or reranker is _DEFAULT:
         embedder, reranker, count_tokens = _real_components(embedder, reranker, count_tokens)
 
-    store = Store(SessionLocal)
+    store = Store(SessionLocal if sessionmaker is None else sessionmaker)
     cache_dir = Path(settings.rag_clone_dir)
     source_factory = source_factory or (
         lambda kb: make_source(kb.repo_url, kb.branch, kb.subdir, cache_dir, owner=str(kb.id))

@@ -7,9 +7,10 @@ interface Props {
   onNew: () => void
   onDelete: (id: string) => void
   onOpenTraces: () => void
+  onOpenKbs: () => void
 }
 
-export default function Sidebar({ threads, activeId, onSelect, onNew, onDelete, onOpenTraces }: Props) {
+export default function Sidebar({ threads, activeId, onSelect, onNew, onDelete, onOpenTraces, onOpenKbs }: Props) {
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-gray-200 bg-white">
       <div className="p-3">
@@ -44,6 +45,12 @@ export default function Sidebar({ threads, activeId, onSelect, onNew, onDelete, 
         ))}
       </ul>
       <div className="border-t border-gray-200 p-3">
+        <button
+          className="w-full rounded-lg px-3 py-2 text-left text-sm text-gray-600 hover:bg-gray-100"
+          onClick={onOpenKbs}
+        >
+          知识库
+        </button>
         <button
           className="w-full rounded-lg px-3 py-2 text-left text-sm text-gray-600 hover:bg-gray-100"
           onClick={onOpenTraces}

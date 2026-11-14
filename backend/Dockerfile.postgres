@@ -1,18 +1,17 @@
-FROM postgres:16
+FROM postgres:17
 ARG APT_MIRROR=
 RUN if [ -n "$APT_MIRROR" ]; then \
       sed -i "s#http://deb.debian.org#$APT_MIRROR#g; s#https://deb.debian.org#$APT_MIRROR#g" /etc/apt/sources.list.d/debian.sources; \
     fi \
  && apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-      build-essential cmake git ca-certificates postgresql-server-dev-16 \
+      build-essential git ca-certificates postgresql-server-dev-17 \
  && git clone --depth 1 --branch v0.8.0 https://github.com/pgvector/pgvector.git /tmp/pgvector \
  && cd /tmp/pgvector && make OPTFLAGS="" && make install \
- && git clone --depth 1 https://github.com/jaiminpan/pg_jieba.git /tmp/pg_jieba \
- && cd /tmp/pg_jieba && git submodule update --init --recursive --depth 1 \
- && mkdir build && cd build \
- && cmake -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/16/server .. \
+ && git clone --depth 1 --branch v1.5.1 https://github.com/timescale/pg_textsearch.git /tmp/pg_textsearch \
+ && cd /tmp/pg_textsearch \
  && make -j4 && make install \
- && cd / && rm -rf /tmp/pgvector /tmp/pg_jieba \
- && DEBIAN_FRONTEND=noninteractive apt-get purge -y build-essential cmake git postgresql-server-dev-16 \
+ && cd / && rm -rf /tmp/pgvector /tmp/pg_textsearch \
+ && DEBIAN_FRONTEND=noninteractive apt-get purge -y build-essential git postgresql-server-dev-17 \
  && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
+CMD ["postgres", "-c", "shared_preload_libraries=pg_textsearch"]

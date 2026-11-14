@@ -3,7 +3,6 @@ from datetime import datetime
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import DateTime, ForeignKey, Index, Integer, Text, UniqueConstraint, Uuid, func
-from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models import Base
@@ -43,7 +42,8 @@ class ChunkRow(Base):
     __table_args__ = (
         UniqueConstraint("doc_id", "idx"),
         Index("ix_chunks_kb_id", "kb_id"),
-        Index("ix_chunks_tsv", "tsv", postgresql_using="gin"),
+        Index("ix_chunks_bm25", "search_text", postgresql_using="bm25",
+              postgresql_with={"text_config": "simple"}),
         Index(
             "ix_chunks_embedding", "embedding",
             postgresql_using="hnsw", postgresql_ops={"embedding": "vector_cosine_ops"},
@@ -59,4 +59,4 @@ class ChunkRow(Base):
     end_char: Mapped[int] = mapped_column(Integer)
     content: Mapped[str] = mapped_column(Text)
     embedding = mapped_column(Vector(1024), nullable=False)
-    tsv = mapped_column(TSVECTOR, nullable=True)
+    search_text: Mapped[str] = mapped_column(Text, nullable=False, default="")

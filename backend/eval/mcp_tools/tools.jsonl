@@ -1,0 +1,200 @@
+{"tool_id":"iWiki/getSpacePageTree","name":"getSpacePageTree","origin":"local","function":"列出知识空间根目录或父文档的子文档树节点。","when_to_use":"浏览文档层级时使用；需空间标识或父文档编号，不读取正文。"}
+{"tool_id":"iWiki/metadata","name":"metadata","origin":"local","function":"查询知识文档的标题、作者和创建修改时间等属性。","when_to_use":"已知文档编号且只需基础属性时使用，不返回完整正文。"}
+{"tool_id":"iWiki/getDocument","name":"getDocument","origin":"local","function":"按编号读取知识文档完整 Markdown 或原生结构内容。","when_to_use":"已知知识文档编号并需正文时使用；企业微信文档正文另需专门读取。"}
+{"tool_id":"iWiki/createDocument","name":"createDocument","origin":"local","function":"在知识空间父目录下新建文档、文件夹或在线表格。","when_to_use":"从零撰写时使用，需空间和父目录编号；已有 HTML 文件应走附件导入。"}
+{"tool_id":"iWiki/moveDocument","name":"moveDocument","origin":"local","function":"移动知识文档父目录或调整同目录中的相对顺序。","when_to_use":"已有文档需换位置或排序时使用；保留原文档而非复制。"}
+{"tool_id":"iWiki/copyDocument","name":"copyDocument","origin":"local","function":"复制单篇知识文档或含子页面的整棵文档树。","when_to_use":"需保留原文档并在另一父目录创建副本时使用，可选择是否包含子文档。"}
+{"tool_id":"iWiki/listImages","name":"listImages","origin":"local","function":"提取知识文档引用的图片附件编号列表。","when_to_use":"已知文档编号且只需图片引用时使用；下载地址需凭附件编号另查。"}
+{"tool_id":"iWiki/saveDocument","name":"saveDocument","origin":"local","function":"更新现有知识文档标题及正文，支持原生内容和 DOC 的 HTML 解析。","when_to_use":"已知文档编号且需替换或保存正文时使用；只改名或首尾追加有专用操作。"}
+{"tool_id":"iWiki/renameDocumentTitle","name":"renameDocumentTitle","origin":"local","function":"只重命名知识文档标题，附件文档保留原扩展名。","when_to_use":"正文保持不变时使用；附件标题不会按新标题改变文件扩展名。"}
+{"tool_id":"iWiki/saveDocumentParts","name":"saveDocumentParts","origin":"local","function":"在知识文档开头插入或末尾追加 Markdown、DOC 内容。","when_to_use":"已有文档只需首尾增补时使用，不用于中间段落定位替换。"}
+{"tool_id":"iWiki/getSpaceInfo","name":"getSpaceInfo","origin":"local","function":"按知识空间标识或名称查询空间属性及权限信息。","when_to_use":"需确认空间编号、描述或权限时使用；空间标识优先，名称可模糊匹配。"}
+{"tool_id":"iWiki/getMySpaces","name":"getMySpaces","origin":"local","function":"列出当前用户收藏或管理的知识空间。","when_to_use":"查看自己的空间清单时使用，需区分收藏和管理两类。"}
+{"tool_id":"iWiki/aiSearchDocument","name":"aiSearchDocument","origin":"local","function":"按自然语言检索知识文档相关内容片段，可限定空间、专题或文档。","when_to_use":"找问题答案或语义相关片段时使用；不是按编号读取完整正文。"}
+{"tool_id":"iWiki/searchDocument","name":"searchDocument","origin":"local","function":"按关键词及类型、空间、作者、标签、时间筛选知识文档列表。","when_to_use":"需结构化过滤或查标题、附件、评论时使用；返回命中文档而非整篇正文。"}
+{"tool_id":"iWiki/searchWeDoc","name":"searchWeDoc","origin":"local","function":"在已指定的企业微信类型知识文档中检索多个关键词片段。","when_to_use":"已知 TXDOC 文档编号时使用，只返回匹配片段和评分，不能读取完整正文。"}
+{"tool_id":"iWiki/smartsheetAddField","name":"smartsheetAddField","origin":"local","function":"为知识库多维表格增加指定类型和属性的新列。","when_to_use":"需扩展表格结构时使用，已知表格编号；新增列不同于新增数据行。"}
+{"tool_id":"iWiki/smartsheetGetFields","name":"smartsheetGetFields","origin":"local","function":"读取知识库多维表格字段编号、名称、类型和属性。","when_to_use":"先了解表结构或查字段编号时使用，可限定视图；不读取数据行。"}
+{"tool_id":"iWiki/smartsheetDeleteField","name":"smartsheetDeleteField","origin":"local","function":"删除知识库多维表格指定列及该列的数据。","when_to_use":"确认删除整个字段时使用，需字段编号；不是清空某几条记录。"}
+{"tool_id":"iWiki/smartsheetGetViews","name":"smartsheetGetViews","origin":"local","function":"列出知识库多维表格视图及其编号，可按视图类型筛选。","when_to_use":"需找到表格的网格、看板、日历等视图时使用，不修改字段或记录。"}
+{"tool_id":"iWiki/smartsheetGetRecords","name":"smartsheetGetRecords","origin":"local","function":"分页读取知识库多维表格记录，支持筛选、排序及字段选择。","when_to_use":"需查看已有数据行时使用，可限定视图或记录编号；不改变记录。"}
+{"tool_id":"iWiki/smartsheetAddRecords","name":"smartsheetAddRecords","origin":"local","function":"向知识库多维表格批量新增带字段值的数据行。","when_to_use":"添加不存在的新记录时使用，需表格编号和字段映射；已有行修改另用更新。"}
+{"tool_id":"iWiki/smartsheetUpdateRecords","name":"smartsheetUpdateRecords","origin":"local","function":"按记录编号批量修改知识库多维表格的部分字段。","when_to_use":"已有行需局部变更时使用，需记录编号；不新增行或改变列定义。"}
+{"tool_id":"iWiki/smartsheetDeleteRecords","name":"smartsheetDeleteRecords","origin":"local","function":"按记录编号批量删除知识库多维表格数据行。","when_to_use":"确认移除已有记录时使用，至少提供一个记录编号；不删除整列。"}
+{"tool_id":"iWiki/getAttachmentDownloadUrl","name":"getAttachmentDownloadUrl","origin":"local","function":"按知识库附件编号获取图片或文件的临时下载地址。","when_to_use":"已知附件编号且需资源链接时使用；不是列出文档图片或签发上传地址。"}
+{"tool_id":"iWiki/prepareAttachmentUpload","name":"prepareAttachmentUpload","origin":"local","function":"为知识文档、多维表附件或 HTML 导入准备预签名上传地址。","when_to_use":"上传尚未开始时使用；HTML 导入需父文档，传完文件后仍需完成绑定。"}
+{"tool_id":"iWiki/completeAttachmentUpload","name":"completeAttachmentUpload","origin":"local","function":"在文件上传后绑定知识文档附件或完成 HTML 文档导入。","when_to_use":"文件已上传且拿到准备阶段编号时使用；不负责实际传输文件。"}
+{"tool_id":"iWiki/getComments","name":"getComments","origin":"local","function":"分页读取知识文档普通评论和嵌套回复。","when_to_use":"已知文档编号且需评论讨论时使用，每页十条；划词批注有单独读取操作。"}
+{"tool_id":"iWiki/getInlineComment","name":"getInlineComment","origin":"local","function":"读取知识文档划词批注、原文片段及其嵌套回复。","when_to_use":"查看正文选中文字上的批注时使用；不同于底部普通评论列表。"}
+{"tool_id":"iWiki/addComment","name":"addComment","origin":"local","function":"为知识文档新增普通评论、回复或 Markdown 划词批注。","when_to_use":"评论需文档编号；划词批注仅支持 Markdown 且所选源码片段必须唯一。"}
+{"tool_id":"iWiki/glossaryTermSearch","name":"glossaryTermSearch","origin":"local","function":"按名称或别名查知识词库中的词条，可模糊或忽略大小写精确匹配。","when_to_use":"单个术语查找或名称探索时使用，可限定有权访问的词库。"}
+{"tool_id":"iWiki/glossaryBatchExactSearch","name":"glossaryBatchExactSearch","origin":"local","function":"批量精确查知识词库术语及别名，逐关键词返回有权限的匹配。","when_to_use":"多个术语一次核对时使用，最多一百项；支持有效、草稿或已删除状态。"}
+{"tool_id":"iWiki/createGlossary","name":"createGlossary","origin":"local","function":"创建知识术语词库并初始化管理员、可见范围及发布方式。","when_to_use":"新建词库容器时使用，名称全局唯一且不超过二十字；不是创建单个词条。"}
+{"tool_id":"iWiki/createGlossaryTerm","name":"createGlossaryTerm","origin":"local","function":"在已有知识词库创建词条，可直接发布或提交人工审批。","when_to_use":"已知词库编号及词条内容时使用；免审批发布需该词库管理员权限。"}
+{"tool_id":"iWiki/getCurrentUser","name":"getCurrentUser","origin":"local","function":"查询知识平台当前认证用户的登录名、员工类型及部门。","when_to_use":"需确认当前身份时使用；不查询其他用户或认证凭据。"}
+{"tool_id":"iWiki/writeMemory","name":"writeMemory","origin":"local","function":"将明确要跨会话保留的偏好、事实或决策写入长期记忆。","when_to_use":"用户明确要求记住内容时使用，可按项目归组；不是创建普通知识文档。"}
+{"tool_id":"iWiki/searchMemory","name":"searchMemory","origin":"local","function":"按语义查询长期记忆中的偏好、背景事实或历史决策。","when_to_use":"需回忆某一主题时使用，可限定项目；不用于分页盘点所有记忆。"}
+{"tool_id":"iWiki/listMemory","name":"listMemory","origin":"local","function":"分页列出长期记忆原始条目，可限定项目分组。","when_to_use":"用户要审阅都记住了什么时使用；不同于按主题语义查找。"}
+{"tool_id":"tapd_mcp_http/lookup_tapd_tool","name":"lookup_tapd_tool","origin":"local","function":"根据单一需求语义发现合适的 TAPD 操作及相似度。","when_to_use":"尚不确定具体操作名称时使用；发现后还需查参数再代理执行。"}
+{"tool_id":"tapd_mcp_http/lookup_tool_param_schema","name":"lookup_tool_param_schema","origin":"local","function":"查询已知 TAPD 操作的描述和输入参数定义。","when_to_use":"已有操作名称且需字段约束时使用；不是执行查询或更新业务数据。"}
+{"tool_id":"tapd_mcp_http/proxy_execute_tool","name":"proxy_execute_tool","origin":"local","function":"用操作名称及参数代理执行 TAPD 业务工具。","when_to_use":"具体操作和参数已确定时使用；不把代理支持的参数值扩充成独立工具。"}
+{"tool_id":"tapd_mcp_http/tql_syntax_reference","name":"tql_syntax_reference","origin":"local","function":"提供 TAPD 查询条件的 TQL 运算符及适用字段参考。","when_to_use":"需构造支持 TQL 的查询条件时使用；不适用于富文本或创建更新字段。"}
+{"tool_id":"tce-env-mcp/query_server_password","name":"query_server_password","origin":"local","function":"按环境、目标主机地址和用户名查询服务器密码库结果。","when_to_use":"授权查看指定主机凭据时使用；不重置密码或执行远程命令。"}
+{"tool_id":"tce-env-mcp/ssh_exec","name":"ssh_exec","origin":"local","function":"通过 SSH 在指定主机、环境或跳板机后的主机执行命令。","when_to_use":"需要远程命令输出时使用；连接需主机或环境，支持危险命令检查。"}
+{"tool_id":"tce-env-mcp/bspaccount_cli","name":"bspaccount_cli","origin":"local","function":"管理云平台租户端 BSP 账户的查询、创建、改密及锁定。","when_to_use":"对象是租户端账号时使用；不同于运营端 CAM 子账号，按 CLI 参数选择操作。"}
+{"tool_id":"tce-env-mcp/cam_cli","name":"cam_cli","origin":"local","function":"管理云平台运营端 CAM 子账号、用户组及回收站账号。","when_to_use":"对象是管理端用户或业务管理员权限时使用；不是租户 BSP 账户。"}
+{"tool_id":"tce-env-mcp/password_cli","name":"password_cli","origin":"local","function":"管理云平台设备密码库的查询、入库、退库和密码修改。","when_to_use":"设备密码生命周期管理时使用；写操作需登录，修改需设备编号，备地域需明确指定。"}
+{"tool_id":"tce-env-mcp/connect_outband_by_sn","name":"connect_outband_by_sn","origin":"local","function":"按机器序列号查询带外信息并生成 SSH 隧道连接步骤。","when_to_use":"需要物理机带外管理连接方案时使用，需序列号；不是直接执行主机命令。"}
+{"tool_id":"tce-env-mcp/transfer_file","name":"transfer_file","origin":"local","function":"把对话中的文本或编码内容写入远程文件，支持权限和备份。","when_to_use":"内容在当前对话而非本地磁盘时使用，最大十 MB；不是远程互传。"}
+{"tool_id":"tce-env-mcp/fetch_file","name":"fetch_file","origin":"local","function":"读取远程文件内容及元信息到当前对话，可返回二进制编码。","when_to_use":"只需查看或分析远程内容时使用，默认十 MB；不会下载到本地磁盘。"}
+{"tool_id":"tce-env-mcp/transfer_between_hosts","name":"transfer_between_hosts","origin":"local","function":"在两台远程主机间传文件，经内存中转并校验完整性。","when_to_use":"源和目标均远程且文件不超过十 MB 时使用；不涉及用户本地磁盘。"}
+{"tool_id":"tce-env-mcp/file_tunnel_transfer","name":"file_tunnel_transfer","origin":"local","function":"生成用户本地磁盘与远程集群之间的 SSH 隧道及 scp 传输命令。","when_to_use":"一端为用户 Mac 路径时使用，无声明大小限制；需本地依赖，工具只返回命令序列。"}
+{"tool_id":"tce-env-mcp/query_env_master","name":"query_env_master","origin":"local","function":"按环境查主节点地址和完整环境说明，或列出全部环境。","when_to_use":"需要定位环境入口、架构或用途信息时使用；不查询服务器密码。"}
+{"tool_id":"tce-env-mcp/whitelist_cli","name":"whitelist_cli","origin":"local","function":"管理云平台虚拟机清理的账户级和实例级白名单。","when_to_use":"要保护或取消保护清理对象时使用；不同于账户登录锁定和权限组。"}
+{"tool_id":"codegraph/codegraph_search","name":"codegraph_search","origin":"local","function":"按符号名快速定位代码中的定义位置，可按符号类型筛选。","when_to_use":"已有部分名称且只需位置时使用；项目需索引，不返回代码正文。"}
+{"tool_id":"codegraph/codegraph_callers","name":"codegraph_callers","origin":"local","function":"列出调用指定函数、方法或类的上游函数。","when_to_use":"要找谁调用某符号时使用，项目需已有索引；不是该函数内部调用谁。"}
+{"tool_id":"codegraph/codegraph_callees","name":"codegraph_callees","origin":"local","function":"列出指定函数、方法或类调用的下游函数。","when_to_use":"要查某符号内部调用哪些函数时使用；不是找上游调用者。"}
+{"tool_id":"codegraph/codegraph_impact","name":"codegraph_impact","origin":"local","function":"沿依赖关系评估修改指定符号影响到的代码。","when_to_use":"改动或重构前需影响范围时使用，可指定依赖深度；不是简单位置查找。"}
+{"tool_id":"codegraph/codegraph_node","name":"codegraph_node","origin":"local","function":"读取单个代码符号的签名、关系及可选完整正文，支持同名定义消歧。","when_to_use":"已探索但正文被截断时使用；可凭文件和行号定位一个重载定义。"}
+{"tool_id":"codegraph/codegraph_explore","name":"codegraph_explore","origin":"local","function":"按代码问题或相关符号集中展开源码及跨文件实现流程。","when_to_use":"理解模块、架构或完整调用流时优先使用，项目需索引；不只是列名称位置。"}
+{"tool_id":"codegraph/codegraph_status","name":"codegraph_status","origin":"local","function":"检查代码索引的文件、节点和关系数量及健康状态。","when_to_use":"检索异常或需确认索引是否正常时使用，不返回业务源码。"}
+{"tool_id":"codegraph/codegraph_files","name":"codegraph_files","origin":"local","function":"展示已索引代码的文件树、语言及符号数量，可按路径或模式筛选。","when_to_use":"了解索引内项目布局时使用；不是访问任意磁盘目录或读取文件内容。"}
+{"tool_id":"context7/resolve-library-id","name":"resolve-library-id","origin":"local","function":"把库或产品名称解析为文档检索所需的准确库标识。","when_to_use":"尚未获得库标识时先用，可比较匹配项和版本；不是直接返回主题文档。"}
+{"tool_id":"context7/query-docs","name":"query-docs","origin":"local","function":"按准确库标识查询某一主题的最新编程文档和代码示例。","when_to_use":"已提供或解析出库标识时使用，一次聚焦一个主题；不是源码符号分析。"}
+{"tool_id":"chrome-devtools/click","name":"click","origin":"local","function":"点击或双击网页快照中的指定元素。","when_to_use":"已知页面编号和最新元素标识时使用；不按屏幕坐标定位。"}
+{"tool_id":"chrome-devtools/close_page","name":"close_page","origin":"local","function":"按编号关闭浏览器标签页，但不能关闭最后一个页面。","when_to_use":"指定页面需关闭时使用；最后页面需用支持当前页关闭的其他操作。"}
+{"tool_id":"chrome-devtools/drag","name":"drag","origin":"local","function":"按快照元素标识将网页元素拖放到另一个元素。","when_to_use":"源和目标均为页面内元素时使用；不是把本地文件从页面外拖入。"}
+{"tool_id":"chrome-devtools/emulate","name":"emulate","origin":"local","function":"模拟网页网络、CPU、设备视口、地理位置、请求头及色彩偏好。","when_to_use":"复现特定设备或网络条件时使用；不是仅调整真实窗口尺寸。"}
+{"tool_id":"chrome-devtools/evaluate_script","name":"evaluate_script","origin":"local","function":"在指定网页执行 JavaScript 函数并返回可序列化结果。","when_to_use":"读取 DOM 或运行页面脚本时使用，可传元素标识；不是在服务器进程运行代码。"}
+{"tool_id":"chrome-devtools/fill","name":"fill","origin":"local","function":"给单个网页输入框、下拉框或勾选控件设置值。","when_to_use":"已有页面和元素标识且只改一个字段时使用；多个字段优先批量填表。"}
+{"tool_id":"chrome-devtools/fill_form","name":"fill_form","origin":"local","function":"一次填入多个网页表单字段，支持选择和勾选控件。","when_to_use":"已有多项元素标识时用于批量填写，比逐字段填入更适合整表操作。"}
+{"tool_id":"chrome-devtools/get_console_message","name":"get_console_message","origin":"local","function":"按已列出的消息编号读取一条网页控制台信息。","when_to_use":"已知页面及消息编号时使用；列表筛选另有操作。"}
+{"tool_id":"chrome-devtools/get_network_request","name":"get_network_request","origin":"local","function":"读取指定或开发者工具当前选中网络请求的头及请求响应体。","when_to_use":"已有请求编号或网络面板选中项时使用；不是列出所有请求。"}
+{"tool_id":"chrome-devtools/handle_dialog","name":"handle_dialog","origin":"local","function":"接受或取消已打开的浏览器弹窗，可填写提示框文本。","when_to_use":"网页 alert、confirm 或 prompt 已出现时使用；不是关闭普通 HTML 弹层。"}
+{"tool_id":"chrome-devtools/hover","name":"hover","origin":"local","function":"把鼠标悬停在网页快照中的指定元素上。","when_to_use":"需要触发悬浮菜单或提示时使用，需元素标识；不是点击。"}
+{"tool_id":"chrome-devtools/lighthouse_audit","name":"lighthouse_audit","origin":"local","function":"生成网页可访问性、SEO、最佳实践等 Lighthouse 审计报告。","when_to_use":"需非性能评分时使用，可审计当前状态或重新导航；性能问题应录制性能轨迹。"}
+{"tool_id":"chrome-devtools/list_console_messages","name":"list_console_messages","origin":"local","function":"分页列出网页导航以来的控制台消息，可按级别筛选及保留历史。","when_to_use":"需查看多条日志或筛选错误时使用；单条编号详情另查。"}
+{"tool_id":"chrome-devtools/list_network_requests","name":"list_network_requests","origin":"local","function":"分页列出网页近期网络请求，可按资源类型和历史保留条件筛选。","when_to_use":"定位请求或观察网络活动时使用；完整头与正文需读取单条详情。"}
+{"tool_id":"chrome-devtools/list_pages","name":"list_pages","origin":"local","function":"列出浏览器当前打开的页面及编号。","when_to_use":"尚需确认有哪些标签或获取页面编号时使用；不打开新页面。"}
+{"tool_id":"chrome-devtools/navigate_page","name":"navigate_page","origin":"local","function":"在已有网页打开地址，或后退、前进、刷新及控制导航缓存。","when_to_use":"当前页需导航时使用，需页面编号；开新标签有单独操作。"}
+{"tool_id":"chrome-devtools/new_page","name":"new_page","origin":"local","function":"新建浏览器标签并加载地址，可使用隔离上下文。","when_to_use":"需新增页面而非替换当前页时使用，隔离上下文可分离会话存储。"}
+{"tool_id":"chrome-devtools/performance_analyze_insight","name":"performance_analyze_insight","origin":"local","function":"展开性能轨迹结果中指定洞察集的一项分析。","when_to_use":"已有轨迹返回的洞察集及洞察名称时使用；不是开始或停止记录。"}
+{"tool_id":"chrome-devtools/performance_start_trace","name":"performance_start_trace","origin":"local","function":"开始记录网页性能轨迹以分析加载速度及核心体验指标。","when_to_use":"性能排查且目标页面已导航好时使用，可自动重载和停止；不是无障碍审计。"}
+{"tool_id":"chrome-devtools/performance_stop_trace","name":"performance_stop_trace","origin":"local","function":"结束指定网页当前仍在运行的性能轨迹记录。","when_to_use":"已有活动性能录制时使用，可保存轨迹；不是启动分析或捕获堆快照。"}
+{"tool_id":"chrome-devtools/press_key","name":"press_key","origin":"local","function":"在网页发送单个按键或带修饰键的快捷键组合。","when_to_use":"需特殊键、导航键或快捷键时使用；不是给输入框直接设置文本。"}
+{"tool_id":"chrome-devtools/resize_page","name":"resize_page","origin":"local","function":"把指定网页窗口调整到给定宽高尺寸。","when_to_use":"只需改变窗口尺寸时使用；网络、CPU、触摸设备模拟有其他操作。"}
+{"tool_id":"chrome-devtools/select_page","name":"select_page","origin":"local","function":"将指定浏览器页面设为后续操作上下文，可带到前台。","when_to_use":"已知页面编号且需切换目标标签时使用；不导航或新建页面。"}
+{"tool_id":"chrome-devtools/take_heapsnapshot","name":"take_heapsnapshot","origin":"local","function":"捕获网页 JavaScript 堆快照用于内存分布和泄漏分析。","when_to_use":"需要对象内存证据时使用，需输出文件路径；不是截图或性能轨迹。"}
+{"tool_id":"chrome-devtools/take_screenshot","name":"take_screenshot","origin":"local","function":"保存网页视口、整页或指定元素的图像截图。","when_to_use":"需视觉证据时使用，可选格式；整页与元素截图不可同时指定。"}
+{"tool_id":"chrome-devtools/take_snapshot","name":"take_snapshot","origin":"local","function":"按可访问性树读取网页文字结构及最新元素标识。","when_to_use":"需理解页面或获取交互目标时使用，不是像素截图。"}
+{"tool_id":"chrome-devtools/type_text","name":"type_text","origin":"local","function":"向已经获得焦点的网页输入位置发送文本，可附加提交键。","when_to_use":"焦点已就位且需键盘输入时使用；不是凭元素标识填单个表单字段。"}
+{"tool_id":"chrome-devtools/upload_file","name":"upload_file","origin":"local","function":"通过已定位的文件控件上传浏览器实例本地的一个或多个文件。","when_to_use":"已有文件输入或打开选择器的元素标识时使用，路径需浏览器实例可访问。"}
+{"tool_id":"chrome-devtools/wait_for","name":"wait_for","origin":"local","function":"等待网页出现非空文本列表中的任一文本。","when_to_use":"需等加载结果文字出现时使用；不用于等待文字消失或任意固定时长。"}
+{"tool_id":"wecom-doc/wecom_doc_login","name":"wecom_doc_login","origin":"local","function":"打开企业微信文档登录窗口供用户扫码，并保存后续会话。","when_to_use":"尚未登录或需重新扫码时使用，需要用户手动参与；不是只检查登录状态。"}
+{"tool_id":"wecom-doc/wecom_doc_status","name":"wecom_doc_status","origin":"local","function":"检查企业微信文档会话是否仍处于有效登录状态。","when_to_use":"读取或编辑前需确认现有会话时使用；不会重新发起扫码。"}
+{"tool_id":"wecom-doc/wecom_doc_fetch","name":"wecom_doc_fetch","origin":"local","function":"按企业微信文档链接读取在线文档、表格或幻灯片内容。","when_to_use":"已登录且需完整内容时使用，表格可指定工作表；不是只搜索关键词片段。"}
+{"tool_id":"wecom-doc/wecom_doc_screenshot","name":"wecom_doc_screenshot","origin":"local","function":"访问企业微信文档链接并保存页面截图。","when_to_use":"已登录且需企微文档的视觉呈现时使用；不返回可编辑正文。"}
+{"tool_id":"wecom-doc/wecom_doc_write","name":"wecom_doc_write","origin":"local","function":"在企业微信在线文档末尾追加纯文本。","when_to_use":"已登录且目标为在线文档时使用；不支持富文本或在线表格单元格写入。"}
+{"tool_id":"wecom-doc/wecom_doc_write_sheet","name":"wecom_doc_write_sheet","origin":"local","function":"给企业微信在线表格指定单元格追加或覆盖文本。","when_to_use":"已登录且只写一个单元格时使用，可指定工作表；不是文档正文追加。"}
+{"tool_id":"wecom-doc/wecom_doc_write_sheet_batch","name":"wecom_doc_write_sheet_batch","origin":"local","function":"一次向企业微信在线表格多个单元格写入文本。","when_to_use":"已登录且需多格批量修改时使用，可选覆盖或追加；不是逐行创建多维表记录。"}
+{"tool_id":"wecom-doc/wecom_doc_create","name":"wecom_doc_create","origin":"local","function":"新建企业微信在线文档、表格、幻灯片或其他可选文档类型。","when_to_use":"已登录且需新的企微文档链接时使用；不是在知识空间父目录创建页面。"}
+{"tool_id":"github/actions_get","name":"actions_get","origin":"public","function":"读取 GitHub 工作流、运行、任务或产物的单项详情。","when_to_use":"已知仓库和资源编号时使用，方法决定编号类型；任务日志正文有专用读取操作。"}
+{"tool_id":"github/actions_list","name":"actions_list","origin":"public","function":"列出 GitHub 工作流、运行、任务或产物，可分页筛选。","when_to_use":"浏览资源集合时使用，需仓库；某次运行的任务和产物需运行编号。"}
+{"tool_id":"github/actions_run_trigger","name":"actions_run_trigger","origin":"public","function":"触发 GitHub Actions 工作流及运行相关操作。","when_to_use":"明确要执行工作流动作时使用；手动运行需工作流和分支，其他运行动作需运行编号。"}
+{"tool_id":"github/get_job_logs","name":"get_job_logs","origin":"public","function":"读取 GitHub Actions 单任务或一次运行中失败任务的日志。","when_to_use":"需要日志正文或末尾行时使用；需任务编号，或失败任务模式下的运行编号。"}
+{"tool_id":"github/get_code_scanning_alert","name":"get_code_scanning_alert","origin":"public","function":"按编号读取 GitHub 仓库代码扫描安全告警。","when_to_use":"已知仓库及告警编号且有安全事件读取权限时使用；不是依赖升级告警。"}
+{"tool_id":"github/list_code_scanning_alerts","name":"list_code_scanning_alerts","origin":"public","function":"列出 GitHub 仓库代码扫描告警，可按状态、等级或扫描器筛选。","when_to_use":"盘点代码安全发现时使用；不是读取单条告警或列依赖漏洞。"}
+{"tool_id":"github/get_me","name":"get_me","origin":"public","function":"读取当前 GitHub 认证用户资料。","when_to_use":"确认正在使用的 GitHub 身份时使用；不是搜索其他用户或读取凭据。"}
+{"tool_id":"github/get_team_members","name":"get_team_members","origin":"public","function":"列出 GitHub 组织中指定团队的成员。","when_to_use":"已知组织和团队短名时使用；不是列某个用户所属团队或仓库协作者。"}
+{"tool_id":"github/get_teams","name":"get_teams","origin":"public","function":"读取指定用户或当前用户在 GitHub 中的团队信息。","when_to_use":"需查看个人团队归属时使用；不是列一个团队的成员名单。"}
+{"tool_id":"github/get_dependabot_alert","name":"get_dependabot_alert","origin":"public","function":"按编号读取 GitHub 仓库 Dependabot 依赖安全告警。","when_to_use":"已知依赖告警编号时使用；区别于源码代码扫描和泄露检测。"}
+{"tool_id":"github/list_dependabot_alerts","name":"list_dependabot_alerts","origin":"public","function":"列出 GitHub 仓库依赖安全告警并支持筛选。","when_to_use":"需盘点 Dependabot 风险时使用，需仓库；不返回源码扫描告警列表。"}
+{"tool_id":"github/discussion_comment_write","name":"discussion_comment_write","origin":"public","function":"新增、回复、修改或删除 GitHub Discussions 评论及管理答案标记。","when_to_use":"对象是讨论区评论时使用；回复仅支持一层，答案标记适用于问答讨论。"}
+{"tool_id":"github/get_discussion","name":"get_discussion","origin":"public","function":"按仓库和讨论编号读取 GitHub Discussions 主题详情。","when_to_use":"已有讨论编号且需主题内容时使用；评论列表需单独读取。"}
+{"tool_id":"github/get_discussion_comments","name":"get_discussion_comments","origin":"public","function":"分页读取 GitHub Discussions 评论，可包含顶层评论的回复。","when_to_use":"已知讨论编号且要看跟帖时使用；不同于读取讨论主题或 issue 评论。"}
+{"tool_id":"github/list_discussion_categories","name":"list_discussion_categories","origin":"public","function":"列出 GitHub 仓库或组织的讨论分类。","when_to_use":"创建或浏览讨论前需查分类时使用；不是 issue 类型或标签清单。"}
+{"tool_id":"github/list_discussions","name":"list_discussions","origin":"public","function":"分页列出 GitHub 仓库或组织讨论，可限定分类和排序。","when_to_use":"需浏览讨论集合时使用；已知单个主题编号应读取详情。"}
+{"tool_id":"github/create_gist","name":"create_gist","origin":"public","function":"在 GitHub 创建包含一个指定文件内容的新 Gist。","when_to_use":"分享新的代码片段时使用，需文件名和内容；不是向仓库提交文件。"}
+{"tool_id":"github/get_gist","name":"get_gist","origin":"public","function":"按 Gist 编号读取 GitHub 代码片段内容。","when_to_use":"已有 Gist 编号且需正文时使用；不是仓库路径文件读取。"}
+{"tool_id":"github/list_gists","name":"list_gists","origin":"public","function":"分页列出指定 GitHub 用户或当前用户的 Gist。","when_to_use":"浏览个人代码片段清单时使用，可限定更新时间；不是仓库列表。"}
+{"tool_id":"github/update_gist","name":"update_gist","origin":"public","function":"修改 GitHub 已有 Gist 中的文件内容或描述。","when_to_use":"已有 Gist 编号且要写入内容时使用；不是创建新片段或修改仓库文件。"}
+{"tool_id":"github/get_repository_tree","name":"get_repository_tree","origin":"public","function":"按 Git 引用读取 GitHub 仓库文件树，可递归或按路径前缀筛选。","when_to_use":"需版本对应目录层级时使用；不是本地索引文件树或文件正文。"}
+{"tool_id":"github/add_issue_comment","name":"add_issue_comment","origin":"public","function":"为 GitHub issue 或 PR 会话添加评论，或对会话及评论添加反应。","when_to_use":"普通会话留言时使用；不是代码行评审评论，不可同时提交正文和反应。"}
+{"tool_id":"github/get_label","name":"get_label","origin":"public","function":"读取 GitHub 仓库中指定名称标签的属性。","when_to_use":"已经知道标签名称时使用；不是列全部标签或查 issue 关联标签。"}
+{"tool_id":"github/issue_read","name":"issue_read","origin":"public","function":"读取 GitHub 单个 issue 的详情、评论、父子关系或标签。","when_to_use":"已有 issue 编号时使用；按方法读取对应内容，不负责修改层级。"}
+{"tool_id":"github/issue_write","name":"issue_write","origin":"public","function":"创建或更新 GitHub issue 的内容、状态、负责人、字段及里程碑。","when_to_use":"已确定仓库且需写 issue 时使用；新增子 issue 可指定父编号，已有层级修改另有操作。"}
+{"tool_id":"github/list_issue_fields","name":"list_issue_fields","origin":"public","function":"读取 GitHub 仓库继承或组织级 issue 自定义字段定义。","when_to_use":"需确认可用字段及结构时使用；不是具体 issue 字段值或标签类型。"}
+{"tool_id":"github/list_issue_types","name":"list_issue_types","origin":"public","function":"列出 GitHub 仓库或组织可用的 issue 类型。","when_to_use":"创建或更改 issue 类型前使用；不是标签、讨论分类或自定义字段。"}
+{"tool_id":"github/list_issues","name":"list_issues","origin":"public","function":"分页列出 GitHub 仓库 issues，支持标签、状态和自定义字段过滤。","when_to_use":"浏览明确仓库的问题清单时使用；自然语言匹配另有搜索操作。"}
+{"tool_id":"github/search_issues","name":"search_issues","origin":"public","function":"按自然语言需求搜索 GitHub issues，可限定仓库。","when_to_use":"需要匹配问题描述而非单纯枚举时使用；不搜索 PR 或源码文件。"}
+{"tool_id":"github/sub_issue_write","name":"sub_issue_write","origin":"public","function":"添加、移除或调整 GitHub 子 issue 的父级与优先顺序。","when_to_use":"更改已有问题层级时使用，需子项真实编号；迁移父级需明确替换原父级。"}
+{"tool_id":"github/update_issue_comment","name":"update_issue_comment","origin":"public","function":"按评论编号修改 GitHub issue 或 PR 普通会话评论正文。","when_to_use":"编辑已经存在的会话留言时使用；不适用于代码评审评论编号。"}
+{"tool_id":"github/label_write","name":"label_write","origin":"public","function":"创建、修改、重命名或删除 GitHub 仓库标签。","when_to_use":"管理标签定义时使用，需仓库和名称；不是给某个 issue 增加标签。"}
+{"tool_id":"github/list_label","name":"list_label","origin":"public","function":"分页列出 GitHub 仓库的标签定义。","when_to_use":"需浏览所有可用标签时使用；已知名称读属性有单项查询。"}
+{"tool_id":"github/projects_get","name":"projects_get","origin":"public","function":"读取 GitHub Projects 项目、字段、单项、视图或状态更新详情。","when_to_use":"已知项目及所需资源编号时使用；项目单项字段需指定字段名或编号。"}
+{"tool_id":"github/projects_list","name":"projects_list","origin":"public","function":"分页列出 GitHub Projects 项目、字段、单项、视图或状态更新。","when_to_use":"需资源集合时使用；列项目单项的字段值需明确字段名或编号。"}
+{"tool_id":"github/projects_write","name":"projects_write","origin":"public","function":"创建及管理 GitHub Projects 项目、单项、字段、视图和状态更新。","when_to_use":"明确要改变项目看板数据时使用；批量更新可一次设置最多五十项的同一字段。"}
+{"tool_id":"github/add_comment_to_pending_review","name":"add_comment_to_pending_review","origin":"public","function":"向当前用户已有的 GitHub PR 待提交评审增加代码评论。","when_to_use":"评审草稿已存在且需行级或文件级意见时使用；不会作为普通会话留言立即发布。"}
+{"tool_id":"github/add_reply_to_pull_request_comment","name":"add_reply_to_pull_request_comment","origin":"public","function":"回复 GitHub PR 已有代码评审评论，或给该评论添加反应。","when_to_use":"已知评审评论的数字编号时使用；不是普通会话评论或评审线程节点编号。"}
+{"tool_id":"github/create_pull_request","name":"create_pull_request","origin":"public","function":"从指定源分支向目标分支创建 GitHub PR，可设草稿及评审人。","when_to_use":"分支已有变更且需发起新合并请求时使用；不是修改现有 PR。"}
+{"tool_id":"github/list_pull_requests","name":"list_pull_requests","origin":"public","function":"分页列出 GitHub 仓库 PR，可按状态及源目标分支筛选。","when_to_use":"浏览明确仓库合并请求时使用；跨仓库搜索另有操作。"}
+{"tool_id":"github/merge_pull_request","name":"merge_pull_request","origin":"public","function":"按合并方式合并 GitHub PR，可校验预期头提交。","when_to_use":"确认合并已有 PR 时使用，需编号；不是只更新分支或关闭请求。"}
+{"tool_id":"github/pull_request_read","name":"pull_request_read","origin":"public","function":"读取 GitHub 单个 PR 的详情、差异、文件、提交、检查或评审线程。","when_to_use":"已有 PR 编号且要查看内容时使用；行级评审线程不同于普通会话评论。"}
+{"tool_id":"github/pull_request_review_write","name":"pull_request_review_write","origin":"public","function":"创建、提交或删除 GitHub PR 评审并处理线程解决状态。","when_to_use":"需正式评审或线程状态变化时使用；线程操作需评审线程节点编号。"}
+{"tool_id":"github/search_pull_requests","name":"search_pull_requests","origin":"public","function":"按 GitHub PR 搜索语法查合并请求，可限定仓库。","when_to_use":"按标题、内容或搜索限定条件找 PR 时使用；不搜索 issue 或代码文件。"}
+{"tool_id":"github/update_pull_request","name":"update_pull_request","origin":"public","function":"修改 GitHub PR 标题、说明、状态、目标分支、草稿或评审人。","when_to_use":"已有 PR 需编辑元信息时使用；不合并，也不向源分支同步新提交。"}
+{"tool_id":"github/update_pull_request_branch","name":"update_pull_request_branch","origin":"public","function":"用目标分支最新变更更新 GitHub PR 源分支，可校验头提交。","when_to_use":"PR 分支落后需同步时使用；不是合并 PR 或单纯改目标分支名称。"}
+{"tool_id":"github/create_branch","name":"create_branch","origin":"public","function":"在 GitHub 仓库从指定或默认分支创建新分支。","when_to_use":"需新的远程分支时使用；不是本地切分支或创建 PR。"}
+{"tool_id":"github/create_or_update_file","name":"create_or_update_file","origin":"public","function":"在 GitHub 指定分支创建或替换一个文件并产生提交。","when_to_use":"单文件写入时使用，现有文件需原 blob 哈希；内容传原文而非预编码。"}
+{"tool_id":"github/create_repository","name":"create_repository","origin":"public","function":"在 GitHub 个人或组织下新建仓库，可选择可见性及初始化说明文件。","when_to_use":"要新仓库时使用，未指定可见性默认为私有；不是 fork 现有仓库。"}
+{"tool_id":"github/delete_file","name":"delete_file","origin":"public","function":"从 GitHub 指定仓库分支删除一个文件并产生提交。","when_to_use":"确认删仓库路径文件时使用，需分支与提交说明；不是删除整个仓库。"}
+{"tool_id":"github/delete_repository","name":"delete_repository","origin":"public","function":"删除指定 GitHub 仓库。","when_to_use":"明确授权删除整个仓库且具备权限时使用；不是只删文件、分支或取消收藏。"}
+{"tool_id":"github/fork_repository","name":"fork_repository","origin":"public","function":"将已有 GitHub 仓库 fork 到当前个人或指定组织。","when_to_use":"需保留上游关系的仓库副本时使用；不是从零新建或普通文件复制。"}
+{"tool_id":"github/get_commit","name":"get_commit","origin":"public","function":"读取 GitHub 指定提交详情，可选择文件统计或完整补丁。","when_to_use":"已有提交哈希或引用时使用；不是搜索提交消息或列整段历史。"}
+{"tool_id":"github/get_file_contents","name":"get_file_contents","origin":"public","function":"按路径及分支、标签或提交读取 GitHub 文件或目录内容。","when_to_use":"已知仓库路径需正文或目录条目时使用；不是全局代码搜索或本地文件读取。"}
+{"tool_id":"github/get_latest_release","name":"get_latest_release","origin":"public","function":"读取 GitHub 仓库最新正式发布版本。","when_to_use":"只需最新 release 时使用；不是最新 Git 标签或全部发布列表。"}
+{"tool_id":"github/get_release_by_tag","name":"get_release_by_tag","origin":"public","function":"按标签名读取 GitHub 仓库对应 release。","when_to_use":"已知版本标签且需发布说明或资产时使用；Git 标签对象另有查询。"}
+{"tool_id":"github/get_tag","name":"get_tag","origin":"public","function":"按名称读取 GitHub 仓库 Git 标签详情。","when_to_use":"需了解已知标签对象时使用；不同于对应版本的 release 说明。"}
+{"tool_id":"github/list_branches","name":"list_branches","origin":"public","function":"分页列出 GitHub 仓库分支。","when_to_use":"需浏览远程分支清单时使用；不是本地文件树或创建新分支。"}
+{"tool_id":"github/list_commits","name":"list_commits","origin":"public","function":"按 Git 引用分页列出 GitHub 提交历史，可筛作者、路径及时间。","when_to_use":"查看分支历史或文件演变时使用；提交消息搜索有单独操作。"}
+{"tool_id":"github/list_releases","name":"list_releases","origin":"public","function":"分页列出 GitHub 仓库发布版本及说明。","when_to_use":"需要发布历史清单时使用；不是只取最新版本或枚举 Git 标签。"}
+{"tool_id":"github/list_repository_collaborators","name":"list_repository_collaborators","origin":"public","function":"列出 GitHub 仓库协作者，可按成员关联类型筛选。","when_to_use":"需了解仓库访问协作者时使用；不是组织团队成员名单。"}
+{"tool_id":"github/list_tags","name":"list_tags","origin":"public","function":"分页列出 GitHub 仓库 Git 标签。","when_to_use":"需浏览版本引用清单时使用；不是 release 历史或单个标签对象。"}
+{"tool_id":"github/push_files","name":"push_files","origin":"public","function":"把多个文件内容一次提交到 GitHub 仓库指定分支。","when_to_use":"需要一个提交包含多文件改动时使用；不是分别写单文件或上传 release 产物。"}
+{"tool_id":"github/search_code","name":"search_code","origin":"public","function":"用 GitHub 代码搜索语法跨仓库检索源文件内容或路径。","when_to_use":"未知具体文件位置时使用，可限仓库、语言或路径；不是语义索引调用分析。"}
+{"tool_id":"github/search_commits","name":"search_commits","origin":"public","function":"按提交消息及作者、时间等条件搜索 GitHub 默认分支提交。","when_to_use":"需要关键词匹配提交记录时使用，可限定仓库；不是列任意分支历史。"}
+{"tool_id":"github/search_repositories","name":"search_repositories","origin":"public","function":"按 GitHub 仓库名称、主题、语言或星数等条件搜索项目。","when_to_use":"寻找仓库而非文件、问题或用户时使用，可选择返回信息量。"}
+{"tool_id":"github/get_secret_scanning_alert","name":"get_secret_scanning_alert","origin":"public","function":"读取 GitHub 指定泄露检测告警的详情。","when_to_use":"已有泄露告警编号且有权限时使用；不是服务器密码查询或依赖漏洞。"}
+{"tool_id":"github/list_secret_scanning_alerts","name":"list_secret_scanning_alerts","origin":"public","function":"列出 GitHub 仓库泄露检测告警，可按状态、类型或解决原因筛选。","when_to_use":"需盘点泄露风险记录时使用；不要将告警中的敏感值当作评测输入。"}
+{"tool_id":"github/get_global_security_advisory","name":"get_global_security_advisory","origin":"public","function":"按 GHSA 编号读取 GitHub 全球安全公告。","when_to_use":"已知公告编号且需漏洞说明时使用；不是某仓库私有公告列表。"}
+{"tool_id":"github/list_global_security_advisories","name":"list_global_security_advisories","origin":"public","function":"按生态、包版本、CVE、等级和时间筛选 GitHub 全球安全公告。","when_to_use":"需查公开漏洞资料集合时使用；区别于某仓库的依赖告警。"}
+{"tool_id":"github/list_org_repository_security_advisories","name":"list_org_repository_security_advisories","origin":"public","function":"列出 GitHub 组织旗下仓库安全公告，可按状态及排序筛选。","when_to_use":"组织范围汇总仓库公告时使用；不是全球漏洞库或单仓库列表。"}
+{"tool_id":"github/list_repository_security_advisories","name":"list_repository_security_advisories","origin":"public","function":"列出 GitHub 单个仓库安全公告，可按状态及排序筛选。","when_to_use":"明确仓库需公告清单时使用；不是 Dependabot 告警或全球安全公告。"}
+{"tool_id":"github/star_repository","name":"star_repository","origin":"public","function":"给指定 GitHub 仓库添加星标收藏。","when_to_use":"明确要收藏仓库时使用；不是订阅通知、fork 或新建仓库。"}
+{"tool_id":"github/unstar_repository","name":"unstar_repository","origin":"public","function":"取消指定 GitHub 仓库的星标收藏。","when_to_use":"明确移除收藏时使用；不会删除仓库或取消其他通知设置。"}
+{"tool_id":"github/search_users","name":"search_users","origin":"public","function":"按姓名、位置、关注数等条件搜索 GitHub 用户。","when_to_use":"寻找个人用户时使用；不是搜索组织、读取当前身份或列团队成员。"}
+{"tool_id":"playwright/browser_click","name":"browser_click","origin":"public","function":"点击或双击网页元素，支持鼠标按钮及修饰键。","when_to_use":"目标来自最新快照引用或唯一选择器时使用；不是屏幕坐标点击。"}
+{"tool_id":"playwright/browser_close","name":"browser_close","origin":"public","function":"关闭当前浏览器页面。","when_to_use":"要关闭当前页时使用，无页面编号参数；指定其他标签可用标签管理。"}
+{"tool_id":"playwright/browser_console_messages","name":"browser_console_messages","origin":"public","function":"读取网页控制台消息，可选严重等级、会话历史及输出文件。","when_to_use":"需日志列表时使用；按等级包含更严重消息，不提供按消息编号的专用读取。"}
+{"tool_id":"playwright/browser_drag","name":"browser_drag","origin":"public","function":"在两个已定位网页元素之间执行拖放。","when_to_use":"源目标为快照引用或唯一选择器时使用；不是从本地拖入文件。"}
+{"tool_id":"playwright/browser_drop","name":"browser_drop","origin":"public","function":"将本地文件或指定 MIME 数据从页面外拖放到网页元素。","when_to_use":"目标是外部拖放区时使用，需文件路径或 MIME 数据；不同于页面内元素互拖。"}
+{"tool_id":"playwright/browser_emulate_media","name":"browser_emulate_media","origin":"public","function":"设置网页 CSS 媒体偏好，如明暗、减少动画、对比度及打印模式。","when_to_use":"仅改变媒体特征时使用，省略保留原设置、空值清除；不控制网络或 CPU。"}
+{"tool_id":"playwright/browser_evaluate","name":"browser_evaluate","origin":"public","function":"在网页或指定元素上执行 JavaScript 并返回结果。","when_to_use":"需页面 DOM 数据或脚本计算时使用；不是浏览器服务器进程任意代码执行。"}
+{"tool_id":"playwright/browser_file_upload","name":"browser_file_upload","origin":"public","function":"处理浏览器文件选择器，上传一或多个本地文件或取消选择。","when_to_use":"文件选择器已触发时使用，路径需绝对地址；省略路径表示取消。"}
+{"tool_id":"playwright/browser_fill_form","name":"browser_fill_form","origin":"public","function":"一次填写多个网页表单字段。","when_to_use":"已定位多个字段且要批量填表时使用；不是向已聚焦位置随意键入。"}
+{"tool_id":"playwright/browser_find","name":"browser_find","origin":"public","function":"在网页可访问性快照中按文字或正则查节点及附近上下文。","when_to_use":"只需定位局部元素时使用，文字与正则二选一；不是整页快照或站内搜索提交。"}
+{"tool_id":"playwright/browser_handle_dialog","name":"browser_handle_dialog","origin":"public","function":"接受或拒绝已打开的浏览器对话框，可填写提示文本。","when_to_use":"alert、confirm 或 prompt 出现时使用；不是点击网页内自绘弹层。"}
+{"tool_id":"playwright/browser_hover","name":"browser_hover","origin":"public","function":"把鼠标悬停到网页快照引用或唯一选择器对应元素。","when_to_use":"要触发悬浮提示或菜单时使用；不会点击或修改字段。"}
+{"tool_id":"playwright/browser_navigate","name":"browser_navigate","origin":"public","function":"在当前浏览器页访问指定地址。","when_to_use":"已有当前页且需地址导航时使用；不是新建标签或返回历史记录。"}
+{"tool_id":"playwright/browser_navigate_back","name":"browser_navigate_back","origin":"public","function":"返回浏览器当前页历史记录中的上一页。","when_to_use":"已有可后退的导航历史时使用；不是重新打开地址、刷新或前进。"}
+{"tool_id":"playwright/browser_network_request","name":"browser_network_request","origin":"public","function":"按请求列表序号读取单个网络请求完整详情或指定部分。","when_to_use":"序号由请求列表提供且从一开始时使用；不是列全部请求。"}
+{"tool_id":"playwright/browser_network_requests","name":"browser_network_requests","origin":"public","function":"列出网页网络请求，可含静态资源、会话历史和地址正则筛选。","when_to_use":"先定位请求或观察网络活动时使用；完整头正文需查单项详情。"}
+{"tool_id":"playwright/browser_press_key","name":"browser_press_key","origin":"public","function":"给当前网页发送按键或字符。","when_to_use":"需键盘导航、特殊键或快捷键时使用；不是凭目标设置表单值。"}
+{"tool_id":"playwright/browser_resize","name":"browser_resize","origin":"public","function":"按给定宽高调整浏览器窗口。","when_to_use":"只改窗口尺寸时使用；不设置网络、CPU 或媒体偏好。"}
+{"tool_id":"playwright/browser_select_option","name":"browser_select_option","origin":"public","function":"为已定位网页下拉控件选择一个或多个选项值。","when_to_use":"目标为原生下拉选项时使用，支持多选；不是输入自由文本。"}
+{"tool_id":"playwright/browser_snapshot","name":"browser_snapshot","origin":"public","function":"读取当前网页或指定元素的可访问性树，可限制深度及返回边界框。","when_to_use":"需页面文字结构和交互引用时使用；不是图像截图。"}
+{"tool_id":"playwright/browser_take_screenshot","name":"browser_take_screenshot","origin":"public","function":"保存当前网页、整页或指定元素截图，可选格式及像素尺度。","when_to_use":"需要视觉证据时使用；整页不能与元素截图混用，像素尺度决定图像大小。"}
+{"tool_id":"playwright/browser_type","name":"browser_type","origin":"public","function":"向指定可编辑网页元素输入文本，可逐字符输入或按回车提交。","when_to_use":"已有目标引用或唯一选择器时使用；多字段表单宜批量填写。"}
+{"tool_id":"playwright/browser_wait_for","name":"browser_wait_for","origin":"public","function":"等待网页文字出现、消失或固定时长，可设置超时。","when_to_use":"需同步页面状态时使用，固定等待最多三十秒；出现和消失同时指定时取先发生者。"}
+{"tool_id":"playwright/browser_tabs","name":"browser_tabs","origin":"public","function":"列出、新建、关闭或选中浏览器标签，可指定隔离上下文。","when_to_use":"需管理已有标签或另开网页时使用；按操作决定是否需索引和地址。"}
+{"tool_id":"playwright/browser_network_state_set","name":"browser_network_state_set","origin":"public","function":"将浏览器网络状态切换为离线或恢复在线。","when_to_use":"已启用网络能力且需模拟断网时使用；不设置具体带宽或网络请求 mock。"}

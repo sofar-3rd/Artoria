@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 export type Route =
   | { page: 'chat' }
+  | { page: 'kbs' }
   | { page: 'traces'; threadId: string | null }
   | { page: 'trace'; id: string }
 
@@ -11,6 +12,7 @@ export function parseRoute(pathname: string, search: string): Route {
   if (/^\/traces\/?$/.test(pathname)) {
     return { page: 'traces', threadId: new URLSearchParams(search).get('thread') }
   }
+  if (/^\/kbs\/?$/.test(pathname)) return { page: 'kbs' }
   return { page: 'chat' }
 }
 

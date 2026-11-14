@@ -68,3 +68,40 @@ export interface TurnPage {
   items: Turn[]
   next_cursor: string | null
 }
+
+export interface KbSummary {
+  name: string
+  description: string
+  doc_count: number
+  synced_at: string | null
+  last_error: string | null
+}
+
+export interface KbDetail extends KbSummary {
+  last_commit: string | null
+  running: boolean
+}
+
+export interface KbCreateInput {
+  name: string
+  description: string
+  repo_url: string
+  branch: string
+  subdir: string
+}
+
+export interface KbDocument {
+  doc_id: string
+  path: string
+  title: string
+  chars: number
+}
+
+export interface KbDocumentPage {
+  path: string
+  title: string
+  text: string
+  offset: number
+  total_chars: number
+  has_more: boolean
+}

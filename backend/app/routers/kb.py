@@ -2,14 +2,14 @@ import asyncio
 import hmac
 import logging
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from pydantic import ValidationError
 
 from app.config import settings
 from app.rag.bootstrap import Rag
-from app.rag.core.errors import KnowledgeBaseExists, RagError, UnknownKnowledgeBase
+from app.rag.core.errors import DocumentNotFound, KnowledgeBaseExists, RagError, UnknownKnowledgeBase
 from app.rag.interfaces.validation import validate_branch, validate_name, validate_repo_url, validate_subdir
-from app.schemas import KbCreate, KbDetail, KbOut
+from app.schemas import KbCreate, KbDetail, KbDocumentOut, KbDocumentPageOut, KbOut
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -75,11 +75,15 @@ async def _read_limited(request: Request) -> bytes:
     return b"".join(chunks)
 
 
-async def _info(rag: Rag, name: str):
+async def _kb_ref(rag: Rag, name: str):
     try:
-        await rag.store.get_kb(name)
+        return await rag.store.get_kb(name)
     except UnknownKnowledgeBase as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+async def _info(rag: Rag, name: str):
+    await _kb_ref(rag, name)
     return next(i for i in await rag.catalog.list_kbs() if i.name == name)
 
 
@@ -92,6 +96,27 @@ async def get_kb(name: str, request: Request, rag: Rag = Depends(get_rag)):
     info = await _info(rag, name)
     kb = await rag.store.get_kb(name)
     return KbDetail(**info.__dict__, last_commit=kb.last_commit, running=running)
+
+
+@router.get("/kbs/{name}/documents", response_model=list[KbDocumentOut])
+async def list_documents(name: str, rag: Rag = Depends(get_rag)):
+    kb = await _kb_ref(rag, name)
+    return await rag.catalog.list_documents(kb.id)
+
+
+@router.get("/kbs/{name}/documents/{doc_id}", response_model=KbDocumentPageOut)
+async def read_document(
+    name: str,
+    doc_id: str,
+    offset: int = Query(0, ge=0),
+    limit: int = Query(6000, ge=1, le=20000),
+    rag: Rag = Depends(get_rag),
+):
+    kb = await _kb_ref(rag, name)
+    try:
+        return await rag.catalog.read_in_kb(kb.id, doc_id, offset, limit)
+    except DocumentNotFound as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
 @router.post("/kbs/{name}/sync", status_code=202, dependencies=[Depends(require_admin)])

@@ -131,6 +131,7 @@ export default function ChatPage() {
         onNew={newChat}
         onDelete={removeThread}
         onOpenTraces={() => navigate(activeId ? `/traces?thread=${activeId}` : '/traces')}
+        onOpenKbs={() => navigate('/kbs')}
       />
       <main className="flex min-w-0 flex-1 flex-col">
         <ChatView messages={messages} streaming={streaming} />

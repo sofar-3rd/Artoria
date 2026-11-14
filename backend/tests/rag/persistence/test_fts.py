@@ -12,26 +12,16 @@ async def _dispose():
 
 
 async def matches(doc: str, query: str):
-    sql = f"SELECT {fts.tsvector_sql('doc')} @@ {fts.tsquery_or_sql('q')}"
+    terms = fts.search_text(query)
+    if not terms:
+        return False
     async with SessionLocal() as s:
-        return (await s.execute(text(sql), {"doc": doc, "q": query})).scalar()
-
-
-async def query_text(query: str):
-    async with SessionLocal() as s:
-        return (await s.execute(text(f"SELECT {fts.tsquery_or_sql('q')}::text"), {"q": query})).scalar()
-
-
-def test_fts_sql_fragments():
-    assert fts.tsvector_sql("t") == "to_tsvector('jiebacfg', :t)"
-    assert "string_agg(quote_literal(l), ' | ')" in fts.tsquery_or_sql("q")
-    assert "btrim(l) <> ''" in fts.tsquery_or_sql("q")
-
-
-async def test_whitespace_lexeme_never_enters_the_query():
-    # pg_jieba emits ' ' for spaces; an OR query containing it matches every chunk that has a space.
-    assert "' '" not in (await query_text("回滚 deploy"))
-    assert "' '" not in (await query_text("kubectl rollout undo"))
+        await s.execute(text("CREATE TEMP TABLE fts_probe (search_text text)"))
+        await s.execute(text("INSERT INTO fts_probe VALUES (:doc)"), {"doc": fts.search_text(doc)})
+        await s.execute(text("CREATE INDEX fts_probe_idx ON fts_probe USING bm25(search_text) WITH (text_config='simple')"))
+        return (await s.execute(text("""
+            SELECT search_text <@> to_bm25query(:query, 'fts_probe_idx') < 0 FROM fts_probe
+        """), {"query": terms})).scalar()
 
 
 async def test_unrelated_document_does_not_match():
@@ -51,8 +41,7 @@ async def test_error_code_matches_case_insensitively():
 
 
 async def test_stop_word_only_query_matches_nothing_and_does_not_raise():
-    assert await query_text("的 了 是") is None
-    assert await matches("的 了 是 anything with spaces", "的 了 是") is None  # NULL, i.e. no row
+    assert await matches("的 了 是 anything with spaces", "的 了 是") is False
 
 
 @pytest.mark.parametrize(
@@ -65,5 +54,5 @@ async def test_stop_word_only_query_matches_nothing_and_does_not_raise():
     ],
 )
 async def test_special_characters_in_user_text_cannot_break_the_query(query, doc, expected):
-    # Each lexeme is quote_literal'd, so operators and quotes in user text are plain words.
+    # User terms are bound data rather than SQL or query operators.
     assert await matches(doc, query) is expected

@@ -4,6 +4,7 @@ version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.20.1",
+    "jieba==0.42.1",
     "fastapi>=0.162.0",
     "langchain>=1.4.8",
     "langchain-openai>=1.7.3",
@@ -27,6 +28,10 @@ dev = [
     "pytest>=9.2.0",
     "pytest-asyncio>=1.4.1.post1",
     "reportlab>=5.1.0",
+]
+eval = [
+    "langchain-community==0.4.1",
+    "ragas==0.4.3",
 ]
 
 [tool.pytest.ini_options]

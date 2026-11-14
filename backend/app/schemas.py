@@ -46,6 +46,22 @@ class KbDetail(KbOut):
     running: bool
 
 
+class KbDocumentOut(BaseModel):
+    doc_id: str
+    path: str
+    title: str
+    chars: int
+
+
+class KbDocumentPageOut(BaseModel):
+    path: str
+    title: str
+    text: str
+    offset: int
+    total_chars: int
+    has_more: bool
+
+
 class ToolCallOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

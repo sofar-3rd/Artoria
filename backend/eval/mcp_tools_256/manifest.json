@@ -1,0 +1,64 @@
+{
+  "format_version": 1,
+  "variant": "expanded_tool_descriptions_256",
+  "status": "ready",
+  "tool_chunk_max_tokens": 256,
+  "tokenizer": "models/bge-reranker-v2-m3",
+  "token_counting": "Complete Tool.text without model-added special tokens; reject overflow, never truncate.",
+  "search_fields": ["name", "function", "when_to_use"],
+  "source_dataset": "../mcp_tools",
+  "source_files_sha256": {
+    "tools.jsonl": "f633893a004f21c3afce6c4052a755d3fa6a8ca3c86493a2f7c3c313921bfe94",
+    "questions.jsonl": "0b3a31c4058e10f5636e4dfe79eb580a0607f1ff94c2aeb79396419b17f171dc",
+    "sources.jsonl": "cf331ff7a511ff585f2b44f56027e27e8a1f016a15e0f4c31f16f2fa1a28c894"
+  },
+  "generation": {
+    "method": "One offline subagent rewriting descriptions from sanitized source definitions, followed by main-agent review.",
+    "allowed_inputs": ["source name", "source description", "source inputSchema"],
+    "excluded_inputs": ["evaluation questions", "labels", "rankings", "model scores"],
+    "constraints": "Preserve canonical tool_id, name, origin; no server label, keyword list, schema dump, invented capabilities or credentials. Budget is an upper bound, not a target."
+  },
+  "questions_policy": "Byte-identical copy of the frozen 400-question dataset; retain intent groups, split, labels and queries.",
+  "evaluation_status": "Evaluated on the frozen 79-question test split with N=20, M=20, K=5; no parameter selection. Historical mcp_tools scores remain separate.",
+  "evaluation": {
+    "runner": "../../scripts/eval_mcp_top5.py",
+    "database_schema": "sagent_rag_eval.mcp_tools_256",
+    "output_directory": "/Users/glinn/Documents/obsidian/sagent/rag-retrieval/run-256-top5-2026-11-09",
+    "recall_candidates_per_route": 20,
+    "rerank_candidates": 20,
+    "top_k": 5,
+    "test_questions_by_reference_count": {"1": 65, "2": 12, "3": 2},
+    "rerank_test_recall_at_5": 0.9556962025316456,
+    "rerank_test_mrr_at_5": 0.9145569620253164,
+    "rerank_test_hit_at_5": 0.9746835443037974
+  },
+  "counts": {
+    "tools": 200,
+    "origins": {"local": 100, "public": 100},
+    "questions": 400,
+    "splits": {"dev": 321, "test": 79}
+  },
+  "token_statistics": {
+    "minimum": 70,
+    "mean": 108.08,
+    "maximum": 191,
+    "over_budget": 0,
+    "maximum_query_chunk_pair_with_special_tokens": 226
+  },
+  "files_sha256": {
+    "tools.jsonl": "50b0160a4f8beb690195c4cd82b486bf85310bab9f69ace3ca21a37b797247b1",
+    "descriptions.tsv": "5e89f4bd265dc8e80776c353d51da82c3cebfa050ea301eeda8ac306763121c0",
+    "questions.jsonl": "0b3a31c4058e10f5636e4dfe79eb580a0607f1ff94c2aeb79396419b17f171dc",
+    "sources.jsonl": "cf331ff7a511ff585f2b44f56027e27e8a1f016a15e0f4c31f16f2fa1a28c894"
+  },
+  "review_notes": [
+    "Main agent read all 200 expanded description rows; an independent subagent compared all rows against source description and schema without reading evaluation questions or results.",
+    "Clarified Star versus Watch, drag/drop versus clipboard paste, TQL operator-specific field scopes, and aiSearchDocument's conditional omitted-limit behavior.",
+    "github/issue_write's source contains a broad issue/pull-request title but methods only clarify Issue writes; no unsupported PR creation capability was added."
+  ],
+  "limitations": [
+    "Descriptions are generated offline, not a claim of runtime tool availability.",
+    "Public schemas are reconstructed from pinned official README parameter documentation; local licenses remain NOASSERTION.",
+    "Expanding descriptions does not prove retrieval improvement."
+  ]
+}

@@ -1,0 +1,36 @@
+[
+  {
+    "server": "github",
+    "repository": "github/github-mcp-server",
+    "revision": "99d6d6503a7b2a133e2f8a595d6d0ba24b4086d3",
+    "source_url": "https://raw.githubusercontent.com/github/github-mcp-server/99d6d6503a7b2a133e2f8a595d6d0ba24b4086d3/README.md",
+    "upstream_full_readme_sha256": "371e8c991df6e5e61ca6a864d692141dbf1a728ae0790d376b54c96b91e4ff13",
+    "stored_sanitized_readme_sha256": "9448c2f7a05e82d03b1db5346bfa166bce072cedc4f593070667eac53729568f",
+    "raw_tool_excerpt_sha256": "626f643af26bf9dc17027ec485a969bee78897ab13296f089848aec0d3258d7f",
+    "raw_tool_excerpt": "sources/github/README.tools.raw.md",
+    "excerpt_character_range": [
+      37970,
+      112139
+    ],
+    "encoding": "UTF-8",
+    "license": "MIT",
+    "method": "Pinned HTTPS GET; preserve verbatim generated tool-documentation section and LICENSE; sanitize IP and credential sample syntax in full README snapshot."
+  },
+  {
+    "server": "playwright",
+    "repository": "microsoft/playwright-mcp",
+    "revision": "404be8eb89abecff77a55152b6d843d140c78372",
+    "source_url": "https://raw.githubusercontent.com/microsoft/playwright-mcp/404be8eb89abecff77a55152b6d843d140c78372/README.md",
+    "upstream_full_readme_sha256": "addbee8e89ceebd696365571456f68d512d9f9bb5d39f8a5094f7f561d3f8af4",
+    "stored_sanitized_readme_sha256": "db63d484534d5d14b8ff745abe891e50aa1dcf0bc45d982afdc507661606f53b",
+    "raw_tool_excerpt_sha256": "1ff69ad0330162d271407e9418279bddc282ab1fc2d4d825b46306554f02fa39",
+    "raw_tool_excerpt": "sources/playwright/README.tools.raw.md",
+    "excerpt_character_range": [
+      35845,
+      69665
+    ],
+    "encoding": "UTF-8",
+    "license": "Apache-2.0",
+    "method": "Pinned HTTPS GET; preserve verbatim generated tool-documentation section and LICENSE; sanitize IP and credential sample syntax in full README snapshot."
+  }
+]

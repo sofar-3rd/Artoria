@@ -75,6 +75,36 @@ async def test_keyword_route_alone_can_recall():
     assert hits[0].content.startswith("错误码 E4021")
 
 
+async def test_keyword_route_uses_bm25_rare_term_ranking():
+    from sqlalchemy import text
+
+    store = Store(SessionLocal)
+    kb = await make_kb(store)
+    await put(store, kb, "common.md", ["database " * 20])
+    await put(store, kb, "rare.md", ["E4021"])
+    for i in range(10):
+        await put(store, kb, f"filler-{i}.md", ["database service"])
+    async with SessionLocal() as s:
+        rows = (await s.execute(text("""
+            SELECT content FROM chunks
+            WHERE kb_id = :kb
+            ORDER BY search_text <@> to_bm25query('database e4021', 'ix_chunks_bm25')
+            LIMIT 1
+        """), {"kb": kb.id})).scalars().all()
+    assert rows == ["E4021"]
+
+
+async def test_stop_word_only_search_has_no_keyword_boost():
+    store = Store(SessionLocal)
+    kb = await make_kb(store)
+    await put(store, kb, "a.md", ["database"])
+    hits = await store.hybrid_candidates(
+        [kb.id], "的 了 是", await emb.embed_query("的 了 是"), 10, 10, 60
+    )
+    assert len(hits) == 1
+    assert hits[0].score == pytest.approx(1 / 61)
+
+
 async def test_delete_documents_cascades():
     store = Store(SessionLocal)
     kb = await make_kb(store)

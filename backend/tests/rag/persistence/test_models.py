@@ -22,12 +22,13 @@ async def test_cascade_delete_and_vector_roundtrip():
         doc = Document(kb_id=kb.id, path="a.md", title="A", content="body", content_sha="s")
         s.add(doc); await s.flush()
         s.add(ChunkRow(doc_id=doc.id, kb_id=kb.id, idx=0, heading_path="", start_char=0,
-                       end_char=4, content="body", embedding=[0.1] * 1024))
+                       end_char=4, content="body", embedding=[0.1] * 1024,
+                       search_text=fts.search_text("回滚部署")))
         await s.flush()
-        await s.execute(text("UPDATE chunks SET tsv = " + fts.tsvector_sql("t")), {"t": "回滚部署"})
         n = (await s.execute(
-            text(f"SELECT count(*) FROM chunks WHERE kb_id = :kb AND tsv @@ {fts.tsquery_or_sql('q')}"),
-            {"kb": kb.id, "q": "回滚"},
+            text("SELECT count(*) FROM chunks WHERE kb_id = :kb "
+                 "AND search_text <@> to_bm25query(:q, 'ix_chunks_bm25') < 0"),
+            {"kb": kb.id, "q": fts.search_text("回滚")},
         )).scalar()
         assert n == 1
         kb_id = kb.id

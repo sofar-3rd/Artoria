@@ -13,7 +13,7 @@ from app.rag.core.errors import (
     SyncInProgress,
     UnknownKnowledgeBase,
 )
-from app.rag.core.types import Chunk, DocPage, Hit, KbInfo
+from app.rag.core.types import Chunk, DocInfo, DocPage, Hit, KbInfo
 from app.rag.persistence import fts
 from app.rag.persistence.models import ChunkRow, Document, KnowledgeBase
 
@@ -45,17 +45,21 @@ def _ref(k: KnowledgeBase) -> KbRef:
                  k.embed_model, k.embed_dim, k.last_commit)
 
 
-HYBRID_SQL = f"""
+HYBRID_SQL = """
 WITH dense AS (
   SELECT c.id, row_number() OVER (ORDER BY c.embedding <=> CAST(:qvec AS vector), d.path, c.idx) AS r
   FROM chunks c JOIN documents d ON d.id = c.doc_id WHERE c.kb_id = ANY(:kb_ids)
   ORDER BY c.embedding <=> CAST(:qvec AS vector), d.path, c.idx LIMIT :recall
-), q AS (SELECT {fts.tsquery_or_sql('query')} AS tq),
-sparse AS (
-  SELECT c.id, row_number() OVER (ORDER BY ts_rank_cd(c.tsv, q.tq) DESC, d.path, c.idx) AS r
-  FROM chunks c JOIN documents d ON d.id = c.doc_id, q
-  WHERE c.kb_id = ANY(:kb_ids) AND c.tsv @@ q.tq
-  ORDER BY ts_rank_cd(c.tsv, q.tq) DESC, d.path, c.idx LIMIT :recall
+), sparse_top AS MATERIALIZED (
+  SELECT c.id, c.search_text <@> to_bm25query(:query, 'ix_chunks_bm25') AS score
+  FROM chunks c
+  WHERE c.kb_id = ANY(:kb_ids) AND :query <> ''
+  ORDER BY c.search_text <@> to_bm25query(:query, 'ix_chunks_bm25')
+  LIMIT :recall
+), sparse AS (
+  SELECT t.id, row_number() OVER (ORDER BY t.score, d.path, c.idx) AS r
+  FROM sparse_top t JOIN chunks c ON c.id = t.id JOIN documents d ON d.id = c.doc_id
+  WHERE t.score < 0
 ), fused AS (
   SELECT coalesce(d.id, s.id) AS id,
          coalesce(1.0 / (:rrf_k + d.r), 0) + coalesce(1.0 / (:rrf_k + s.r), 0) AS score
@@ -77,15 +81,43 @@ SET title = EXCLUDED.title, content = EXCLUDED.content,
 RETURNING id
 """
 
-TSV_UPDATE_SQL = (
-    f"UPDATE chunks SET tsv = {fts.tsvector_sql('t')} WHERE doc_id = :doc AND idx = :idx"
+# The ORDER BY + LIMIT must stay INSIDE the CTE: that is what lets the planner read the bm25 index in
+# score order and stop after `limit` rows. Scoring the whole table in the CTE and sorting afterwards
+# turns it into a Seq Scan that costs O(chunks) per query (28 ms vs 0.5 ms at 572 chunks, 600 ms at 50k).
+# Scores are negative, so the unmatched rows (0) sort after every match and the outer `WHERE < 0`
+# only removes them without changing the top-N.
+BM25_SQL = """
+WITH top AS MATERIALIZED (
+  SELECT c.id, c.search_text <@> to_bm25query(:query, 'ix_chunks_bm25') AS bm25_score
+  FROM chunks c
+  WHERE c.kb_id = ANY(:kb_ids) AND :query <> ''
+  ORDER BY c.search_text <@> to_bm25query(:query, 'ix_chunks_bm25')
+  LIMIT :limit
 )
+SELECT k.name AS kb, d.id AS doc_id, d.path, d.title, c.heading_path,
+       c.start_char, c.end_char, length(d.content) AS doc_chars, c.content,
+       -t.bm25_score AS score
+FROM top t JOIN chunks c ON c.id = t.id
+JOIN documents d ON d.id = c.doc_id
+JOIN knowledge_bases k ON k.id = c.kb_id
+WHERE t.bm25_score < 0
+ORDER BY t.bm25_score, d.path, c.idx LIMIT :limit
+"""
 
 PAGE_SQL = """
 SELECT id, path, title,
        substring(content from :offset + 1 for :lim) AS text,
        length(content) AS total
 FROM documents WHERE id = :doc_id
+"""
+
+# The kb_id filter is part of the read-only HTTP boundary: a doc_id from one knowledge base must not
+# be readable through another knowledge base's path.
+KB_PAGE_SQL = """
+SELECT id, path, title,
+       substring(content from :offset + 1 for :lim) AS text,
+       length(content) AS total
+FROM documents WHERE id = :doc_id AND kb_id = :kb_id
 """
 
 
@@ -176,14 +208,11 @@ class Store:
                 s.add_all([
                     ChunkRow(doc_id=doc_id, kb_id=kb_id, idx=c.idx,
                              heading_path=c.heading_path, start_char=c.start,
-                             end_char=c.end, content=c.content, embedding=v)
+                             end_char=c.end, content=c.content, embedding=v,
+                             search_text=fts.search_text(c.index_text))
                     for c, v in zip(chunks, vectors)
                 ])
                 await s.flush()
-                if chunks:
-                    await s.execute(text(TSV_UPDATE_SQL), [
-                        {"t": c.index_text, "doc": doc_id, "idx": c.idx} for c in chunks
-                    ])
 
     async def delete_documents(self, kb_id: uuid.UUID, paths: list[str]) -> None:
         async with self._sm() as s:
@@ -226,6 +255,32 @@ class Store:
             })).first()
         if row is None:
             raise DocumentNotFound(str(doc_id))
+        return self._page(row, offset)
+
+    async def list_documents(self, kb_id: uuid.UUID) -> list[DocInfo]:
+        sql = (
+            select(Document.id, Document.path, Document.title, func.length(Document.content))
+            .where(Document.kb_id == kb_id)
+            .order_by(Document.path)
+        )
+        async with self._sm() as s:
+            return [
+                DocInfo(doc_id=str(r[0]), path=r[1], title=r[2], chars=r[3])
+                for r in await s.execute(sql)
+            ]
+
+    async def read_in_kb(self, kb_id: uuid.UUID, doc_id: uuid.UUID,
+                         offset: int, limit: int) -> DocPage:
+        async with self._sm() as s:
+            row = (await s.execute(text(KB_PAGE_SQL), {
+                "doc_id": doc_id, "kb_id": kb_id, "offset": offset, "lim": limit,
+            })).first()
+        if row is None:
+            raise DocumentNotFound(str(doc_id))
+        return self._page(row, offset)
+
+    @staticmethod
+    def _page(row, offset: int) -> DocPage:
         text_ = row.text or ""
         return DocPage(doc_id=str(row.id), path=row.path, title=row.title, text=text_,
                        offset=offset, total_chars=row.total,
@@ -233,12 +288,25 @@ class Store:
 
     # --- search ----------------------------------------------------------
 
+    async def bm25_candidates(self, kb_ids: list[uuid.UUID], query: str,
+                              limit: int) -> list[Hit]:
+        async with self._sm() as s:
+            rows = await s.execute(text(BM25_SQL), {
+                "kb_ids": kb_ids, "query": fts.search_text(query), "limit": limit,
+            })
+            return [
+                Hit(kb=r.kb, doc_id=str(r.doc_id), path=r.path, title=r.title,
+                    heading_path=r.heading_path, start=r.start_char, end=r.end_char,
+                    doc_chars=r.doc_chars, content=r.content, score=float(r.score))
+                for r in rows
+            ]
+
     async def hybrid_candidates(self, kb_ids: list[uuid.UUID], query: str,
                                 qvec: list[float], recall: int, limit: int,
                                 rrf_k: int) -> list[Hit]:
         async with self._sm() as s:
             rows = await s.execute(text(HYBRID_SQL), {
-                "qvec": _vector_param(qvec), "kb_ids": kb_ids, "query": query,
+                "qvec": _vector_param(qvec), "kb_ids": kb_ids, "query": fts.search_text(query),
                 "recall": recall, "rrf_k": rrf_k, "limit": limit,
             })
             return [

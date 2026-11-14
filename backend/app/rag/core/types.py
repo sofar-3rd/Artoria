@@ -68,6 +68,14 @@ class KbInfo:
 
 
 @dataclass(frozen=True)
+class DocInfo:
+    doc_id: str
+    path: str
+    title: str
+    chars: int
+
+
+@dataclass(frozen=True)
 class DocPage:
     doc_id: str
     path: str

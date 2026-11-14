@@ -1,0 +1,100 @@
+github/actions_get	读取 GitHub 工作流、运行、任务或产物的单项详情。	已知仓库和资源编号时使用，方法决定编号类型；任务日志正文有专用读取操作。	GitHub 的这个工作流运行编号已经给出，查看本次运行的详情。	只拿 GitHub 运行产物的下载地址，已有产物编号，不列出整个工作流。	boundary	p001
+github/actions_list	列出 GitHub 工作流、运行、任务或产物，可分页筛选。	浏览资源集合时使用，需仓库；某次运行的任务和产物需运行编号。	列出 GitHub 仓库 example/service 配置的全部工作流。	运行编号已给出，只列这一轮 GitHub Actions 的任务清单，不读取日志正文。	boundary	p002
+github/actions_run_trigger	触发 GitHub Actions 工作流及运行相关操作。	明确要执行工作流动作时使用；手动运行需工作流和分支，其他运行动作需运行编号。	在 GitHub 仓库 example/service 的 main 分支触发指定工作流，输入参数已准备好。	取消 GitHub Actions 中这次仍在执行的运行，运行编号已经给出。	boundary	p003
+github/get_job_logs	读取 GitHub Actions 单任务或一次运行中失败任务的日志。	需要日志正文或末尾行时使用；需任务编号，或失败任务模式下的运行编号。	GitHub Actions 的这个任务失败了，取日志最后一百行正文。	只读取指定 GitHub 运行中所有失败任务的日志，不是下载完整运行日志包。	boundary	p004
+github/get_code_scanning_alert	按编号读取 GitHub 仓库代码扫描安全告警。	已知仓库及告警编号且有安全事件读取权限时使用；不是依赖升级告警。	GitHub 仓库的代码扫描告警编号 12 已知，查看漏洞详情。	这是源码静态扫描的具体告警，不是 Dependabot 依赖风险，展开编号对应信息。	paraphrase	p005
+github/list_code_scanning_alerts	列出 GitHub 仓库代码扫描告警，可按状态、等级或扫描器筛选。	盘点代码安全发现时使用；不是读取单条告警或列依赖漏洞。	列出 GitHub 仓库 example/service 中尚未关闭的高危代码扫描告警。	只看指定分支上某扫描器发现的源码漏洞列表，先不展开单条详情。	boundary	p006
+github/get_me	读取当前 GitHub 认证用户资料。	确认正在使用的 GitHub 身份时使用；不是搜索其他用户或读取凭据。	当前 GitHub 访问身份是谁？读取自己的用户资料。	我想确认现在连接 GitHub 的账号，不查其他人，也不要认证凭据。	paraphrase	p007
+github/get_team_members	列出 GitHub 组织中指定团队的成员。	已知组织和团队短名时使用；不是列某个用户所属团队或仓库协作者。	查 GitHub 组织 example 下 platform 团队有哪些成员。	只列这个 GitHub 团队的人员，不列整个仓库的协作者。	paraphrase	p008
+github/get_teams	读取指定用户或当前用户在 GitHub 中的团队信息。	需查看个人团队归属时使用；不是列一个团队的成员名单。	在 GitHub 上，我当前属于哪些团队？	查这位 GitHub 用户加入的团队，不是查某团队有哪些人。	boundary	p009
+github/get_dependabot_alert	按编号读取 GitHub 仓库 Dependabot 依赖安全告警。	已知依赖告警编号时使用；区别于源码代码扫描和泄露检测。	GitHub Dependabot 的告警编号 12 是哪个依赖有问题？展开详情。	我问的是依赖包漏洞的这条提醒，不是源码扫描告警。	paraphrase	p010
+github/list_dependabot_alerts	列出 GitHub 仓库依赖安全告警并支持筛选。	需盘点 Dependabot 风险时使用，需仓库；不返回源码扫描告警列表。	列出 GitHub 仓库 example/service 的开放 Dependabot 告警。	查看项目依赖包的安全提醒清单，不查询代码静态扫描结果。	paraphrase	p011
+github/discussion_comment_write	新增、回复、修改或删除 GitHub Discussions 评论及管理答案标记。	对象是讨论区评论时使用；回复仅支持一层，答案标记适用于问答讨论。	把 GitHub 问答讨论中这条评论标记为已接受答案，评论节点编号已知。	回复 GitHub Discussions 的顶层评论，不给 issue 或 PR 留言。	boundary	p012
+github/get_discussion	按仓库和讨论编号读取 GitHub Discussions 主题详情。	已有讨论编号且需主题内容时使用；评论列表需单独读取。	读取 GitHub 仓库 example/service 的讨论 12 的主题详情。	讨论编号已知，只看 GitHub 讨论主题本身，不列所有跟帖。	paraphrase	p013
+github/get_discussion_comments	分页读取 GitHub Discussions 评论，可包含顶层评论的回复。	已知讨论编号且要看跟帖时使用；不同于读取讨论主题或 issue 评论。	读取 GitHub 讨论 12 的评论和每条顶层评论下面的回复。	我需要这个讨论串的跟帖内容，不是讨论主题介绍。	paraphrase	p014
+github/list_discussion_categories	列出 GitHub 仓库或组织的讨论分类。	创建或浏览讨论前需查分类时使用；不是 issue 类型或标签清单。	GitHub 仓库 example/service 的 Discussions 有哪些分类？	不指定仓库，只查这个 GitHub 组织的讨论分类。	boundary	p015
+github/list_discussions	分页列出 GitHub 仓库或组织讨论，可限定分类和排序。	需浏览讨论集合时使用；已知单个主题编号应读取详情。	列出 GitHub 仓库 example/service 问答分类里的讨论主题。	查看这个 GitHub 组织的讨论列表，不查 issue 或 pull request。	boundary	p016
+github/create_gist	在 GitHub 创建包含一个指定文件内容的新 Gist。	分享新的代码片段时使用，需文件名和内容；不是向仓库提交文件。	把这段小脚本发布为 GitHub 的一个新 Gist，文件名为 demo.py。	我要创建未公开的单文件 Gist，不是提交到现有仓库分支。	boundary	p017
+github/get_gist	按 Gist 编号读取 GitHub 代码片段内容。	已有 Gist 编号且需正文时使用；不是仓库路径文件读取。	Gist 编号已经给出，读取里面的代码内容。	这是 GitHub Gist，不是仓库文件，我想看完整片段。	paraphrase	p018
+github/list_gists	分页列出指定 GitHub 用户或当前用户的 Gist。	浏览个人代码片段清单时使用，可限定更新时间；不是仓库列表。	列出这位 GitHub 用户上个月之后更新的 Gist。	先看我在 GitHub 保存的 Gist 清单，不打开某一个片段。	boundary	p019
+github/update_gist	修改 GitHub 已有 Gist 中的文件内容或描述。	已有 Gist 编号且要写入内容时使用；不是创建新片段或修改仓库文件。	用新脚本替换 GitHub Gist 中 demo.py 的内容，Gist 编号已知。	只更新现有 Gist 的这个文件和描述，不创建另一个 Gist。	paraphrase	p020
+github/get_repository_tree	按 Git 引用读取 GitHub 仓库文件树，可递归或按路径前缀筛选。	需版本对应目录层级时使用；不是本地索引文件树或文件正文。	读取 GitHub 仓库 example/service 的 main 分支下 src 的递归文件树。	我只要这个 GitHub 标签对应的路径层级，不读取各文件正文。	boundary	p021
+github/add_issue_comment	为 GitHub issue 或 PR 会话添加评论，或对会话及评论添加反应。	普通会话留言时使用；不是代码行评审评论，不可同时提交正文和反应。	在 GitHub issue 12 下添加评论：问题已复现。	给 GitHub PR 的普通讨论区发一条验收结论，不附着到任何代码行。	boundary	p022
+github/get_label	读取 GitHub 仓库中指定名称标签的属性。	已经知道标签名称时使用；不是列全部标签或查 issue 关联标签。	查询 GitHub 仓库 example/service 里 bug 标签的颜色和说明。	只查这个名称对应的仓库标签属性，不获取全部标签列表。	paraphrase	p023
+github/issue_read	读取 GitHub 单个 issue 的详情、评论、父子关系或标签。	已有 issue 编号时使用；按方法读取对应内容，不负责修改层级。	读取 GitHub issue 12 的完整说明。	这个 GitHub issue 的父 issue 是谁？只读关系，不重新挂接。	boundary	p024
+github/issue_write	创建或更新 GitHub issue 的内容、状态、负责人、字段及里程碑。	已确定仓库且需写 issue 时使用；新增子 issue 可指定父编号，已有层级修改另有操作。	在 GitHub 仓库 example/service 创建登录失败问题，复现正文已经提供。	把现有 GitHub issue 12 标记为重复，指向 issue 8，不新建问题。	boundary	p025
+github/list_issue_fields	读取 GitHub 仓库继承或组织级 issue 自定义字段定义。	需确认可用字段及结构时使用；不是具体 issue 字段值或标签类型。	列出 GitHub 组织 example 为 issue 设置的自定义字段。	看看这个 GitHub 仓库继承了哪些 issue 字段，不读取某条 issue 的值。	boundary	p026
+github/list_issue_types	列出 GitHub 仓库或组织可用的 issue 类型。	创建或更改 issue 类型前使用；不是标签、讨论分类或自定义字段。	GitHub 仓库 example/service 支持哪些 issue 类型？	查组织级允许的 issue 类型名称，避免把标签当成类型。	boundary	p027
+github/list_issues	分页列出 GitHub 仓库 issues，支持标签、状态和自定义字段过滤。	浏览明确仓库的问题清单时使用；自然语言匹配另有搜索操作。	列出 GitHub 仓库 example/service 的开放 issue，按更新时间倒序。	按 GitHub issue 自定义字段优先级筛选问题列表，不按正文关键词搜索。	boundary	p028
+github/search_issues	按自然语言需求搜索 GitHub issues，可限定仓库。	需要匹配问题描述而非单纯枚举时使用；不搜索 PR 或源码文件。	在 GitHub 仓库 example/service 找提到登录超时的 issue。	我记不清 issue 标题，想找描述里讨论缓存失效的 GitHub 问题。	paraphrase	p029
+github/sub_issue_write	添加、移除或调整 GitHub 子 issue 的父级与优先顺序。	更改已有问题层级时使用，需子项真实编号；迁移父级需明确替换原父级。	把现有 GitHub 子 issue 改挂到 issue 12 下，替换原来的父级。	调整 GitHub 父 issue 里的子问题顺序，不更改标题或正文。	boundary	p030
+github/update_issue_comment	按评论编号修改 GitHub issue 或 PR 普通会话评论正文。	编辑已经存在的会话留言时使用；不适用于代码评审评论编号。	修改 GitHub issue 中我之前发的那条普通评论，评论编号已知。	把 PR 讨论区已有留言改成新验收结果，不新发评论，也不是行级评审评论。	boundary	p031
+github/label_write	创建、修改、重命名或删除 GitHub 仓库标签。	管理标签定义时使用，需仓库和名称；不是给某个 issue 增加标签。	在 GitHub 仓库 example/service 创建一个新的已验收标签并设置颜色。	将仓库旧标签重命名，保留标签定义，不只是更新某条 issue 的标签。	boundary	p032
+github/list_label	分页列出 GitHub 仓库的标签定义。	需浏览所有可用标签时使用；已知名称读属性有单项查询。	把 GitHub 仓库 example/service 的标签列表全部列出。	我还不知道标签名，先浏览这个 GitHub 仓库所有标签，不查单个 issue。	paraphrase	p033
+github/projects_get	读取 GitHub Projects 项目、字段、单项、视图或状态更新详情。	已知项目及所需资源编号时使用；项目单项字段需指定字段名或编号。	GitHub 项目和单项编号已知，读取这项任务的状态与优先级字段。	查看 GitHub Projects 的某个视图详情，视图节点编号已经给出。	boundary	p034
+github/projects_list	分页列出 GitHub Projects 项目、字段、单项、视图或状态更新。	需资源集合时使用；列项目单项的字段值需明确字段名或编号。	列出 GitHub 组织 example 的所有开放项目。	读取 GitHub 项目 3 的单项列表，同时带上状态字段，不只返回标题。	boundary	p035
+github/projects_write	创建及管理 GitHub Projects 项目、单项、字段、视图和状态更新。	明确要改变项目看板数据时使用；批量更新可一次设置最多五十项的同一字段。	将 GitHub 项目里的这十项任务的状态统一改为完成，单项编号都已给出。	创建 GitHub Projects 的一个迭代字段，开始日期和周期天数已确定。	boundary	p036
+github/add_comment_to_pending_review	向当前用户已有的 GitHub PR 待提交评审增加代码评论。	评审草稿已存在且需行级或文件级意见时使用；不会作为普通会话留言立即发布。	我已有 GitHub PR 12 的待提交评审，在指定文件新侧第 20 行加入这条意见。	把文件级意见加入我最新的未提交 PR 评审，不发到普通讨论区。	boundary	p037
+github/add_reply_to_pull_request_comment	回复 GitHub PR 已有代码评审评论，或给该评论添加反应。	已知评审评论的数字编号时使用；不是普通会话评论或评审线程节点编号。	回复 GitHub PR 中这条代码行评审评论，数字评论编号已给出。	只给指定的 PR 代码评审评论添加反应，不新建评审，也不改正文。	boundary	p038
+github/create_pull_request	从指定源分支向目标分支创建 GitHub PR，可设草稿及评审人。	分支已有变更且需发起新合并请求时使用；不是修改现有 PR。	在 GitHub 仓库 example/service 将 feature/report 向 main 发起一个草稿 PR。	源分支和目标分支已确定，新建 GitHub PR 并邀请指定团队评审。	boundary	p039
+github/list_pull_requests	分页列出 GitHub 仓库 PR，可按状态及源目标分支筛选。	浏览明确仓库合并请求时使用；跨仓库搜索另有操作。	列出 GitHub 仓库 example/service 目标分支为 main 的开放 PR。	按源分支筛选这个 GitHub 仓库的合并请求清单，不按正文内容搜索。	boundary	p040
+github/merge_pull_request	按合并方式合并 GitHub PR，可校验预期头提交。	确认合并已有 PR 时使用，需编号；不是只更新分支或关闭请求。	将 GitHub PR 12 以 squash 方式合并，预期头提交已经确认。	我授权真正合并这条 PR，不是仅关闭它或同步主分支。	paraphrase	p041
+github/pull_request_read	读取 GitHub 单个 PR 的详情、差异、文件、提交、检查或评审线程。	已有 PR 编号且要查看内容时使用；行级评审线程不同于普通会话评论。	读取 GitHub PR 12 的完整代码差异。	查看 GitHub PR 的代码评审线程及其中的评论，不是普通会话区留言。	boundary	p042
+github/pull_request_review_write	创建、提交或删除 GitHub PR 评审并处理线程解决状态。	需正式评审或线程状态变化时使用；线程操作需评审线程节点编号。	向 GitHub PR 12 提交正式的请求修改评审，评审正文已经提供。	把 GitHub PR 中这个评审线程标记为已解决，线程节点编号已知。	boundary	p043
+github/search_pull_requests	按 GitHub PR 搜索语法查合并请求，可限定仓库。	按标题、内容或搜索限定条件找 PR 时使用；不搜索 issue 或代码文件。	在 GitHub 中找 example/service 上标题涉及缓存的已合并 PR。	搜某位作者上个月提交的 GitHub PR，使用作者和日期限定条件。	boundary	p044
+github/update_pull_request	修改 GitHub PR 标题、说明、状态、目标分支、草稿或评审人。	已有 PR 需编辑元信息时使用；不合并，也不向源分支同步新提交。	把 GitHub PR 12 从草稿改成可评审状态，并更新说明。	调整现有 PR 的目标分支，不新建 PR，也不合并代码。	boundary	p045
+github/update_pull_request_branch	用目标分支最新变更更新 GitHub PR 源分支，可校验头提交。	PR 分支落后需同步时使用；不是合并 PR 或单纯改目标分支名称。	GitHub PR 12 的分支落后于 main，把目标分支最新变化同步进来。	只更新这条 PR 的源分支，不合并 PR，预期头提交已经给出。	paraphrase	p046
+github/create_branch	在 GitHub 仓库从指定或默认分支创建新分支。	需新的远程分支时使用；不是本地切分支或创建 PR。	从 GitHub 仓库 example/service 的 main 创建 feature/audit 分支。	只在远程仓库建立这个新分支，先不发起合并请求。	paraphrase	p047
+github/create_or_update_file	在 GitHub 指定分支创建或替换一个文件并产生提交。	单文件写入时使用，现有文件需原 blob 哈希；内容传原文而非预编码。	在 GitHub 仓库指定分支新增 docs/checklist.md，内容和提交说明已给出。	替换 GitHub 分支上一个已有文件，原 blob 哈希已查到，不批量推多个文件。	boundary	p048
+github/create_repository	在 GitHub 个人或组织下新建仓库，可选择可见性及初始化说明文件。	要新仓库时使用，未指定可见性默认为私有；不是 fork 现有仓库。	在 GitHub 组织 example 下创建名为 audit-demo 的私有仓库并初始化 README。	我需要从零创建个人 GitHub 仓库，不复制别人的已有仓库。	boundary	p049
+github/delete_file	从 GitHub 指定仓库分支删除一个文件并产生提交。	确认删仓库路径文件时使用，需分支与提交说明；不是删除整个仓库。	确认删除 GitHub 仓库 example/service 分支上的过期说明文件，提交说明已给出。	只删这个 GitHub 文件路径，保留仓库和分支中的其他文件。	paraphrase	p050
+github/delete_repository	删除指定 GitHub 仓库。	明确授权删除整个仓库且具备权限时使用；不是只删文件、分支或取消收藏。	我确认授权删除 GitHub 中 example/audit-demo 这个整个测试仓库。	永久移除这个 GitHub 测试仓库，不是删除里面某个文件或取消星标。	paraphrase	p051
+github/fork_repository	将已有 GitHub 仓库 fork 到当前个人或指定组织。	需保留上游关系的仓库副本时使用；不是从零新建或普通文件复制。	把 GitHub 上 example/service fork 到我的账号下。	为组织建立这个已有 GitHub 仓库的 fork，保留与上游关联。	boundary	p052
+github/get_commit	读取 GitHub 指定提交详情，可选择文件统计或完整补丁。	已有提交哈希或引用时使用；不是搜索提交消息或列整段历史。	GitHub 提交哈希已给出，读取作者、改动统计和完整补丁。	只看这个 GitHub 提交的文件统计，不返回很大的 patch 正文。	boundary	p053
+github/get_file_contents	按路径及分支、标签或提交读取 GitHub 文件或目录内容。	已知仓库路径需正文或目录条目时使用；不是全局代码搜索或本地文件读取。	读取 GitHub 仓库 example/service 在 main 上 docs/setup.md 的正文。	打开指定提交中的仓库目录内容，不在本地代码索引里查路径。	boundary	p054
+github/get_latest_release	读取 GitHub 仓库最新正式发布版本。	只需最新 release 时使用；不是最新 Git 标签或全部发布列表。	GitHub 仓库 example/service 最新正式 release 是什么？	我只需要当前最新发布说明，不列全部历史，也不只看标签名。	paraphrase	p055
+github/get_release_by_tag	按标签名读取 GitHub 仓库对应 release。	已知版本标签且需发布说明或资产时使用；Git 标签对象另有查询。	读取 GitHub 仓库 example/service 的 v1.2.0 发布说明和发布信息。	版本标签已经确定，我要对应的 release，不是标签指向的 Git 对象。	paraphrase	p056
+github/get_tag	按名称读取 GitHub 仓库 Git 标签详情。	需了解已知标签对象时使用；不同于对应版本的 release 说明。	查 GitHub 仓库 example/service 中 v1.2.0 这个 Git 标签的详情。	我关心标签对象本身，不查 release 发布说明或资产。	paraphrase	p057
+github/list_branches	分页列出 GitHub 仓库分支。	需浏览远程分支清单时使用；不是本地文件树或创建新分支。	GitHub 仓库 example/service 有哪些分支？分页列出。	只查看现有远程分支列表，不创建分支也不查询标签。	paraphrase	p058
+github/list_commits	按 Git 引用分页列出 GitHub 提交历史，可筛作者、路径及时间。	查看分支历史或文件演变时使用；提交消息搜索有单独操作。	列出 GitHub 仓库 main 分支上最近涉及 docs 的提交，按时间范围限制。	查看某个 GitHub 文件的提交历史，只返回哈希和链接，不检索提交消息关键词。	boundary	p059
+github/list_releases	分页列出 GitHub 仓库发布版本及说明。	需要发布历史清单时使用；不是只取最新版本或枚举 Git 标签。	列出 GitHub 仓库 example/service 的 release 历史。	看这个项目历次正式发布记录，不只是 Git 标签列表。	paraphrase	p060
+github/list_repository_collaborators	列出 GitHub 仓库协作者，可按成员关联类型筛选。	需了解仓库访问协作者时使用；不是组织团队成员名单。	列出 GitHub 仓库 example/service 的外部协作者。	只看直接拥有仓库权限的人员，不查某个组织团队有哪些成员。	boundary	p061
+github/list_tags	分页列出 GitHub 仓库 Git 标签。	需浏览版本引用清单时使用；不是 release 历史或单个标签对象。	列出 GitHub 仓库 example/service 的所有 Git 标签。	先看这个仓库有哪些版本标签，不读取 release 说明。	paraphrase	p062
+github/push_files	把多个文件内容一次提交到 GitHub 仓库指定分支。	需要一个提交包含多文件改动时使用；不是分别写单文件或上传 release 产物。	将两份文档和一个脚本作为同一次提交推到 GitHub 指定分支。	这三个文件必须进入同一个 GitHub 提交，不逐个生成提交。	paraphrase	p063
+github/search_code	用 GitHub 代码搜索语法跨仓库检索源文件内容或路径。	未知具体文件位置时使用，可限仓库、语言或路径；不是语义索引调用分析。	在 GitHub 组织 example 的 Go 源码里搜索 WithContext 调用文字。	找 GitHub 仓库中含某个精确字符串的 Python 文件，不分析本地调用链。	boundary	p064
+github/search_commits	按提交消息及作者、时间等条件搜索 GitHub 默认分支提交。	需要关键词匹配提交记录时使用，可限定仓库；不是列任意分支历史。	在 GitHub 仓库 example/service 找提交消息含修复缓存的记录。	按作者和日期搜索 GitHub 默认分支提交，不扫描源码内容。	boundary	p065
+github/search_repositories	按 GitHub 仓库名称、主题、语言或星数等条件搜索项目。	寻找仓库而非文件、问题或用户时使用，可选择返回信息量。	找 GitHub 上主题为 observability、使用 Python 且超过一千星的仓库。	我还没有确定仓库名，先搜索做日志分析的开源项目，不搜索源码文件。	boundary	p066
+github/get_secret_scanning_alert	读取 GitHub 指定泄露检测告警的详情。	已有泄露告警编号且有权限时使用；不是服务器密码查询或依赖漏洞。	GitHub 泄露检测告警编号已知，查看该告警的类型和状态，不展示敏感值。	这是仓库中的凭据泄露提醒，不是源码扫描或依赖包漏洞，展开元信息。	paraphrase	p067
+github/list_secret_scanning_alerts	列出 GitHub 仓库泄露检测告警，可按状态、类型或解决原因筛选。	需盘点泄露风险记录时使用；不要将告警中的敏感值当作评测输入。	列出 GitHub 仓库 example/service 未解决的泄露检测告警，仅看告警元信息。	筛选已经解决且原因相同的仓库凭据泄露提醒，不查服务器密码库。	boundary	p068
+github/get_global_security_advisory	按 GHSA 编号读取 GitHub 全球安全公告。	已知公告编号且需漏洞说明时使用；不是某仓库私有公告列表。	GHSA 编号已给出，读取 GitHub 全球安全公告的影响范围。	我知道准确公告 ID，只查这条公开漏洞公告，不列仓库告警。	paraphrase	p069
+github/list_global_security_advisories	按生态、包版本、CVE、等级和时间筛选 GitHub 全球安全公告。	需查公开漏洞资料集合时使用；区别于某仓库的依赖告警。	查 GitHub 全球公告里影响某 Python 包版本的高危漏洞。	按 CVE 编号和发布时间筛全球安全公告，不需要我的仓库扫描结果。	boundary	p070
+github/list_org_repository_security_advisories	列出 GitHub 组织旗下仓库安全公告，可按状态及排序筛选。	组织范围汇总仓库公告时使用；不是全球漏洞库或单仓库列表。	列出 GitHub 组织 example 下各仓库尚处草稿状态的安全公告。	我要组织旗下所有仓库的公告汇总，不只看一个仓库，也不查全球公告。	paraphrase	p071
+github/list_repository_security_advisories	列出 GitHub 单个仓库安全公告，可按状态及排序筛选。	明确仓库需公告清单时使用；不是 Dependabot 告警或全球安全公告。	列出 GitHub 仓库 example/service 已发布的仓库安全公告。	只看这个仓库自己发布的安全公告，不盘点依赖扫描告警。	paraphrase	p072
+github/star_repository	给指定 GitHub 仓库添加星标收藏。	明确要收藏仓库时使用；不是订阅通知、fork 或新建仓库。	把 GitHub 仓库 example/service 加入我的星标收藏。	我只是要 star 这个仓库，不订阅通知也不 fork。	paraphrase	p073
+github/unstar_repository	取消指定 GitHub 仓库的星标收藏。	明确移除收藏时使用；不会删除仓库或取消其他通知设置。	取消我对 GitHub 仓库 example/service 的星标。	只移除这个仓库的收藏，不删除仓库本身。	paraphrase	p074
+github/search_users	按姓名、位置、关注数等条件搜索 GitHub 用户。	寻找个人用户时使用；不是搜索组织、读取当前身份或列团队成员。	在 GitHub 找名字匹配这位开发者且位于深圳的个人用户。	搜索 GitHub 上使用这个姓名的用户账号，不查组织或我自己的身份。	paraphrase	p075
+playwright/browser_click	点击或双击网页元素，支持鼠标按钮及修饰键。	目标来自最新快照引用或唯一选择器时使用；不是屏幕坐标点击。	点击当前网页快照里的提交按钮。	在网页上按住 Shift 点击已定位的列表项，不能只做普通单击。	boundary	p076
+playwright/browser_close	关闭当前浏览器页面。	要关闭当前页时使用，无页面编号参数；指定其他标签可用标签管理。	关闭我现在操作的浏览器页面。	关闭当前最后剩下的网页，不是按编号关闭另一个标签。	boundary	p077
+playwright/browser_console_messages	读取网页控制台消息，可选严重等级、会话历史及输出文件。	需日志列表时使用；按等级包含更严重消息，不提供按消息编号的专用读取。	查看当前网页的控制台错误和警告列表。	导出整个浏览器会话以来的控制台消息，不只看本次导航后的日志。	boundary	p078
+playwright/browser_drag	在两个已定位网页元素之间执行拖放。	源目标为快照引用或唯一选择器时使用；不是从本地拖入文件。	把当前网页看板里的任务卡拖到完成列。	在同一网页中拖动一个项目到另一个项目的位置，不上传本地文件。	paraphrase	p079
+playwright/browser_drop	将本地文件或指定 MIME 数据从页面外拖放到网页元素。	目标是外部拖放区时使用，需文件路径或 MIME 数据；不同于页面内元素互拖。	给网页拖放区投递一份 text/plain 数据，模拟从页面外拖入。	把本地文件拖到网页导入区，不通过文件选择弹窗，也不是移动页面里的元素。	boundary	p080
+playwright/browser_emulate_media	设置网页 CSS 媒体偏好，如明暗、减少动画、对比度及打印模式。	仅改变媒体特征时使用，省略保留原设置、空值清除；不控制网络或 CPU。	让当前网页按减少动画的媒体偏好渲染，复现对应样式。	将网页切到打印 CSS 媒体模式，不改变浏览器窗口尺寸。	boundary	p081
+playwright/browser_evaluate	在网页或指定元素上执行 JavaScript 并返回结果。	需页面 DOM 数据或脚本计算时使用；不是浏览器服务器进程任意代码执行。	在当前网页执行函数返回 document.title。	在页面内用脚本读取指定元素的文本，返回结果而不是截图。	paraphrase	p082
+playwright/browser_file_upload	处理浏览器文件选择器，上传一或多个本地文件或取消选择。	文件选择器已触发时使用，路径需绝对地址；省略路径表示取消。	网页已经打开文件选择器，把这两份本地文件选上上传。	取消当前网页文件选择弹窗，不上传任何文件。	boundary	p083
+playwright/browser_fill_form	一次填写多个网页表单字段。	已定位多个字段且要批量填表时使用；不是向已聚焦位置随意键入。	将当前网页的姓名、部门和邮箱一次填写完成。	把网页表单地址与同意条款一起设置，不逐个字段填入。	paraphrase	p084
+playwright/browser_find	在网页可访问性快照中按文字或正则查节点及附近上下文。	只需定位局部元素时使用，文字与正则二选一；不是整页快照或站内搜索提交。	在当前网页快照里找文字含验收的节点，只给附近几行和元素引用。	用正则在网页可访问性快照中定位错误编号，不抓取整页结构。	boundary	p085
+playwright/browser_handle_dialog	接受或拒绝已打开的浏览器对话框，可填写提示文本。	alert、confirm 或 prompt 出现时使用；不是点击网页内自绘弹层。	取消当前网页弹出的确认框。	给浏览器 prompt 提示框输入测试备注再接受。	boundary	p086
+playwright/browser_hover	把鼠标悬停到网页快照引用或唯一选择器对应元素。	要触发悬浮提示或菜单时使用；不会点击或修改字段。	鼠标停在网页头像上，让悬浮菜单出现。	将指针悬停在信息图标上，先不要单击。	paraphrase	p087
+playwright/browser_navigate	在当前浏览器页访问指定地址。	已有当前页且需地址导航时使用；不是新建标签或返回历史记录。	当前标签打开 https://example.com/reports，不新增标签。	把现有页面转到这个报告地址，其他标签保持原样。	paraphrase	p088
+playwright/browser_navigate_back	返回浏览器当前页历史记录中的上一页。	已有可后退的导航历史时使用；不是重新打开地址、刷新或前进。	在当前浏览器页返回刚才访问的上一页。	沿这个标签的历史记录后退一步，不新建网页。	paraphrase	p089
+playwright/browser_network_request	按请求列表序号读取单个网络请求完整详情或指定部分。	序号由请求列表提供且从一开始时使用；不是列全部请求。	网络请求列表已给出序号，展开失败请求的头和响应正文。	把已选中的网页请求响应体导出到文件，不重新列请求清单。	boundary	p090
+playwright/browser_network_requests	列出网页网络请求，可含静态资源、会话历史和地址正则筛选。	先定位请求或观察网络活动时使用；完整头正文需查单项详情。	列出这个网页加载后发出的接口请求，不包含成功图片和字体资源。	查看整个浏览器会话中地址符合这个正则的请求，不仅当前页导航后的请求。	boundary	p091
+playwright/browser_press_key	给当前网页发送按键或字符。	需键盘导航、特殊键或快捷键时使用；不是凭目标设置表单值。	向当前页面发送 Escape 关闭正在打开的菜单。	给网页发送 ArrowLeft 做键盘导航，不填入字符串文本。	boundary	p092
+playwright/browser_resize	按给定宽高调整浏览器窗口。	只改窗口尺寸时使用；不设置网络、CPU 或媒体偏好。	把当前浏览器窗口设为 1280 乘 720。	仅调整网页窗口宽高，别设置移动设备或慢速网络。	paraphrase	p093
+playwright/browser_select_option	为已定位网页下拉控件选择一个或多个选项值。	目标为原生下拉选项时使用，支持多选；不是输入自由文本。	把网页地区下拉框选为指定的选项值。	在网页多选下拉中同时选中两个选项，不用自由文本输入代替。	boundary	p094
+playwright/browser_snapshot	读取当前网页或指定元素的可访问性树，可限制深度及返回边界框。	需页面文字结构和交互引用时使用；不是图像截图。	读取当前网页的可访问性结构和可点击元素引用。	给我网页文字快照定位控件，不要输出图片。	paraphrase	p095
+playwright/browser_take_screenshot	保存当前网页、整页或指定元素截图，可选格式及像素尺度。	需要视觉证据时使用；整页不能与元素截图混用，像素尺度决定图像大小。	保存当前网页的整页截图，包含屏幕下方滚动内容。	只截图这个已定位网页组件，不截整页。	boundary	p096
+playwright/browser_type	向指定可编辑网页元素输入文本，可逐字符输入或按回车提交。	已有目标引用或唯一选择器时使用；多字段表单宜批量填写。	向已定位的网页搜索框填入季度报告。	逐字符键入测试文本以触发网页按键处理器，结束后按回车。	boundary	p097
+playwright/browser_wait_for	等待网页文字出现、消失或固定时长，可设置超时。	需同步页面状态时使用，固定等待最多三十秒；出现和消失同时指定时取先发生者。	等待当前页面出现提交成功的文字。	等网页上的加载中提示消失再继续，不是等待它再次出现。	boundary	p098
+playwright/browser_tabs	列出、新建、关闭或选中浏览器标签，可指定隔离上下文。	需管理已有标签或另开网页时使用；按操作决定是否需索引和地址。	列出当前浏览器所有已打开的标签页。	在独立浏览器上下文里新建测试标签，不共享原有登录状态。	boundary	p099
+playwright/browser_network_state_set	将浏览器网络状态切换为离线或恢复在线。	已启用网络能力且需模拟断网时使用；不设置具体带宽或网络请求 mock。	给当前浏览器模拟断网，让所有网络请求失败。	恢复浏览器在线状态，撤销刚才的离线设置，不修改接口模拟规则。	boundary	p100

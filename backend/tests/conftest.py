@@ -8,9 +8,9 @@ import psycopg
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-ADMIN_URL = "postgresql://sagent:sagent@localhost:5433/sagent"
+ADMIN_URL = os.environ.get("TEST_ADMIN_URL", "postgresql://sagent:sagent@localhost:5433/sagent")
 TEST_DB = "sagent_rag_test"
-TEST_URL = f"postgresql://sagent:sagent@localhost:5433/{TEST_DB}"
+TEST_URL = ADMIN_URL.rsplit("/", 1)[0] + f"/{TEST_DB}"
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 
 # Must be set before any `app` module is imported.

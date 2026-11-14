@@ -1,0 +1,400 @@
+{"id":"q0001","intent_id":"l001-1","query":"我有一个知识空间的标识，想看看根目录下面都有哪些文档。","relevant_tool_ids":["iWiki/getSpacePageTree"],"split":"dev","category":"direct"}
+{"id":"q0002","intent_id":"l001-2","query":"只列文档编号 1234 下一级的标题和是否还有子页面，不要读正文。","relevant_tool_ids":["iWiki/getSpacePageTree"],"split":"dev","category":"boundary"}
+{"id":"q0003","intent_id":"l002","query":"帮我查一下知识文档 1234 是谁创建的、什么时候最后修改。","relevant_tool_ids":["iWiki/metadata"],"split":"dev","category":"direct"}
+{"id":"q0004","intent_id":"l002","query":"我不需要这篇文档的内容，只想确认它的作者和更新时间。","relevant_tool_ids":["iWiki/metadata"],"split":"dev","category":"paraphrase"}
+{"id":"q0005","intent_id":"l003","query":"把知识文档 1234 的完整 Markdown 正文取出来。","relevant_tool_ids":["iWiki/getDocument"],"split":"dev","category":"direct"}
+{"id":"q0006","intent_id":"l003","query":"我已经知道页面编号，想读整篇内容而不是搜索命中片段。","relevant_tool_ids":["iWiki/getDocument"],"split":"dev","category":"paraphrase"}
+{"id":"q0007","intent_id":"knowledge-create-markdown","query":"在知识空间 12 的父页面 34 下新建一篇 Markdown 周报，标题和正文我已准备好。","relevant_tool_ids":["iWiki/createDocument"],"split":"dev","category":"direct"}
+{"id":"q0008","intent_id":"knowledge-create-folder","query":"我要从零建一个知识库文件夹，不是把已有 HTML 文件导进去。","relevant_tool_ids":["iWiki/createDocument"],"split":"test","category":"boundary"}
+{"id":"q0009","intent_id":"knowledge-move-parent","query":"把知识文档 1234 移到父页面 5678 下，原位置不保留副本。","relevant_tool_ids":["iWiki/moveDocument"],"split":"test","category":"direct"}
+{"id":"q0010","intent_id":"knowledge-reorder-sibling","query":"同一个知识目录里，把周报排到会议记录的上方，内容不用改。","relevant_tool_ids":["iWiki/moveDocument"],"split":"dev","category":"boundary"}
+{"id":"q0011","intent_id":"knowledge-copy-tree","query":"把知识文档 1234 连同所有子页面复制到目录 5678，原件保留。","relevant_tool_ids":["iWiki/copyDocument"],"split":"dev","category":"direct"}
+{"id":"q0012","intent_id":"knowledge-copy-single","query":"我只想复制这一页到另一个知识目录，不带它下面的子页。","relevant_tool_ids":["iWiki/copyDocument"],"split":"dev","category":"boundary"}
+{"id":"q0013","intent_id":"l007","query":"知识文档 1234 用了哪些图片？把图片的附件编号列出来。","relevant_tool_ids":["iWiki/listImages"],"split":"dev","category":"direct"}
+{"id":"q0014","intent_id":"l007","query":"不要把整篇正文发来，我要盘点这页嵌入的图片引用。","relevant_tool_ids":["iWiki/listImages"],"split":"dev","category":"paraphrase"}
+{"id":"q0015","intent_id":"knowledge-replace-body","query":"用我提供的新正文替换知识文档 1234 的内容，并保存这个标题。","relevant_tool_ids":["iWiki/saveDocument"],"split":"dev","category":"direct"}
+{"id":"q0016","intent_id":"knowledge-replace-doc-html","query":"目标是 DOC 类型知识文档，我要把一段 HTML 富文本作为新正文保存。","relevant_tool_ids":["iWiki/saveDocument"],"split":"dev","category":"boundary"}
+{"id":"q0017","intent_id":"l009-1","query":"把知识文档 1234 的标题改成十一月周报，正文不要动。","relevant_tool_ids":["iWiki/renameDocumentTitle","iWiki/saveDocument"],"split":"dev","category":"direct"}
+{"id":"q0018","intent_id":"l009-2","query":"给知识库里的 PDF 附件改显示名称，必须保留原来的扩展名。","relevant_tool_ids":["iWiki/renameDocumentTitle"],"split":"dev","category":"boundary"}
+{"id":"q0019","intent_id":"knowledge-prepend","query":"在知识文档 1234 最前面加一段更新说明，其余正文保留。","relevant_tool_ids":["iWiki/saveDocumentParts"],"split":"test","category":"direct"}
+{"id":"q0020","intent_id":"knowledge-append-doc-html","query":"给现有 DOC 知识文档末尾追加这段 HTML 会议结论，不覆盖原内容。","relevant_tool_ids":["iWiki/saveDocumentParts"],"split":"dev","category":"boundary"}
+{"id":"q0021","intent_id":"knowledge-find-space-key","query":"我知道知识空间的英文标识，帮我查它的编号、创建者和权限。","relevant_tool_ids":["iWiki/getSpaceInfo"],"split":"test","category":"direct"}
+{"id":"q0022","intent_id":"knowledge-find-space-name","query":"只记得知识空间名称里有网络平台，先查空间本身，不搜索文档正文。","relevant_tool_ids":["iWiki/getSpaceInfo"],"split":"dev","category":"boundary"}
+{"id":"q0023","intent_id":"l012-1","query":"列出我收藏的知识空间，包含编号和名称。","relevant_tool_ids":["iWiki/getMySpaces"],"split":"dev","category":"direct"}
+{"id":"q0024","intent_id":"l012-2","query":"哪些知识空间是由我管理的？不是收藏列表。","relevant_tool_ids":["iWiki/getMySpaces"],"split":"dev","category":"boundary"}
+{"id":"q0025","intent_id":"l013","query":"在网络知识库里找解释跨地域故障切换流程的内容片段。","relevant_tool_ids":["iWiki/aiSearchDocument"],"split":"dev","category":"direct"}
+{"id":"q0026","intent_id":"l013","query":"我不知道页面编号，帮我找知识库中讲主备切换注意事项的相关段落。","relevant_tool_ids":["iWiki/aiSearchDocument"],"split":"dev","category":"paraphrase"}
+{"id":"q0027","intent_id":"l014-1","query":"在知识空间 12 中找作者为测试成员、带故障标签且标题涉及路由的页面。","relevant_tool_ids":["iWiki/searchDocument"],"split":"dev","category":"direct"}
+{"id":"q0028","intent_id":"l014-2","query":"只查上个月的知识库附件中名称含验收的结果，不要语义推荐正文片段。","relevant_tool_ids":["iWiki/searchDocument"],"split":"dev","category":"boundary"}
+{"id":"q0029","intent_id":"l015","query":"知识库里的这几个 TXDOC 页面，分别找告警策略和回滚的命中段落。","relevant_tool_ids":["iWiki/searchWeDoc"],"split":"dev","category":"direct"}
+{"id":"q0030","intent_id":"l015","query":"我已有企业微信类型的知识文档编号，只要关键词附近的片段，不要整篇正文。","relevant_tool_ids":["iWiki/searchWeDoc"],"split":"dev","category":"paraphrase"}
+{"id":"q0031","intent_id":"knowledge-add-number-field","query":"给知识库多维表格 1234 增加一个名叫预算的数字字段。","relevant_tool_ids":["iWiki/smartsheetAddField"],"split":"dev","category":"direct"}
+{"id":"q0032","intent_id":"knowledge-add-select-field","query":"我想在这张多维表里加状态单选列，并配置待办和完成两个选项。","relevant_tool_ids":["iWiki/smartsheetAddField"],"split":"dev","category":"boundary"}
+{"id":"q0033","intent_id":"l017","query":"把知识库多维表格 1234 的字段编号和类型列给我。","relevant_tool_ids":["iWiki/smartsheetGetFields"],"split":"dev","category":"direct"}
+{"id":"q0034","intent_id":"l017","query":"只看多维表的列定义，不需要查询每一行记录。","relevant_tool_ids":["iWiki/smartsheetGetFields"],"split":"dev","category":"paraphrase"}
+{"id":"q0035","intent_id":"l018","query":"确认删除多维表格 1234 的旧备注字段，整列数据也不保留。","relevant_tool_ids":["iWiki/smartsheetDeleteField"],"split":"dev","category":"direct"}
+{"id":"q0036","intent_id":"l018","query":"这次不是删除某一行，我要从知识库多维表结构里移除这一列。","relevant_tool_ids":["iWiki/smartsheetDeleteField"],"split":"dev","category":"paraphrase"}
+{"id":"q0037","intent_id":"knowledge-filter-kanban-views","query":"知识库多维表格 1234 有哪些看板视图？把视图编号带上。","relevant_tool_ids":["iWiki/smartsheetGetViews"],"split":"dev","category":"direct"}
+{"id":"q0038","intent_id":"knowledge-list-views","query":"我想先看这张多维表都配置了哪些视图，不读取行数据。","relevant_tool_ids":["iWiki/smartsheetGetViews"],"split":"dev","category":"boundary"}
+{"id":"q0039","intent_id":"knowledge-filter-records","query":"查多维表格 1234 中优先级高且待办的记录，按日期倒序，只返回负责人和标题。","relevant_tool_ids":["iWiki/smartsheetGetRecords"],"split":"dev","category":"direct"}
+{"id":"q0040","intent_id":"knowledge-read-record-ids","query":"我已有几条多维表记录的编号，只读取这些行的字段值，不修改它们。","relevant_tool_ids":["iWiki/smartsheetGetRecords"],"split":"dev","category":"boundary"}
+{"id":"q0041","intent_id":"l021","query":"把我给出的三条工单作为新行插入知识库多维表格 1234。","relevant_tool_ids":["iWiki/smartsheetAddRecords"],"split":"dev","category":"direct"}
+{"id":"q0042","intent_id":"l021","query":"这些是新增多维表记录，还没有记录编号，不要覆盖原来的行。","relevant_tool_ids":["iWiki/smartsheetAddRecords"],"split":"dev","category":"paraphrase"}
+{"id":"q0043","intent_id":"l022","query":"把多维表格 1234 中这两条已有记录的状态改为完成，其他字段不动。","relevant_tool_ids":["iWiki/smartsheetUpdateRecords"],"split":"dev","category":"direct"}
+{"id":"q0044","intent_id":"l022","query":"记录编号都已给出，只更新各行负责人，不再插入副本。","relevant_tool_ids":["iWiki/smartsheetUpdateRecords"],"split":"dev","category":"paraphrase"}
+{"id":"q0045","intent_id":"l023","query":"确认从多维表格 1234 删除这三个记录编号对应的行。","relevant_tool_ids":["iWiki/smartsheetDeleteRecords"],"split":"dev","category":"direct"}
+{"id":"q0046","intent_id":"l023","query":"我不要移除字段，只要把这两条过期的数据记录彻底删掉。","relevant_tool_ids":["iWiki/smartsheetDeleteRecords"],"split":"dev","category":"paraphrase"}
+{"id":"q0047","intent_id":"l024","query":"附件编号已经给你，帮我拿到这个知识库文件的临时下载链接。","relevant_tool_ids":["iWiki/getAttachmentDownloadUrl"],"split":"dev","category":"direct"}
+{"id":"q0048","intent_id":"l024","query":"我要访问知识文档引用的那张图片，已有附件编号，只缺可下载地址。","relevant_tool_ids":["iWiki/getAttachmentDownloadUrl"],"split":"dev","category":"paraphrase"}
+{"id":"q0049","intent_id":"l025-1","query":"我有一份现成 HTML 文件，要导入知识目录 1234，先获取上传地址。","relevant_tool_ids":["iWiki/prepareAttachmentUpload"],"split":"dev","category":"direct"}
+{"id":"q0050","intent_id":"l025-2","query":"给知识文档 1234 准备附件上传链接，文件还没有传到存储中。","relevant_tool_ids":["iWiki/prepareAttachmentUpload"],"split":"dev","category":"boundary"}
+{"id":"q0051","intent_id":"l026-1","query":"知识库附件已上传成功，已有附件编号和原文件名，帮我完成绑定。","relevant_tool_ids":["iWiki/completeAttachmentUpload"],"split":"test","category":"direct"}
+{"id":"q0052","intent_id":"l026-2","query":"HTML 包已传到预签名地址，准备阶段给了新文档编号，现在通知服务器完成导入。","relevant_tool_ids":["iWiki/completeAttachmentUpload"],"split":"dev","category":"boundary"}
+{"id":"q0053","intent_id":"knowledge-list-normal-comments","query":"读知识文档 1234 的第二页普通评论，包含下面的回复。","relevant_tool_ids":["iWiki/getComments"],"split":"dev","category":"direct"}
+{"id":"q0054","intent_id":"knowledge-list-normal-comments","query":"看看这篇知识文档底部的讨论，不是正文里的划词批注。","relevant_tool_ids":["iWiki/getComments"],"split":"dev","category":"boundary"}
+{"id":"q0055","intent_id":"l028","query":"知识文档 1234 哪些原文被划词批注了？把批注和回复一起列出。","relevant_tool_ids":["iWiki/getInlineComment"],"split":"test","category":"direct"}
+{"id":"q0056","intent_id":"l028","query":"我只要正文选中片段上的评论，不是页面底部的留言。","relevant_tool_ids":["iWiki/getInlineComment"],"split":"test","category":"paraphrase"}
+{"id":"q0057","intent_id":"l029-1","query":"在知识文档 1234 底部评论：这份方案已通过验收。","relevant_tool_ids":["iWiki/addComment"],"split":"test","category":"direct"}
+{"id":"q0058","intent_id":"l029-2","query":"给 Markdown 知识文档中唯一出现的这段原文加批注，不修改原文正文。","relevant_tool_ids":["iWiki/addComment"],"split":"dev","category":"boundary"}
+{"id":"q0059","intent_id":"knowledge-lookup-fuzzy-term","query":"在知识词库里找名称或别名包含容灾的术语。","relevant_tool_ids":["iWiki/glossaryTermSearch"],"split":"dev","category":"direct"}
+{"id":"q0060","intent_id":"knowledge-lookup-exact-term","query":"只查指定词库中与这个术语名字精确相同的条目，大小写不敏感。","relevant_tool_ids":["iWiki/glossaryTermSearch","iWiki/glossaryBatchExactSearch"],"split":"dev","category":"boundary"}
+{"id":"q0061","intent_id":"knowledge-batch-exact-terms","query":"一次核对这二十个术语在知识词库中是否有精确对应，包括别名。","relevant_tool_ids":["iWiki/glossaryBatchExactSearch"],"split":"test","category":"direct"}
+{"id":"q0062","intent_id":"knowledge-batch-term-states","query":"批量查这些术语的草稿和已发布条目，不能只做模糊推荐。","relevant_tool_ids":["iWiki/glossaryBatchExactSearch"],"split":"dev","category":"boundary"}
+{"id":"q0063","intent_id":"knowledge-create-private-glossary","query":"创建一个仅我管理的私有网络术语词库，名称已经想好。","relevant_tool_ids":["iWiki/createGlossary"],"split":"test","category":"direct"}
+{"id":"q0064","intent_id":"knowledge-create-public-glossary","query":"我要建立全员可浏览的新词库，现在还不添加具体术语。","relevant_tool_ids":["iWiki/createGlossary"],"split":"dev","category":"boundary"}
+{"id":"q0065","intent_id":"knowledge-publish-term","query":"我有词库管理员权限，在词库 12 中直接发布这个新术语及释义。","relevant_tool_ids":["iWiki/createGlossaryTerm"],"split":"dev","category":"direct"}
+{"id":"q0066","intent_id":"knowledge-apply-term-approval","query":"将这个术语提交到词库 12 等待人工审批，不走直接发布。","relevant_tool_ids":["iWiki/createGlossaryTerm"],"split":"dev","category":"boundary"}
+{"id":"q0067","intent_id":"l034","query":"当前访问知识库用的是哪个账号、属于哪个部门？","relevant_tool_ids":["iWiki/getCurrentUser"],"split":"dev","category":"direct"}
+{"id":"q0068","intent_id":"l034","query":"帮我确认知识平台现在的认证身份，不要查其他员工的信息。","relevant_tool_ids":["iWiki/getCurrentUser"],"split":"dev","category":"paraphrase"}
+{"id":"q0069","intent_id":"knowledge-remember-preference","query":"请记住我今后所有项目周报都需要中文输出，保存为长期偏好。","relevant_tool_ids":["iWiki/writeMemory"],"split":"dev","category":"direct"}
+{"id":"q0070","intent_id":"knowledge-remember-decision","query":"把这次确定的项目验收日期写进长期记忆，供之后的对话继续用。","relevant_tool_ids":["iWiki/writeMemory"],"split":"dev","category":"boundary"}
+{"id":"q0071","intent_id":"knowledge-recall-preference","query":"帮我回忆之前记住的周报语言偏好是什么。","relevant_tool_ids":["iWiki/searchMemory"],"split":"dev","category":"direct"}
+{"id":"q0072","intent_id":"knowledge-recall-decision","query":"我们上次保存了什么验收结论？按这个主题查长期记忆，不要列出全部。","relevant_tool_ids":["iWiki/searchMemory"],"split":"dev","category":"boundary"}
+{"id":"q0073","intent_id":"knowledge-browse-memory","query":"列出这个项目已经保存的全部长期记忆，先看前二十条。","relevant_tool_ids":["iWiki/listMemory"],"split":"dev","category":"direct"}
+{"id":"q0074","intent_id":"knowledge-browse-memory","query":"我想逐页审阅记忆库，从偏移量二十开始，不做相关性搜索。","relevant_tool_ids":["iWiki/listMemory"],"split":"dev","category":"boundary"}
+{"id":"q0075","intent_id":"tapd-discover-operation","query":"不知道 TAPD 哪个操作能查需求变更历史，先帮我找到对应入口。","relevant_tool_ids":["tapd_mcp_http/lookup_tapd_tool"],"split":"dev","category":"direct"}
+{"id":"q0076","intent_id":"tapd-discover-operation","query":"我要统计 TAPD 缺陷数量，但还不知道底层工具名，先发现工具不要执行。","relevant_tool_ids":["tapd_mcp_http/lookup_tapd_tool"],"split":"dev","category":"boundary"}
+{"id":"q0077","intent_id":"l039","query":"我已选定 TAPD 的需求更新操作，先查它需要哪些参数。","relevant_tool_ids":["tapd_mcp_http/lookup_tool_param_schema"],"split":"dev","category":"direct"}
+{"id":"q0078","intent_id":"l039","query":"底层操作名已经知道，只想获取 TAPD 工具的参数结构，不实际执行。","relevant_tool_ids":["tapd_mcp_http/lookup_tool_param_schema"],"split":"dev","category":"paraphrase"}
+{"id":"q0079","intent_id":"l040","query":"TAPD 操作名称和请求参数已经确认，现在执行这次查询。","relevant_tool_ids":["tapd_mcp_http/proxy_execute_tool"],"split":"dev","category":"direct"}
+{"id":"q0080","intent_id":"l040","query":"已拿到 TAPD 参数定义并组好更新内容，代理执行，不再做工具发现。","relevant_tool_ids":["tapd_mcp_http/proxy_execute_tool"],"split":"dev","category":"paraphrase"}
+{"id":"q0081","intent_id":"tapd-tql-text-or","query":"TAPD 的名称条件想匹配登录或支付，查一下 TQL 的多值模糊写法。","relevant_tool_ids":["tapd_mcp_http/tql_syntax_reference"],"split":"test","category":"direct"}
+{"id":"q0082","intent_id":"tapd-tql-user-or","query":"准备筛选 TAPD 人员字段为两位负责人中的任意一位，只要语法参考，不执行。","relevant_tool_ids":["tapd_mcp_http/tql_syntax_reference"],"split":"test","category":"boundary"}
+{"id":"q0083","intent_id":"l042","query":"我有授权，按环境和主机标识查测试服务器 root 用户在密码库中的当前密码。","relevant_tool_ids":["tce-env-mcp/query_server_password","tce-env-mcp/password_cli"],"split":"dev","category":"direct"}
+{"id":"q0084","intent_id":"l042","query":"只查询指定服务器账户的现有凭据，不修改密码，也不登录运行命令。","relevant_tool_ids":["tce-env-mcp/query_server_password","tce-env-mcp/password_cli"],"split":"dev","category":"paraphrase"}
+{"id":"q0085","intent_id":"remote-readonly-shell","query":"在已授权的测试环境上运行 df -h，返回命令输出和退出码。","relevant_tool_ids":["tce-env-mcp/ssh_exec"],"split":"dev","category":"direct"}
+{"id":"q0086","intent_id":"remote-readonly-shell","query":"已指定远程主机和跳板机，请执行只读的磁盘查询，不传文件。","relevant_tool_ids":["tce-env-mcp/ssh_exec"],"split":"dev","category":"boundary"}
+{"id":"q0087","intent_id":"tenant-list-accounts","query":"在测试云环境查租户端 BSP 账号列表，不查运营端子账号。","relevant_tool_ids":["tce-env-mcp/bspaccount_cli"],"split":"dev","category":"direct"}
+{"id":"q0088","intent_id":"tenant-unlock-account","query":"解锁一个被锁定的租户侧测试账户，明确不是管理端 CAM 用户。","relevant_tool_ids":["tce-env-mcp/bspaccount_cli"],"split":"test","category":"boundary"}
+{"id":"q0089","intent_id":"operator-add-admin-group","query":"把测试环境的运营端子账号加入业务管理员用户组。","relevant_tool_ids":["tce-env-mcp/cam_cli"],"split":"test","category":"direct"}
+{"id":"q0090","intent_id":"operator-list-retained-accounts","query":"查管理端回收站里保留的 CAM 子账号，不是租户侧 BSP 用户。","relevant_tool_ids":["tce-env-mcp/cam_cli"],"split":"dev","category":"boundary"}
+{"id":"q0091","intent_id":"device-password-bank-remove","query":"已授权并登录密码库管理，将这台测试设备退库，设备编号已给出。","relevant_tool_ids":["tce-env-mcp/password_cli"],"split":"dev","category":"direct"}
+{"id":"q0092","intent_id":"device-password-bank-status","query":"只查备地域某设备的密码入库状态，不查询租户账户列表。","relevant_tool_ids":["tce-env-mcp/password_cli"],"split":"dev","category":"boundary"}
+{"id":"q0093","intent_id":"l047","query":"有机器序列号，想知道如何连接这台测试物理机的带外管理。","relevant_tool_ids":["tce-env-mcp/connect_outband_by_sn"],"split":"dev","category":"direct"}
+{"id":"q0094","intent_id":"l047","query":"请按这个 SN 给出带外连接步骤和隧道方案，不实际连接或运行命令。","relevant_tool_ids":["tce-env-mcp/connect_outband_by_sn"],"split":"dev","category":"paraphrase"}
+{"id":"q0095","intent_id":"l048","query":"把我在聊天里贴出的这段 YAML 保存到测试环境远程的配置路径。","relevant_tool_ids":["tce-env-mcp/transfer_file"],"split":"dev","category":"direct"}
+{"id":"q0096","intent_id":"l048","query":"内容只有当前对话里的脚本文本，不存在本地文件，请写到远端并备份旧文件。","relevant_tool_ids":["tce-env-mcp/transfer_file"],"split":"dev","category":"paraphrase"}
+{"id":"q0097","intent_id":"l049","query":"读测试环境远程的这个小型配置文件，把内容返回到聊天中分析。","relevant_tool_ids":["tce-env-mcp/fetch_file","tce-env-mcp/ssh_exec"],"split":"test","category":"direct"}
+{"id":"q0098","intent_id":"l049","query":"只在当前对话展示远程文件内容，不要在我的电脑上保存下载副本。","relevant_tool_ids":["tce-env-mcp/fetch_file","tce-env-mcp/ssh_exec"],"split":"test","category":"paraphrase"}
+{"id":"q0099","intent_id":"l050","query":"将测试环境甲的这个小文件复制到测试环境乙，两端都是远程服务器。","relevant_tool_ids":["tce-env-mcp/transfer_between_hosts"],"split":"dev","category":"direct"}
+{"id":"q0100","intent_id":"l050","query":"不要下载到我的电脑，再上传；把两台远程主机上的文件直接互传并校验。","relevant_tool_ids":["tce-env-mcp/transfer_between_hosts"],"split":"dev","category":"paraphrase"}
+{"id":"q0101","intent_id":"local-disk-upload-remote","query":"把我电脑 Downloads 中已有的压缩包上传到测试集群，给出隧道和传输命令。","relevant_tool_ids":["tce-env-mcp/file_tunnel_transfer"],"split":"dev","category":"direct"}
+{"id":"q0102","intent_id":"remote-download-local-disk","query":"把远程的大文件下载到我的 Mac 指定目录，不要把内容读入聊天。","relevant_tool_ids":["tce-env-mcp/file_tunnel_transfer"],"split":"dev","category":"boundary"}
+{"id":"q0103","intent_id":"l052","query":"测试环境有哪些主节点入口？列出环境名称和完整说明。","relevant_tool_ids":["tce-env-mcp/query_env_master"],"split":"dev","category":"direct"}
+{"id":"q0104","intent_id":"l052","query":"查这个环境的 master 地址和架构用途，不获取凭据也不执行命令。","relevant_tool_ids":["tce-env-mcp/query_env_master"],"split":"dev","category":"paraphrase"}
+{"id":"q0105","intent_id":"cleanup-whitelist-add-instance","query":"给测试环境中的指定虚拟机加入清理白名单，避免被自动清掉。","relevant_tool_ids":["tce-env-mcp/whitelist_cli"],"split":"dev","category":"direct"}
+{"id":"q0106","intent_id":"cleanup-whitelist-check-account","query":"查某租户账号是否在清理保护名单里，不是解锁账号或授予管理权限。","relevant_tool_ids":["tce-env-mcp/whitelist_cli"],"split":"dev","category":"boundary"}
+{"id":"q0107","intent_id":"indexed-find-symbol-location","query":"在已索引项目里定位名字含 AuthService 的类，只要文件和行号。","relevant_tool_ids":["codegraph/codegraph_search"],"split":"dev","category":"direct"}
+{"id":"q0108","intent_id":"indexed-find-symbol-location","query":"搜索所有名为 login 的方法位置，不展开函数体或调用链。","relevant_tool_ids":["codegraph/codegraph_search"],"split":"dev","category":"boundary"}
+{"id":"q0109","intent_id":"l055","query":"已索引项目中，哪些函数调用了 validate_request？只列直接调用者。","relevant_tool_ids":["codegraph/codegraph_callers","codegraph/codegraph_node","codegraph/codegraph_explore"],"split":"dev","category":"direct"}
+{"id":"q0110","intent_id":"l055","query":"我问的是谁进入这个函数，不是它接着又调用了哪些函数。","relevant_tool_ids":["codegraph/codegraph_callers","codegraph/codegraph_node","codegraph/codegraph_explore"],"split":"dev","category":"paraphrase"}
+{"id":"q0111","intent_id":"l056","query":"validate_request 在已索引项目中直接调用了哪些函数？","relevant_tool_ids":["codegraph/codegraph_callees","codegraph/codegraph_node","codegraph/codegraph_explore"],"split":"test","category":"direct"}
+{"id":"q0112","intent_id":"l056","query":"只列这个方法依赖的下游调用目标，不找谁调用它。","relevant_tool_ids":["codegraph/codegraph_callees","codegraph/codegraph_node","codegraph/codegraph_explore"],"split":"test","category":"paraphrase"}
+{"id":"q0113","intent_id":"l057","query":"重构 validate_request 前，评估两层依赖范围内受影响的符号。","relevant_tool_ids":["codegraph/codegraph_impact"],"split":"test","category":"direct"}
+{"id":"q0114","intent_id":"l057","query":"这个共享方法准备改签名，我要看变更波及范围，不只是直接调用者。","relevant_tool_ids":["codegraph/codegraph_impact"],"split":"test","category":"paraphrase"}
+{"id":"q0115","intent_id":"l058","query":"前面的代码探索截断了函数体，给出这个符号在指定文件中的完整定义。","relevant_tool_ids":["codegraph/codegraph_node"],"split":"dev","category":"direct"}
+{"id":"q0116","intent_id":"l058","query":"方法有多个重载，我已有文件和行号，只展开这一处的签名及正文。","relevant_tool_ids":["codegraph/codegraph_node"],"split":"dev","category":"paraphrase"}
+{"id":"q0117","intent_id":"indexed-explain-source-flow","query":"在已索引项目里解释登录请求如何经过校验和会话保存，展开相关源码。","relevant_tool_ids":["codegraph/codegraph_explore"],"split":"dev","category":"direct"}
+{"id":"q0118","intent_id":"indexed-explain-source-flow","query":"把这几个相关符号跨文件的实现一起展示，我要理解流程而不只是定位行号。","relevant_tool_ids":["codegraph/codegraph_explore"],"split":"dev","category":"boundary"}
+{"id":"q0119","intent_id":"l060","query":"代码搜索结果异常，检查当前项目索引的文件、节点和关系数量。","relevant_tool_ids":["codegraph/codegraph_status"],"split":"dev","category":"direct"}
+{"id":"q0120","intent_id":"l060","query":"先确认代码索引是否健康，不分析某个业务函数。","relevant_tool_ids":["codegraph/codegraph_status"],"split":"dev","category":"paraphrase"}
+{"id":"q0121","intent_id":"indexed-browse-file-layout","query":"看已索引项目 src 下的文件树，并标出语言和符号数量。","relevant_tool_ids":["codegraph/codegraph_files"],"split":"test","category":"direct"}
+{"id":"q0122","intent_id":"indexed-browse-file-layout","query":"只列索引中的测试文件路径，不打开文件正文。","relevant_tool_ids":["codegraph/codegraph_files"],"split":"test","category":"boundary"}
+{"id":"q0123","intent_id":"docs-resolve-library","query":"我只知道 Next.js 的名字，先找到文档查询可用的准确库标识。","relevant_tool_ids":["context7/resolve-library-id"],"split":"dev","category":"direct"}
+{"id":"q0124","intent_id":"docs-resolve-library","query":"要查某版本数据库驱动的文档，但还没有库 ID，先匹配对应库。","relevant_tool_ids":["context7/resolve-library-id"],"split":"dev","category":"boundary"}
+{"id":"q0125","intent_id":"l063","query":"库标识 /vercel/next.js 已知，查路由缓存失效的官方用法和示例。","relevant_tool_ids":["context7/query-docs"],"split":"dev","category":"direct"}
+{"id":"q0126","intent_id":"l063","query":"我已经拿到这个驱动的文档库 ID，只查事务回滚的代码示例。","relevant_tool_ids":["context7/query-docs"],"split":"dev","category":"paraphrase"}
+{"id":"q0127","intent_id":"browser-submit-click","query":"网页已经打开，点击快照中标为提交的按钮。","relevant_tool_ids":["chrome-devtools/click","playwright/browser_click"],"split":"dev","category":"direct"}
+{"id":"q0128","intent_id":"browser-double-click-item","query":"在这个页面双击列表项进入详情，元素标识已经给出。","relevant_tool_ids":["chrome-devtools/click","playwright/browser_click"],"split":"dev","category":"boundary"}
+{"id":"q0129","intent_id":"browser-close-one-keep-others","query":"浏览器至少有两个标签页，关掉指定的那个测试页面。","relevant_tool_ids":["chrome-devtools/close_page","playwright/browser_tabs"],"split":"dev","category":"direct"}
+{"id":"q0130","intent_id":"browser-close-one-keep-others","query":"保留其他已打开标签，只关闭这一个页面，不退出整个浏览器。","relevant_tool_ids":["chrome-devtools/close_page","playwright/browser_tabs"],"split":"dev","category":"paraphrase"}
+{"id":"q0131","intent_id":"browser-element-drag","query":"把网页看板里的这张任务卡拖到完成列，源和目标元素都已定位。","relevant_tool_ids":["chrome-devtools/drag","playwright/browser_drag"],"split":"dev","category":"direct"}
+{"id":"q0132","intent_id":"browser-element-drag","query":"同一页面内将第一个列表项拖到最后一个列表项所在位置。","relevant_tool_ids":["chrome-devtools/drag","playwright/browser_drag"],"split":"dev","category":"paraphrase"}
+{"id":"q0133","intent_id":"browser-throttle-network-cpu","query":"把测试页面模拟成慢 3G 网络并让 CPU 降速四倍，复现卡顿。","relevant_tool_ids":["chrome-devtools/emulate"],"split":"dev","category":"direct"}
+{"id":"q0134","intent_id":"browser-emulate-device-location","query":"为这个网页设置移动触摸设备视口和地理位置，不只是改变窗口宽高。","relevant_tool_ids":["chrome-devtools/emulate"],"split":"dev","category":"boundary"}
+{"id":"q0135","intent_id":"browser-read-title","query":"在已打开网页执行函数读取 document.title，把结果返回。","relevant_tool_ids":["chrome-devtools/evaluate_script","playwright/browser_evaluate"],"split":"dev","category":"direct"}
+{"id":"q0136","intent_id":"browser-read-element-text","query":"通过页面脚本取出这个已定位元素的文字，返回 JSON 可序列化数据。","relevant_tool_ids":["chrome-devtools/evaluate_script","playwright/browser_evaluate"],"split":"dev","category":"paraphrase"}
+{"id":"q0137","intent_id":"browser-search-fill","query":"将页面上已定位的搜索输入框设置为季度报告。","relevant_tool_ids":["chrome-devtools/fill","playwright/browser_type"],"split":"dev","category":"direct"}
+{"id":"q0138","intent_id":"browser-check-checkbox","query":"只选中这个复选框，不填写整张表单。","relevant_tool_ids":["chrome-devtools/fill"],"split":"test","category":"boundary"}
+{"id":"q0139","intent_id":"browser-three-fields","query":"把网页表单中的姓名、部门和邮箱三个字段一次填好。","relevant_tool_ids":["chrome-devtools/fill_form","playwright/browser_fill_form"],"split":"dev","category":"direct"}
+{"id":"q0140","intent_id":"browser-address-checkbox","query":"一次填写地址并勾选同意条款，不要逐个字段操作。","relevant_tool_ids":["chrome-devtools/fill_form","playwright/browser_fill_form"],"split":"dev","category":"paraphrase"}
+{"id":"q0141","intent_id":"l071","query":"控制台列表已经给出消息编号，展开指定那一条错误详情。","relevant_tool_ids":["chrome-devtools/get_console_message"],"split":"dev","category":"direct"}
+{"id":"q0142","intent_id":"l071","query":"不要重新列全部日志，我只看之前选中的那条控制台消息。","relevant_tool_ids":["chrome-devtools/get_console_message"],"split":"dev","category":"paraphrase"}
+{"id":"q0143","intent_id":"browser-request-detail","query":"请求列表已经定位到失败项，读取这一条请求的头和响应正文。","relevant_tool_ids":["chrome-devtools/get_network_request","playwright/browser_network_request"],"split":"test","category":"direct"}
+{"id":"q0144","intent_id":"browser-devtools-selected-request","query":"我在开发者工具网络面板选中了一个请求，查看它的完整内容而不指定请求编号。","relevant_tool_ids":["chrome-devtools/get_network_request"],"split":"dev","category":"boundary"}
+{"id":"q0145","intent_id":"browser-dialog-dismiss","query":"网页弹出了确认对话框，选择取消。","relevant_tool_ids":["chrome-devtools/handle_dialog","playwright/browser_handle_dialog"],"split":"dev","category":"direct"}
+{"id":"q0146","intent_id":"browser-dialog-prompt","query":"当前浏览器 prompt 提示框需要输入测试备注，然后确认。","relevant_tool_ids":["chrome-devtools/handle_dialog","playwright/browser_handle_dialog"],"split":"dev","category":"boundary"}
+{"id":"q0147","intent_id":"browser-hover-reveal","query":"将鼠标移到网页头像上，看看悬浮菜单，先不要点击。","relevant_tool_ids":["chrome-devtools/hover","playwright/browser_hover"],"split":"dev","category":"direct"}
+{"id":"q0148","intent_id":"browser-hover-reveal","query":"停留在这个信息图标上触发提示，不改变表单值。","relevant_tool_ids":["chrome-devtools/hover","playwright/browser_hover"],"split":"dev","category":"paraphrase"}
+{"id":"q0149","intent_id":"browser-audit-accessibility-seo","query":"对这个页面做 Lighthouse 可访问性和 SEO 审计，不要性能测量。","relevant_tool_ids":["chrome-devtools/lighthouse_audit"],"split":"dev","category":"direct"}
+{"id":"q0150","intent_id":"browser-audit-current-state-accessibility","query":"只评估当前网页状态的无障碍问题，不重新加载页面，也不追踪 LCP。","relevant_tool_ids":["chrome-devtools/lighthouse_audit"],"split":"test","category":"boundary"}
+{"id":"q0151","intent_id":"browser-console-errors","query":"列出这个网页本次导航后的所有控制台错误和警告。","relevant_tool_ids":["chrome-devtools/list_console_messages","playwright/browser_console_messages"],"split":"test","category":"direct"}
+{"id":"q0152","intent_id":"browser-console-errors","query":"看看页面的控制台报错列表，不仅展开某一条消息。","relevant_tool_ids":["chrome-devtools/list_console_messages","playwright/browser_console_messages"],"split":"test","category":"paraphrase"}
+{"id":"q0153","intent_id":"browser-request-list","query":"列出这个网页加载之后发出的接口请求，不要图片和字体。","relevant_tool_ids":["chrome-devtools/list_network_requests","playwright/browser_network_requests"],"split":"dev","category":"direct"}
+{"id":"q0154","intent_id":"browser-request-list","query":"我想先浏览网页请求清单，找出失败项，不需要逐条响应正文。","relevant_tool_ids":["chrome-devtools/list_network_requests","playwright/browser_network_requests"],"split":"dev","category":"paraphrase"}
+{"id":"q0155","intent_id":"browser-tabs-list","query":"浏览器现在开着哪些标签页？先列出各页编号。","relevant_tool_ids":["chrome-devtools/list_pages","playwright/browser_tabs"],"split":"test","category":"direct"}
+{"id":"q0156","intent_id":"browser-tabs-list","query":"我忘了目标网页在哪个标签，给我当前页面清单，不新开网页。","relevant_tool_ids":["chrome-devtools/list_pages","playwright/browser_tabs"],"split":"test","category":"paraphrase"}
+{"id":"q0157","intent_id":"browser-report-navigate","query":"在当前标签页打开 https://example.com/reports，不新建标签。","relevant_tool_ids":["chrome-devtools/navigate_page","playwright/browser_navigate"],"split":"dev","category":"direct"}
+{"id":"q0158","intent_id":"browser-history-forward","query":"让当前页面向前回到历史记录中的下一页。","relevant_tool_ids":["chrome-devtools/navigate_page"],"split":"dev","category":"boundary"}
+{"id":"q0159","intent_id":"browser-new-report-tab","query":"另开一个标签访问 https://example.com/reports，现有页面保留。","relevant_tool_ids":["chrome-devtools/new_page","playwright/browser_tabs"],"split":"dev","category":"direct"}
+{"id":"q0160","intent_id":"browser-isolated-tab","query":"在独立浏览器上下文里新开测试页，不能共享原有标签的登录状态。","relevant_tool_ids":["chrome-devtools/new_page","playwright/browser_tabs"],"split":"dev","category":"boundary"}
+{"id":"q0161","intent_id":"l081","query":"性能轨迹已有洞察集编号，展开其中 LCP 拆解那一项。","relevant_tool_ids":["chrome-devtools/performance_analyze_insight"],"split":"test","category":"direct"}
+{"id":"q0162","intent_id":"l081","query":"只分析上次轨迹给出的文档延迟洞察，不重新录制网页性能。","relevant_tool_ids":["chrome-devtools/performance_analyze_insight"],"split":"test","category":"paraphrase"}
+{"id":"q0163","intent_id":"browser-trace-page-load","query":"记录这个网页的加载性能，看看 LCP、INP 和布局偏移的瓶颈。","relevant_tool_ids":["chrome-devtools/performance_start_trace"],"split":"dev","category":"direct"}
+{"id":"q0164","intent_id":"browser-trace-manual-stop","query":"开始持续录制页面性能但先不要自动停止，我还要操作几步。","relevant_tool_ids":["chrome-devtools/performance_start_trace"],"split":"test","category":"boundary"}
+{"id":"q0165","intent_id":"l083","query":"网页性能录制仍在运行，现在结束并保存轨迹文件。","relevant_tool_ids":["chrome-devtools/performance_stop_trace"],"split":"test","category":"direct"}
+{"id":"q0166","intent_id":"l083","query":"已经完成交互操作，停止刚才开始的性能记录，不再新建一次。","relevant_tool_ids":["chrome-devtools/performance_stop_trace"],"split":"test","category":"paraphrase"}
+{"id":"q0167","intent_id":"browser-escape-key","query":"给当前网页发送 Escape，退出正在打开的菜单。","relevant_tool_ids":["chrome-devtools/press_key","playwright/browser_press_key"],"split":"dev","category":"direct"}
+{"id":"q0168","intent_id":"browser-shortcut-select-all","query":"在页面触发 Control+A 快捷键，不直接替换输入框内容。","relevant_tool_ids":["chrome-devtools/press_key","playwright/browser_press_key"],"split":"dev","category":"boundary"}
+{"id":"q0169","intent_id":"browser-resize-window","query":"把浏览器窗口改成宽 1280、高 720。","relevant_tool_ids":["chrome-devtools/resize_page","playwright/browser_resize"],"split":"dev","category":"direct"}
+{"id":"q0170","intent_id":"browser-resize-window","query":"我只改测试页面窗口宽高，不模拟移动设备或网络限速。","relevant_tool_ids":["chrome-devtools/resize_page","playwright/browser_resize"],"split":"dev","category":"paraphrase"}
+{"id":"q0171","intent_id":"browser-select-existing-tab","query":"切换到已经打开的报表标签，并把它带到前台。","relevant_tool_ids":["chrome-devtools/select_page","playwright/browser_tabs"],"split":"dev","category":"direct"}
+{"id":"q0172","intent_id":"browser-select-existing-tab","query":"现有标签页编号已给出，后续都操作这个标签，不打开新地址。","relevant_tool_ids":["chrome-devtools/select_page","playwright/browser_tabs"],"split":"dev","category":"paraphrase"}
+{"id":"q0173","intent_id":"l087","query":"页面疑似内存泄漏，保存一份 JavaScript 堆快照用于对象分析。","relevant_tool_ids":["chrome-devtools/take_heapsnapshot"],"split":"dev","category":"direct"}
+{"id":"q0174","intent_id":"l087","query":"我要查看网页对象占用分布，捕获堆数据，不要页面图片。","relevant_tool_ids":["chrome-devtools/take_heapsnapshot"],"split":"dev","category":"paraphrase"}
+{"id":"q0175","intent_id":"browser-fullpage-shot","query":"保存当前网页的整页截图，要包含滚动区下方内容。","relevant_tool_ids":["chrome-devtools/take_screenshot","playwright/browser_take_screenshot"],"split":"dev","category":"direct"}
+{"id":"q0176","intent_id":"browser-element-shot","query":"只截这个已定位的网页组件，不截整页。","relevant_tool_ids":["chrome-devtools/take_screenshot","playwright/browser_take_screenshot"],"split":"dev","category":"boundary"}
+{"id":"q0177","intent_id":"browser-a11y-snapshot","query":"读当前网页的可访问性结构，列出可点击元素及标识。","relevant_tool_ids":["chrome-devtools/take_snapshot","playwright/browser_snapshot"],"split":"dev","category":"direct"}
+{"id":"q0178","intent_id":"browser-a11y-snapshot","query":"给我网页文字快照用于定位控件，不要图片截图。","relevant_tool_ids":["chrome-devtools/take_snapshot","playwright/browser_snapshot"],"split":"dev","category":"paraphrase"}
+{"id":"q0179","intent_id":"browser-focused-type-submit","query":"网页输入框已经聚焦，直接键入这段测试文本并按 Enter。","relevant_tool_ids":["chrome-devtools/type_text"],"split":"dev","category":"direct"}
+{"id":"q0180","intent_id":"browser-focused-type","query":"不用再次定位元素，在当前光标位置输入两行备注。","relevant_tool_ids":["chrome-devtools/type_text"],"split":"dev","category":"boundary"}
+{"id":"q0181","intent_id":"browser-upload-local-files","query":"网页的文件输入控件已定位，把浏览器机器上的报告文件上传。","relevant_tool_ids":["chrome-devtools/upload_file"],"split":"test","category":"direct"}
+{"id":"q0182","intent_id":"browser-upload-local-files","query":"通过已给出的上传按钮选择两个本地文件，路径都在浏览器实例上。","relevant_tool_ids":["chrome-devtools/upload_file"],"split":"test","category":"paraphrase"}
+{"id":"q0183","intent_id":"browser-wait-success","query":"等待页面显示提交成功这几个字再继续。","relevant_tool_ids":["chrome-devtools/wait_for","playwright/browser_wait_for"],"split":"dev","category":"direct"}
+{"id":"q0184","intent_id":"browser-wait-any-outcome","query":"页面显示已完成或失败中的任意一个就返回，不要求两个都出现。","relevant_tool_ids":["chrome-devtools/wait_for"],"split":"dev","category":"boundary"}
+{"id":"q0185","intent_id":"l093","query":"我还没登录企业微信文档，打开窗口让我扫码。","relevant_tool_ids":["wecom-doc/wecom_doc_login"],"split":"dev","category":"direct"}
+{"id":"q0186","intent_id":"l093","query":"企微文档需要重新认证，请发起扫码登录，不只是检查状态。","relevant_tool_ids":["wecom-doc/wecom_doc_login"],"split":"dev","category":"paraphrase"}
+{"id":"q0187","intent_id":"l094","query":"检查企业微信文档现在是否仍登录有效，不要打开新扫码窗口。","relevant_tool_ids":["wecom-doc/wecom_doc_status"],"split":"test","category":"direct"}
+{"id":"q0188","intent_id":"l094","query":"企微文档现有登录会话还能用吗？只查状态。","relevant_tool_ids":["wecom-doc/wecom_doc_status"],"split":"test","category":"paraphrase"}
+{"id":"q0189","intent_id":"l095-1","query":"我已登录，读取这个企业微信文档链接的完整内容，不仅关键词命中。","relevant_tool_ids":["wecom-doc/wecom_doc_fetch"],"split":"dev","category":"direct"}
+{"id":"q0190","intent_id":"l095-2","query":"按企业微信表格链接读取指定工作表的内容，不修改单元格。","relevant_tool_ids":["wecom-doc/wecom_doc_fetch"],"split":"dev","category":"boundary"}
+{"id":"q0191","intent_id":"l096","query":"我已登录，给这个企业微信文档链接保存一张页面截图。","relevant_tool_ids":["wecom-doc/wecom_doc_screenshot"],"split":"dev","category":"direct"}
+{"id":"q0192","intent_id":"l096","query":"想看企微文档页面的实际排版，请截图，不要只取文字。","relevant_tool_ids":["wecom-doc/wecom_doc_screenshot"],"split":"dev","category":"paraphrase"}
+{"id":"q0193","intent_id":"l097","query":"我已登录，在这份企业微信在线文档末尾追加两行纯文本结论。","relevant_tool_ids":["wecom-doc/wecom_doc_write"],"split":"dev","category":"direct"}
+{"id":"q0194","intent_id":"l097","query":"不要覆盖正文或设置富文本，只把这段备注写到企微文档最后。","relevant_tool_ids":["wecom-doc/wecom_doc_write"],"split":"dev","category":"paraphrase"}
+{"id":"q0195","intent_id":"wecom-overwrite-cell","query":"把企业微信表格的 B3 覆盖为已验收，其他单元格不动。","relevant_tool_ids":["wecom-doc/wecom_doc_write_sheet","wecom-doc/wecom_doc_write_sheet_batch"],"split":"dev","category":"direct"}
+{"id":"q0196","intent_id":"wecom-append-cell","query":"在企微在线表格的 A1 原有文字后追加备注，不覆盖原值。","relevant_tool_ids":["wecom-doc/wecom_doc_write_sheet","wecom-doc/wecom_doc_write_sheet_batch"],"split":"dev","category":"boundary"}
+{"id":"q0197","intent_id":"l099","query":"企业微信表格的 A1、B2、C3 分别写入这三个值，一次完成。","relevant_tool_ids":["wecom-doc/wecom_doc_write_sheet_batch"],"split":"dev","category":"direct"}
+{"id":"q0198","intent_id":"l099","query":"把这张企微表格指定的五个单元格批量覆盖，不逐格打开页面。","relevant_tool_ids":["wecom-doc/wecom_doc_write_sheet_batch"],"split":"dev","category":"paraphrase"}
+{"id":"q0199","intent_id":"wecom-create-sheet","query":"我已登录企业微信文档，新建一张标题为验收记录的在线表格。","relevant_tool_ids":["wecom-doc/wecom_doc_create"],"split":"test","category":"direct"}
+{"id":"q0200","intent_id":"wecom-create-slides","query":"在企微文档首页创建一个新的幻灯片，返回链接，不编辑已有文件。","relevant_tool_ids":["wecom-doc/wecom_doc_create"],"split":"dev","category":"boundary"}
+{"id":"q0201","intent_id":"p001-1","query":"GitHub 的这个工作流运行编号已经给出，查看本次运行的详情。","relevant_tool_ids":["github/actions_get"],"split":"dev","category":"direct"}
+{"id":"q0202","intent_id":"p001-2","query":"只拿 GitHub 运行产物的下载地址，已有产物编号，不列出整个工作流。","relevant_tool_ids":["github/actions_get"],"split":"dev","category":"boundary"}
+{"id":"q0203","intent_id":"p002-1","query":"列出 GitHub 仓库 example/service 配置的全部工作流。","relevant_tool_ids":["github/actions_list"],"split":"dev","category":"direct"}
+{"id":"q0204","intent_id":"p002-2","query":"运行编号已给出，只列这一轮 GitHub Actions 的任务清单，不读取日志正文。","relevant_tool_ids":["github/actions_list"],"split":"test","category":"boundary"}
+{"id":"q0205","intent_id":"p003-1","query":"在 GitHub 仓库 example/service 的 main 分支触发指定工作流，输入参数已准备好。","relevant_tool_ids":["github/actions_run_trigger"],"split":"dev","category":"direct"}
+{"id":"q0206","intent_id":"p003-2","query":"取消 GitHub Actions 中这次仍在执行的运行，运行编号已经给出。","relevant_tool_ids":["github/actions_run_trigger"],"split":"dev","category":"boundary"}
+{"id":"q0207","intent_id":"p004-1","query":"GitHub Actions 的这个任务失败了，取日志最后一百行正文。","relevant_tool_ids":["github/get_job_logs"],"split":"dev","category":"direct"}
+{"id":"q0208","intent_id":"p004-2","query":"只读取指定 GitHub 运行中所有失败任务的日志，不是下载完整运行日志包。","relevant_tool_ids":["github/get_job_logs"],"split":"dev","category":"boundary"}
+{"id":"q0209","intent_id":"github-read-code-alert","query":"GitHub 仓库的代码扫描告警编号 12 已知，查看漏洞详情。","relevant_tool_ids":["github/get_code_scanning_alert"],"split":"dev","category":"direct"}
+{"id":"q0210","intent_id":"github-read-code-alert","query":"这是源码静态扫描的具体告警，不是 Dependabot 依赖风险，展开编号对应信息。","relevant_tool_ids":["github/get_code_scanning_alert"],"split":"dev","category":"paraphrase"}
+{"id":"q0211","intent_id":"github-list-code-alerts","query":"列出 GitHub 仓库 example/service 中尚未关闭的高危代码扫描告警。","relevant_tool_ids":["github/list_code_scanning_alerts"],"split":"test","category":"direct"}
+{"id":"q0212","intent_id":"github-list-code-alerts","query":"只看指定分支上某扫描器发现的源码漏洞列表，先不展开单条详情。","relevant_tool_ids":["github/list_code_scanning_alerts"],"split":"test","category":"boundary"}
+{"id":"q0213","intent_id":"p007","query":"当前 GitHub 访问身份是谁？读取自己的用户资料。","relevant_tool_ids":["github/get_me"],"split":"dev","category":"direct"}
+{"id":"q0214","intent_id":"p007","query":"我想确认现在连接 GitHub 的账号，不查其他人，也不要认证凭据。","relevant_tool_ids":["github/get_me"],"split":"dev","category":"paraphrase"}
+{"id":"q0215","intent_id":"github-list-team-members","query":"查 GitHub 组织 example 下 platform 团队有哪些成员。","relevant_tool_ids":["github/get_team_members"],"split":"dev","category":"direct"}
+{"id":"q0216","intent_id":"github-list-team-members","query":"只列这个 GitHub 团队的人员，不列整个仓库的协作者。","relevant_tool_ids":["github/get_team_members"],"split":"dev","category":"paraphrase"}
+{"id":"q0217","intent_id":"github-user-team-memberships","query":"在 GitHub 上，我当前属于哪些团队？","relevant_tool_ids":["github/get_teams"],"split":"dev","category":"direct"}
+{"id":"q0218","intent_id":"github-user-team-memberships","query":"查这位 GitHub 用户加入的团队，不是查某团队有哪些人。","relevant_tool_ids":["github/get_teams"],"split":"dev","category":"boundary"}
+{"id":"q0219","intent_id":"p010","query":"GitHub Dependabot 的告警编号 12 是哪个依赖有问题？展开详情。","relevant_tool_ids":["github/get_dependabot_alert"],"split":"dev","category":"direct"}
+{"id":"q0220","intent_id":"p010","query":"我问的是依赖包漏洞的这条提醒，不是源码扫描告警。","relevant_tool_ids":["github/get_dependabot_alert"],"split":"dev","category":"paraphrase"}
+{"id":"q0221","intent_id":"github-list-dependency-alerts","query":"列出 GitHub 仓库 example/service 的开放 Dependabot 告警。","relevant_tool_ids":["github/list_dependabot_alerts"],"split":"dev","category":"direct"}
+{"id":"q0222","intent_id":"github-list-dependency-alerts","query":"查看项目依赖包的安全提醒清单，不查询代码静态扫描结果。","relevant_tool_ids":["github/list_dependabot_alerts"],"split":"dev","category":"paraphrase"}
+{"id":"q0223","intent_id":"github-mark-discussion-answer","query":"把 GitHub 问答讨论中这条评论标记为已接受答案，评论节点编号已知。","relevant_tool_ids":["github/discussion_comment_write"],"split":"dev","category":"direct"}
+{"id":"q0224","intent_id":"github-reply-discussion-comment","query":"回复 GitHub Discussions 的顶层评论，不给 issue 或 PR 留言。","relevant_tool_ids":["github/discussion_comment_write"],"split":"dev","category":"boundary"}
+{"id":"q0225","intent_id":"p013","query":"读取 GitHub 仓库 example/service 的讨论 12 的主题详情。","relevant_tool_ids":["github/get_discussion"],"split":"dev","category":"direct"}
+{"id":"q0226","intent_id":"p013","query":"讨论编号已知，只看 GitHub 讨论主题本身，不列所有跟帖。","relevant_tool_ids":["github/get_discussion"],"split":"dev","category":"paraphrase"}
+{"id":"q0227","intent_id":"p014","query":"读取 GitHub 讨论 12 的评论和每条顶层评论下面的回复。","relevant_tool_ids":["github/get_discussion_comments"],"split":"dev","category":"direct"}
+{"id":"q0228","intent_id":"p014","query":"我需要这个讨论串的跟帖内容，不是讨论主题介绍。","relevant_tool_ids":["github/get_discussion_comments"],"split":"dev","category":"paraphrase"}
+{"id":"q0229","intent_id":"github-repository-discussion-categories","query":"GitHub 仓库 example/service 的 Discussions 有哪些分类？","relevant_tool_ids":["github/list_discussion_categories"],"split":"test","category":"direct"}
+{"id":"q0230","intent_id":"github-org-discussion-categories","query":"不指定仓库，只查这个 GitHub 组织的讨论分类。","relevant_tool_ids":["github/list_discussion_categories"],"split":"dev","category":"boundary"}
+{"id":"q0231","intent_id":"github-list-repository-discussions","query":"列出 GitHub 仓库 example/service 问答分类里的讨论主题。","relevant_tool_ids":["github/list_discussions"],"split":"dev","category":"direct"}
+{"id":"q0232","intent_id":"github-list-org-discussions","query":"查看这个 GitHub 组织的讨论列表，不查 issue 或 pull request。","relevant_tool_ids":["github/list_discussions"],"split":"dev","category":"boundary"}
+{"id":"q0233","intent_id":"github-create-gist","query":"把这段小脚本发布为 GitHub 的一个新 Gist，文件名为 demo.py。","relevant_tool_ids":["github/create_gist"],"split":"test","category":"direct"}
+{"id":"q0234","intent_id":"github-create-gist","query":"我要创建未公开的单文件 Gist，不是提交到现有仓库分支。","relevant_tool_ids":["github/create_gist"],"split":"test","category":"boundary"}
+{"id":"q0235","intent_id":"p018","query":"Gist 编号已经给出，读取里面的代码内容。","relevant_tool_ids":["github/get_gist"],"split":"test","category":"direct"}
+{"id":"q0236","intent_id":"p018","query":"这是 GitHub Gist，不是仓库文件，我想看完整片段。","relevant_tool_ids":["github/get_gist"],"split":"test","category":"paraphrase"}
+{"id":"q0237","intent_id":"github-list-gists","query":"列出这位 GitHub 用户上个月之后更新的 Gist。","relevant_tool_ids":["github/list_gists"],"split":"dev","category":"direct"}
+{"id":"q0238","intent_id":"github-list-gists","query":"先看我在 GitHub 保存的 Gist 清单，不打开某一个片段。","relevant_tool_ids":["github/list_gists"],"split":"dev","category":"boundary"}
+{"id":"q0239","intent_id":"p020","query":"用新脚本替换 GitHub Gist 中 demo.py 的内容，Gist 编号已知。","relevant_tool_ids":["github/update_gist"],"split":"test","category":"direct"}
+{"id":"q0240","intent_id":"p020","query":"只更新现有 Gist 的这个文件和描述，不创建另一个 Gist。","relevant_tool_ids":["github/update_gist"],"split":"test","category":"paraphrase"}
+{"id":"q0241","intent_id":"github-read-repository-tree","query":"读取 GitHub 仓库 example/service 的 main 分支下 src 的递归文件树。","relevant_tool_ids":["github/get_repository_tree"],"split":"dev","category":"direct"}
+{"id":"q0242","intent_id":"github-read-repository-tree","query":"我只要这个 GitHub 标签对应的路径层级，不读取各文件正文。","relevant_tool_ids":["github/get_repository_tree"],"split":"dev","category":"boundary"}
+{"id":"q0243","intent_id":"github-add-issue-comment","query":"在 GitHub issue 12 下添加评论：问题已复现。","relevant_tool_ids":["github/add_issue_comment"],"split":"dev","category":"direct"}
+{"id":"q0244","intent_id":"github-add-pr-conversation-comment","query":"给 GitHub PR 的普通讨论区发一条验收结论，不附着到任何代码行。","relevant_tool_ids":["github/add_issue_comment"],"split":"dev","category":"boundary"}
+{"id":"q0245","intent_id":"p023","query":"查询 GitHub 仓库 example/service 里 bug 标签的颜色和说明。","relevant_tool_ids":["github/get_label"],"split":"dev","category":"direct"}
+{"id":"q0246","intent_id":"p023","query":"只查这个名称对应的仓库标签属性，不获取全部标签列表。","relevant_tool_ids":["github/get_label"],"split":"dev","category":"paraphrase"}
+{"id":"q0247","intent_id":"github-read-issue-body","query":"读取 GitHub issue 12 的完整说明。","relevant_tool_ids":["github/issue_read"],"split":"test","category":"direct"}
+{"id":"q0248","intent_id":"github-read-parent-issue","query":"这个 GitHub issue 的父 issue 是谁？只读关系，不重新挂接。","relevant_tool_ids":["github/issue_read"],"split":"dev","category":"boundary"}
+{"id":"q0249","intent_id":"github-create-issue","query":"在 GitHub 仓库 example/service 创建登录失败问题，复现正文已经提供。","relevant_tool_ids":["github/issue_write"],"split":"dev","category":"direct"}
+{"id":"q0250","intent_id":"github-mark-duplicate-issue","query":"把现有 GitHub issue 12 标记为重复，指向 issue 8，不新建问题。","relevant_tool_ids":["github/issue_write"],"split":"dev","category":"boundary"}
+{"id":"q0251","intent_id":"github-read-org-issue-fields","query":"列出 GitHub 组织 example 为 issue 设置的自定义字段。","relevant_tool_ids":["github/list_issue_fields"],"split":"dev","category":"direct"}
+{"id":"q0252","intent_id":"github-read-repository-issue-fields","query":"看看这个 GitHub 仓库继承了哪些 issue 字段，不读取某条 issue 的值。","relevant_tool_ids":["github/list_issue_fields"],"split":"dev","category":"boundary"}
+{"id":"q0253","intent_id":"github-read-repository-issue-types","query":"GitHub 仓库 example/service 支持哪些 issue 类型？","relevant_tool_ids":["github/list_issue_types"],"split":"dev","category":"direct"}
+{"id":"q0254","intent_id":"github-read-org-issue-types","query":"查组织级允许的 issue 类型名称，避免把标签当成类型。","relevant_tool_ids":["github/list_issue_types"],"split":"test","category":"boundary"}
+{"id":"q0255","intent_id":"github-list-open-issues","query":"列出 GitHub 仓库 example/service 的开放 issue，按更新时间倒序。","relevant_tool_ids":["github/list_issues"],"split":"test","category":"direct"}
+{"id":"q0256","intent_id":"github-filter-custom-issue-field","query":"按 GitHub issue 自定义字段优先级筛选问题列表，不按正文关键词搜索。","relevant_tool_ids":["github/list_issues"],"split":"dev","category":"boundary"}
+{"id":"q0257","intent_id":"p029","query":"在 GitHub 仓库 example/service 找提到登录超时的 issue。","relevant_tool_ids":["github/search_issues"],"split":"test","category":"direct"}
+{"id":"q0258","intent_id":"p029","query":"我记不清 issue 标题，想找描述里讨论缓存失效的 GitHub 问题。","relevant_tool_ids":["github/search_issues"],"split":"test","category":"paraphrase"}
+{"id":"q0259","intent_id":"github-reparent-subissue","query":"把现有 GitHub 子 issue 改挂到 issue 12 下，替换原来的父级。","relevant_tool_ids":["github/sub_issue_write"],"split":"dev","category":"direct"}
+{"id":"q0260","intent_id":"github-reorder-subissue","query":"调整 GitHub 父 issue 里的子问题顺序，不更改标题或正文。","relevant_tool_ids":["github/sub_issue_write"],"split":"dev","category":"boundary"}
+{"id":"q0261","intent_id":"github-edit-issue-comment","query":"修改 GitHub issue 中我之前发的那条普通评论，评论编号已知。","relevant_tool_ids":["github/update_issue_comment"],"split":"dev","category":"direct"}
+{"id":"q0262","intent_id":"github-edit-pr-conversation-comment","query":"把 PR 讨论区已有留言改成新验收结果，不新发评论，也不是行级评审评论。","relevant_tool_ids":["github/update_issue_comment"],"split":"test","category":"boundary"}
+{"id":"q0263","intent_id":"github-create-label","query":"在 GitHub 仓库 example/service 创建一个新的已验收标签并设置颜色。","relevant_tool_ids":["github/label_write"],"split":"dev","category":"direct"}
+{"id":"q0264","intent_id":"github-rename-label","query":"将仓库旧标签重命名，保留标签定义，不只是更新某条 issue 的标签。","relevant_tool_ids":["github/label_write"],"split":"dev","category":"boundary"}
+{"id":"q0265","intent_id":"p033","query":"把 GitHub 仓库 example/service 的标签列表全部列出。","relevant_tool_ids":["github/list_label"],"split":"dev","category":"direct"}
+{"id":"q0266","intent_id":"p033","query":"我还不知道标签名，先浏览这个 GitHub 仓库所有标签，不查单个 issue。","relevant_tool_ids":["github/list_label"],"split":"dev","category":"paraphrase"}
+{"id":"q0267","intent_id":"github-read-project-item-fields","query":"GitHub 项目和单项编号已知，读取这项任务的状态与优先级字段。","relevant_tool_ids":["github/projects_get"],"split":"dev","category":"direct"}
+{"id":"q0268","intent_id":"github-read-project-view","query":"查看 GitHub Projects 的某个视图详情，视图节点编号已经给出。","relevant_tool_ids":["github/projects_get"],"split":"dev","category":"boundary"}
+{"id":"q0269","intent_id":"github-list-projects","query":"列出 GitHub 组织 example 的所有开放项目。","relevant_tool_ids":["github/projects_list"],"split":"test","category":"direct"}
+{"id":"q0270","intent_id":"github-list-project-items-fields","query":"读取 GitHub 项目 3 的单项列表，同时带上状态字段，不只返回标题。","relevant_tool_ids":["github/projects_list"],"split":"dev","category":"boundary"}
+{"id":"q0271","intent_id":"github-update-project-items","query":"将 GitHub 项目里的这十项任务的状态统一改为完成，单项编号都已给出。","relevant_tool_ids":["github/projects_write"],"split":"dev","category":"direct"}
+{"id":"q0272","intent_id":"github-create-project-iteration-field","query":"创建 GitHub Projects 的一个迭代字段，开始日期和周期天数已确定。","relevant_tool_ids":["github/projects_write"],"split":"dev","category":"boundary"}
+{"id":"q0273","intent_id":"github-add-line-pending-review","query":"我已有 GitHub PR 12 的待提交评审，在指定文件新侧第 20 行加入这条意见。","relevant_tool_ids":["github/add_comment_to_pending_review"],"split":"test","category":"direct"}
+{"id":"q0274","intent_id":"github-add-file-pending-review","query":"把文件级意见加入我最新的未提交 PR 评审，不发到普通讨论区。","relevant_tool_ids":["github/add_comment_to_pending_review"],"split":"dev","category":"boundary"}
+{"id":"q0275","intent_id":"github-reply-review-comment","query":"回复 GitHub PR 中这条代码行评审评论，数字评论编号已给出。","relevant_tool_ids":["github/add_reply_to_pull_request_comment"],"split":"dev","category":"direct"}
+{"id":"q0276","intent_id":"github-react-review-comment","query":"只给指定的 PR 代码评审评论添加反应，不新建评审，也不改正文。","relevant_tool_ids":["github/add_reply_to_pull_request_comment"],"split":"dev","category":"boundary"}
+{"id":"q0277","intent_id":"github-create-pull-request","query":"在 GitHub 仓库 example/service 将 feature/report 向 main 发起一个草稿 PR。","relevant_tool_ids":["github/create_pull_request"],"split":"dev","category":"direct"}
+{"id":"q0278","intent_id":"github-create-pull-request","query":"源分支和目标分支已确定，新建 GitHub PR 并邀请指定团队评审。","relevant_tool_ids":["github/create_pull_request"],"split":"dev","category":"boundary"}
+{"id":"q0279","intent_id":"github-list-pull-requests-branches","query":"列出 GitHub 仓库 example/service 目标分支为 main 的开放 PR。","relevant_tool_ids":["github/list_pull_requests","github/search_pull_requests"],"split":"dev","category":"direct"}
+{"id":"q0280","intent_id":"github-list-pull-requests-branches","query":"按源分支筛选这个 GitHub 仓库的合并请求清单，不按正文内容搜索。","relevant_tool_ids":["github/list_pull_requests","github/search_pull_requests"],"split":"dev","category":"boundary"}
+{"id":"q0281","intent_id":"p041","query":"将 GitHub PR 12 以 squash 方式合并，预期头提交已经确认。","relevant_tool_ids":["github/merge_pull_request"],"split":"dev","category":"direct"}
+{"id":"q0282","intent_id":"p041","query":"我授权真正合并这条 PR，不是仅关闭它或同步主分支。","relevant_tool_ids":["github/merge_pull_request"],"split":"dev","category":"paraphrase"}
+{"id":"q0283","intent_id":"github-read-pr-diff","query":"读取 GitHub PR 12 的完整代码差异。","relevant_tool_ids":["github/pull_request_read"],"split":"dev","category":"direct"}
+{"id":"q0284","intent_id":"github-read-review-threads","query":"查看 GitHub PR 的代码评审线程及其中的评论，不是普通会话区留言。","relevant_tool_ids":["github/pull_request_read"],"split":"test","category":"boundary"}
+{"id":"q0285","intent_id":"github-submit-request-changes-review","query":"向 GitHub PR 12 提交正式的请求修改评审，评审正文已经提供。","relevant_tool_ids":["github/pull_request_review_write"],"split":"test","category":"direct"}
+{"id":"q0286","intent_id":"github-resolve-review-thread","query":"把 GitHub PR 中这个评审线程标记为已解决，线程节点编号已知。","relevant_tool_ids":["github/pull_request_review_write"],"split":"test","category":"boundary"}
+{"id":"q0287","intent_id":"github-search-pr-content","query":"在 GitHub 中找 example/service 上标题涉及缓存的已合并 PR。","relevant_tool_ids":["github/search_pull_requests"],"split":"dev","category":"direct"}
+{"id":"q0288","intent_id":"github-search-pr-author-date","query":"搜某位作者上个月提交的 GitHub PR，使用作者和日期限定条件。","relevant_tool_ids":["github/search_pull_requests"],"split":"dev","category":"boundary"}
+{"id":"q0289","intent_id":"github-ready-pr-review","query":"把 GitHub PR 12 从草稿改成可评审状态，并更新说明。","relevant_tool_ids":["github/update_pull_request"],"split":"dev","category":"direct"}
+{"id":"q0290","intent_id":"github-change-pr-base","query":"调整现有 PR 的目标分支，不新建 PR，也不合并代码。","relevant_tool_ids":["github/update_pull_request"],"split":"dev","category":"boundary"}
+{"id":"q0291","intent_id":"p046","query":"GitHub PR 12 的分支落后于 main，把目标分支最新变化同步进来。","relevant_tool_ids":["github/update_pull_request_branch"],"split":"test","category":"direct"}
+{"id":"q0292","intent_id":"p046","query":"只更新这条 PR 的源分支，不合并 PR，预期头提交已经给出。","relevant_tool_ids":["github/update_pull_request_branch"],"split":"test","category":"paraphrase"}
+{"id":"q0293","intent_id":"p047","query":"从 GitHub 仓库 example/service 的 main 创建 feature/audit 分支。","relevant_tool_ids":["github/create_branch"],"split":"dev","category":"direct"}
+{"id":"q0294","intent_id":"p047","query":"只在远程仓库建立这个新分支，先不发起合并请求。","relevant_tool_ids":["github/create_branch"],"split":"dev","category":"paraphrase"}
+{"id":"q0295","intent_id":"github-create-file","query":"在 GitHub 仓库指定分支新增 docs/checklist.md，内容和提交说明已给出。","relevant_tool_ids":["github/create_or_update_file","github/push_files"],"split":"dev","category":"direct"}
+{"id":"q0296","intent_id":"github-update-file","query":"替换 GitHub 分支上一个已有文件，原 blob 哈希已查到，不批量推多个文件。","relevant_tool_ids":["github/create_or_update_file","github/push_files"],"split":"test","category":"boundary"}
+{"id":"q0297","intent_id":"github-create-org-repository","query":"在 GitHub 组织 example 下创建名为 audit-demo 的私有仓库并初始化 README。","relevant_tool_ids":["github/create_repository"],"split":"dev","category":"direct"}
+{"id":"q0298","intent_id":"github-create-personal-repository","query":"我需要从零创建个人 GitHub 仓库，不复制别人的已有仓库。","relevant_tool_ids":["github/create_repository"],"split":"dev","category":"boundary"}
+{"id":"q0299","intent_id":"p050","query":"确认删除 GitHub 仓库 example/service 分支上的过期说明文件，提交说明已给出。","relevant_tool_ids":["github/delete_file"],"split":"dev","category":"direct"}
+{"id":"q0300","intent_id":"p050","query":"只删这个 GitHub 文件路径，保留仓库和分支中的其他文件。","relevant_tool_ids":["github/delete_file"],"split":"dev","category":"paraphrase"}
+{"id":"q0301","intent_id":"p051","query":"我确认授权删除 GitHub 中 example/audit-demo 这个整个测试仓库。","relevant_tool_ids":["github/delete_repository"],"split":"test","category":"direct"}
+{"id":"q0302","intent_id":"p051","query":"永久移除这个 GitHub 测试仓库，不是删除里面某个文件或取消星标。","relevant_tool_ids":["github/delete_repository"],"split":"test","category":"paraphrase"}
+{"id":"q0303","intent_id":"github-fork-personal","query":"把 GitHub 上 example/service fork 到我的账号下。","relevant_tool_ids":["github/fork_repository"],"split":"dev","category":"direct"}
+{"id":"q0304","intent_id":"github-fork-org","query":"为组织建立这个已有 GitHub 仓库的 fork，保留与上游关联。","relevant_tool_ids":["github/fork_repository"],"split":"dev","category":"boundary"}
+{"id":"q0305","intent_id":"github-read-commit-full-patch","query":"GitHub 提交哈希已给出，读取作者、改动统计和完整补丁。","relevant_tool_ids":["github/get_commit"],"split":"dev","category":"direct"}
+{"id":"q0306","intent_id":"github-read-commit-stats","query":"只看这个 GitHub 提交的文件统计，不返回很大的 patch 正文。","relevant_tool_ids":["github/get_commit"],"split":"dev","category":"boundary"}
+{"id":"q0307","intent_id":"github-read-file-body","query":"读取 GitHub 仓库 example/service 在 main 上 docs/setup.md 的正文。","relevant_tool_ids":["github/get_file_contents"],"split":"dev","category":"direct"}
+{"id":"q0308","intent_id":"github-read-directory-entries","query":"打开指定提交中的仓库目录内容，不在本地代码索引里查路径。","relevant_tool_ids":["github/get_file_contents","github/get_repository_tree"],"split":"dev","category":"boundary"}
+{"id":"q0309","intent_id":"p055","query":"GitHub 仓库 example/service 最新正式 release 是什么？","relevant_tool_ids":["github/get_latest_release"],"split":"dev","category":"direct"}
+{"id":"q0310","intent_id":"p055","query":"我只需要当前最新发布说明，不列全部历史，也不只看标签名。","relevant_tool_ids":["github/get_latest_release"],"split":"dev","category":"paraphrase"}
+{"id":"q0311","intent_id":"p056","query":"读取 GitHub 仓库 example/service 的 v1.2.0 发布说明和发布信息。","relevant_tool_ids":["github/get_release_by_tag"],"split":"dev","category":"direct"}
+{"id":"q0312","intent_id":"p056","query":"版本标签已经确定，我要对应的 release，不是标签指向的 Git 对象。","relevant_tool_ids":["github/get_release_by_tag"],"split":"dev","category":"paraphrase"}
+{"id":"q0313","intent_id":"p057","query":"查 GitHub 仓库 example/service 中 v1.2.0 这个 Git 标签的详情。","relevant_tool_ids":["github/get_tag"],"split":"dev","category":"direct"}
+{"id":"q0314","intent_id":"p057","query":"我关心标签对象本身，不查 release 发布说明或资产。","relevant_tool_ids":["github/get_tag"],"split":"dev","category":"paraphrase"}
+{"id":"q0315","intent_id":"p058","query":"GitHub 仓库 example/service 有哪些分支？分页列出。","relevant_tool_ids":["github/list_branches"],"split":"dev","category":"direct"}
+{"id":"q0316","intent_id":"p058","query":"只查看现有远程分支列表，不创建分支也不查询标签。","relevant_tool_ids":["github/list_branches"],"split":"dev","category":"paraphrase"}
+{"id":"q0317","intent_id":"github-list-commit-history","query":"列出 GitHub 仓库 main 分支上最近涉及 docs 的提交，按时间范围限制。","relevant_tool_ids":["github/list_commits"],"split":"dev","category":"direct"}
+{"id":"q0318","intent_id":"github-list-commit-history","query":"查看某个 GitHub 文件的提交历史，只返回哈希和链接，不检索提交消息关键词。","relevant_tool_ids":["github/list_commits"],"split":"dev","category":"boundary"}
+{"id":"q0319","intent_id":"p060","query":"列出 GitHub 仓库 example/service 的 release 历史。","relevant_tool_ids":["github/list_releases"],"split":"dev","category":"direct"}
+{"id":"q0320","intent_id":"p060","query":"看这个项目历次正式发布记录，不只是 Git 标签列表。","relevant_tool_ids":["github/list_releases"],"split":"dev","category":"paraphrase"}
+{"id":"q0321","intent_id":"github-list-external-collaborators","query":"列出 GitHub 仓库 example/service 的外部协作者。","relevant_tool_ids":["github/list_repository_collaborators"],"split":"dev","category":"direct"}
+{"id":"q0322","intent_id":"github-list-direct-collaborators","query":"只看直接拥有仓库权限的人员，不查某个组织团队有哪些成员。","relevant_tool_ids":["github/list_repository_collaborators"],"split":"test","category":"boundary"}
+{"id":"q0323","intent_id":"p062","query":"列出 GitHub 仓库 example/service 的所有 Git 标签。","relevant_tool_ids":["github/list_tags"],"split":"dev","category":"direct"}
+{"id":"q0324","intent_id":"p062","query":"先看这个仓库有哪些版本标签，不读取 release 说明。","relevant_tool_ids":["github/list_tags"],"split":"dev","category":"paraphrase"}
+{"id":"q0325","intent_id":"p063","query":"将两份文档和一个脚本作为同一次提交推到 GitHub 指定分支。","relevant_tool_ids":["github/push_files"],"split":"dev","category":"direct"}
+{"id":"q0326","intent_id":"p063","query":"这三个文件必须进入同一个 GitHub 提交，不逐个生成提交。","relevant_tool_ids":["github/push_files"],"split":"dev","category":"paraphrase"}
+{"id":"q0327","intent_id":"github-search-code-content","query":"在 GitHub 组织 example 的 Go 源码里搜索 WithContext 调用文字。","relevant_tool_ids":["github/search_code"],"split":"dev","category":"direct"}
+{"id":"q0328","intent_id":"github-search-code-content","query":"找 GitHub 仓库中含某个精确字符串的 Python 文件，不分析本地调用链。","relevant_tool_ids":["github/search_code"],"split":"dev","category":"boundary"}
+{"id":"q0329","intent_id":"github-search-commit-message","query":"在 GitHub 仓库 example/service 找提交消息含修复缓存的记录。","relevant_tool_ids":["github/search_commits"],"split":"dev","category":"direct"}
+{"id":"q0330","intent_id":"github-search-commit-author-date","query":"按作者和日期搜索 GitHub 默认分支提交，不扫描源码内容。","relevant_tool_ids":["github/search_commits"],"split":"dev","category":"boundary"}
+{"id":"q0331","intent_id":"github-search-repositories","query":"找 GitHub 上主题为 observability、使用 Python 且超过一千星的仓库。","relevant_tool_ids":["github/search_repositories"],"split":"dev","category":"direct"}
+{"id":"q0332","intent_id":"github-search-repositories","query":"我还没有确定仓库名，先搜索做日志分析的开源项目，不搜索源码文件。","relevant_tool_ids":["github/search_repositories"],"split":"dev","category":"boundary"}
+{"id":"q0333","intent_id":"p067","query":"GitHub 泄露检测告警编号已知，查看该告警的类型和状态，不展示敏感值。","relevant_tool_ids":["github/get_secret_scanning_alert"],"split":"test","category":"direct"}
+{"id":"q0334","intent_id":"p067","query":"这是仓库中的凭据泄露提醒，不是源码扫描或依赖包漏洞，展开元信息。","relevant_tool_ids":["github/get_secret_scanning_alert"],"split":"test","category":"paraphrase"}
+{"id":"q0335","intent_id":"github-list-open-secret-alerts","query":"列出 GitHub 仓库 example/service 未解决的泄露检测告警，仅看告警元信息。","relevant_tool_ids":["github/list_secret_scanning_alerts"],"split":"dev","category":"direct"}
+{"id":"q0336","intent_id":"github-list-resolved-secret-alerts","query":"筛选已经解决且原因相同的仓库凭据泄露提醒，不查服务器密码库。","relevant_tool_ids":["github/list_secret_scanning_alerts"],"split":"dev","category":"boundary"}
+{"id":"q0337","intent_id":"p069","query":"GHSA 编号已给出，读取 GitHub 全球安全公告的影响范围。","relevant_tool_ids":["github/get_global_security_advisory"],"split":"dev","category":"direct"}
+{"id":"q0338","intent_id":"p069","query":"我知道准确公告 ID，只查这条公开漏洞公告，不列仓库告警。","relevant_tool_ids":["github/get_global_security_advisory"],"split":"dev","category":"paraphrase"}
+{"id":"q0339","intent_id":"github-global-advisories-package","query":"查 GitHub 全球公告里影响某 Python 包版本的高危漏洞。","relevant_tool_ids":["github/list_global_security_advisories"],"split":"test","category":"direct"}
+{"id":"q0340","intent_id":"github-global-advisories-cve","query":"按 CVE 编号和发布时间筛全球安全公告，不需要我的仓库扫描结果。","relevant_tool_ids":["github/list_global_security_advisories"],"split":"dev","category":"boundary"}
+{"id":"q0341","intent_id":"p071","query":"列出 GitHub 组织 example 下各仓库尚处草稿状态的安全公告。","relevant_tool_ids":["github/list_org_repository_security_advisories"],"split":"dev","category":"direct"}
+{"id":"q0342","intent_id":"p071","query":"我要组织旗下所有仓库的公告汇总，不只看一个仓库，也不查全球公告。","relevant_tool_ids":["github/list_org_repository_security_advisories"],"split":"dev","category":"paraphrase"}
+{"id":"q0343","intent_id":"p072","query":"列出 GitHub 仓库 example/service 已发布的仓库安全公告。","relevant_tool_ids":["github/list_repository_security_advisories"],"split":"test","category":"direct"}
+{"id":"q0344","intent_id":"p072","query":"只看这个仓库自己发布的安全公告，不盘点依赖扫描告警。","relevant_tool_ids":["github/list_repository_security_advisories"],"split":"test","category":"paraphrase"}
+{"id":"q0345","intent_id":"p073","query":"把 GitHub 仓库 example/service 加入我的星标收藏。","relevant_tool_ids":["github/star_repository"],"split":"dev","category":"direct"}
+{"id":"q0346","intent_id":"p073","query":"我只是要 star 这个仓库，不订阅通知也不 fork。","relevant_tool_ids":["github/star_repository"],"split":"dev","category":"paraphrase"}
+{"id":"q0347","intent_id":"p074","query":"取消我对 GitHub 仓库 example/service 的星标。","relevant_tool_ids":["github/unstar_repository"],"split":"dev","category":"direct"}
+{"id":"q0348","intent_id":"p074","query":"只移除这个仓库的收藏，不删除仓库本身。","relevant_tool_ids":["github/unstar_repository"],"split":"dev","category":"paraphrase"}
+{"id":"q0349","intent_id":"p075","query":"在 GitHub 找名字匹配这位开发者且位于深圳的个人用户。","relevant_tool_ids":["github/search_users"],"split":"dev","category":"direct"}
+{"id":"q0350","intent_id":"p075","query":"搜索 GitHub 上使用这个姓名的用户账号，不查组织或我自己的身份。","relevant_tool_ids":["github/search_users"],"split":"dev","category":"paraphrase"}
+{"id":"q0351","intent_id":"browser-submit-click","query":"点击当前网页快照里的提交按钮。","relevant_tool_ids":["chrome-devtools/click","playwright/browser_click"],"split":"dev","category":"direct"}
+{"id":"q0352","intent_id":"browser-shift-click-item","query":"在网页上按住 Shift 点击已定位的列表项，不能只做普通单击。","relevant_tool_ids":["playwright/browser_click"],"split":"test","category":"boundary"}
+{"id":"q0353","intent_id":"browser-close-current-page","query":"关闭我现在操作的浏览器页面。","relevant_tool_ids":["playwright/browser_close","playwright/browser_tabs"],"split":"test","category":"direct"}
+{"id":"q0354","intent_id":"browser-close-last-page","query":"关闭当前最后剩下的网页，不是按编号关闭另一个标签。","relevant_tool_ids":["playwright/browser_close","playwright/browser_tabs"],"split":"dev","category":"boundary"}
+{"id":"q0355","intent_id":"browser-console-errors","query":"查看当前网页的控制台错误和警告列表。","relevant_tool_ids":["chrome-devtools/list_console_messages","playwright/browser_console_messages"],"split":"test","category":"direct"}
+{"id":"q0356","intent_id":"browser-console-session-history","query":"导出整个浏览器会话以来的控制台消息，不只看本次导航后的日志。","relevant_tool_ids":["playwright/browser_console_messages"],"split":"dev","category":"boundary"}
+{"id":"q0357","intent_id":"browser-element-drag","query":"把当前网页看板里的任务卡拖到完成列。","relevant_tool_ids":["chrome-devtools/drag","playwright/browser_drag"],"split":"dev","category":"direct"}
+{"id":"q0358","intent_id":"browser-element-drag","query":"在同一网页中拖动一个项目到另一个项目的位置，不上传本地文件。","relevant_tool_ids":["chrome-devtools/drag","playwright/browser_drag"],"split":"dev","category":"paraphrase"}
+{"id":"q0359","intent_id":"p080-1","query":"给网页拖放区投递一份 text/plain 数据，模拟从页面外拖入。","relevant_tool_ids":["playwright/browser_drop"],"split":"dev","category":"direct"}
+{"id":"q0360","intent_id":"p080-2","query":"把本地文件拖到网页导入区，不通过文件选择弹窗，也不是移动页面里的元素。","relevant_tool_ids":["playwright/browser_drop"],"split":"dev","category":"boundary"}
+{"id":"q0361","intent_id":"p081-1","query":"让当前网页按减少动画的媒体偏好渲染，复现对应样式。","relevant_tool_ids":["playwright/browser_emulate_media"],"split":"dev","category":"direct"}
+{"id":"q0362","intent_id":"p081-2","query":"将网页切到打印 CSS 媒体模式，不改变浏览器窗口尺寸。","relevant_tool_ids":["playwright/browser_emulate_media"],"split":"test","category":"boundary"}
+{"id":"q0363","intent_id":"browser-read-title","query":"在当前网页执行函数返回 document.title。","relevant_tool_ids":["chrome-devtools/evaluate_script","playwright/browser_evaluate"],"split":"dev","category":"direct"}
+{"id":"q0364","intent_id":"browser-read-element-text","query":"在页面内用脚本读取指定元素的文本，返回结果而不是截图。","relevant_tool_ids":["chrome-devtools/evaluate_script","playwright/browser_evaluate"],"split":"dev","category":"paraphrase"}
+{"id":"q0365","intent_id":"browser-upload-local-files","query":"网页已经打开文件选择器，把这两份本地文件选上上传。","relevant_tool_ids":["playwright/browser_file_upload"],"split":"test","category":"direct"}
+{"id":"q0366","intent_id":"browser-cancel-file-chooser","query":"取消当前网页文件选择弹窗，不上传任何文件。","relevant_tool_ids":["playwright/browser_file_upload"],"split":"dev","category":"boundary"}
+{"id":"q0367","intent_id":"browser-three-fields","query":"将当前网页的姓名、部门和邮箱一次填写完成。","relevant_tool_ids":["chrome-devtools/fill_form","playwright/browser_fill_form"],"split":"dev","category":"direct"}
+{"id":"q0368","intent_id":"browser-address-checkbox","query":"把网页表单地址与同意条款一起设置，不逐个字段填入。","relevant_tool_ids":["chrome-devtools/fill_form","playwright/browser_fill_form"],"split":"dev","category":"paraphrase"}
+{"id":"q0369","intent_id":"p085-1","query":"在当前网页快照里找文字含验收的节点，只给附近几行和元素引用。","relevant_tool_ids":["playwright/browser_find"],"split":"dev","category":"direct"}
+{"id":"q0370","intent_id":"p085-2","query":"用正则在网页可访问性快照中定位错误编号，不抓取整页结构。","relevant_tool_ids":["playwright/browser_find"],"split":"dev","category":"boundary"}
+{"id":"q0371","intent_id":"browser-dialog-dismiss","query":"取消当前网页弹出的确认框。","relevant_tool_ids":["chrome-devtools/handle_dialog","playwright/browser_handle_dialog"],"split":"dev","category":"direct"}
+{"id":"q0372","intent_id":"browser-dialog-prompt","query":"给浏览器 prompt 提示框输入测试备注再接受。","relevant_tool_ids":["chrome-devtools/handle_dialog","playwright/browser_handle_dialog"],"split":"dev","category":"boundary"}
+{"id":"q0373","intent_id":"browser-hover-reveal","query":"鼠标停在网页头像上，让悬浮菜单出现。","relevant_tool_ids":["chrome-devtools/hover","playwright/browser_hover"],"split":"dev","category":"direct"}
+{"id":"q0374","intent_id":"browser-hover-reveal","query":"将指针悬停在信息图标上，先不要单击。","relevant_tool_ids":["chrome-devtools/hover","playwright/browser_hover"],"split":"dev","category":"paraphrase"}
+{"id":"q0375","intent_id":"browser-report-navigate","query":"当前标签打开 https://example.com/reports，不新增标签。","relevant_tool_ids":["chrome-devtools/navigate_page","playwright/browser_navigate"],"split":"dev","category":"direct"}
+{"id":"q0376","intent_id":"browser-report-navigate","query":"把现有页面转到这个报告地址，其他标签保持原样。","relevant_tool_ids":["chrome-devtools/navigate_page","playwright/browser_navigate"],"split":"dev","category":"paraphrase"}
+{"id":"q0377","intent_id":"browser-history-back","query":"在当前浏览器页返回刚才访问的上一页。","relevant_tool_ids":["chrome-devtools/navigate_page","playwright/browser_navigate_back"],"split":"dev","category":"direct"}
+{"id":"q0378","intent_id":"browser-history-back","query":"沿这个标签的历史记录后退一步，不新建网页。","relevant_tool_ids":["chrome-devtools/navigate_page","playwright/browser_navigate_back"],"split":"dev","category":"paraphrase"}
+{"id":"q0379","intent_id":"browser-request-detail","query":"网络请求列表已给出序号，展开失败请求的头和响应正文。","relevant_tool_ids":["chrome-devtools/get_network_request","playwright/browser_network_request"],"split":"test","category":"direct"}
+{"id":"q0380","intent_id":"browser-export-response-body","query":"把已选中的网页请求响应体导出到文件，不重新列请求清单。","relevant_tool_ids":["chrome-devtools/get_network_request","playwright/browser_network_request"],"split":"dev","category":"boundary"}
+{"id":"q0381","intent_id":"browser-request-list","query":"列出这个网页加载后发出的接口请求，不包含成功图片和字体资源。","relevant_tool_ids":["chrome-devtools/list_network_requests","playwright/browser_network_requests"],"split":"dev","category":"direct"}
+{"id":"q0382","intent_id":"browser-request-session-regex","query":"查看整个浏览器会话中地址符合这个正则的请求，不仅当前页导航后的请求。","relevant_tool_ids":["playwright/browser_network_requests"],"split":"test","category":"boundary"}
+{"id":"q0383","intent_id":"browser-escape-key","query":"向当前页面发送 Escape 关闭正在打开的菜单。","relevant_tool_ids":["chrome-devtools/press_key","playwright/browser_press_key"],"split":"dev","category":"direct"}
+{"id":"q0384","intent_id":"browser-keyboard-left-navigation","query":"给网页发送 ArrowLeft 做键盘导航，不填入字符串文本。","relevant_tool_ids":["chrome-devtools/press_key","playwright/browser_press_key"],"split":"dev","category":"boundary"}
+{"id":"q0385","intent_id":"browser-resize-window","query":"把当前浏览器窗口设为 1280 乘 720。","relevant_tool_ids":["chrome-devtools/resize_page","playwright/browser_resize"],"split":"dev","category":"direct"}
+{"id":"q0386","intent_id":"browser-resize-window","query":"仅调整网页窗口宽高，别设置移动设备或慢速网络。","relevant_tool_ids":["chrome-devtools/resize_page","playwright/browser_resize"],"split":"dev","category":"paraphrase"}
+{"id":"q0387","intent_id":"browser-select-one-option","query":"把网页地区下拉框选为指定的选项值。","relevant_tool_ids":["playwright/browser_select_option","chrome-devtools/fill"],"split":"dev","category":"direct"}
+{"id":"q0388","intent_id":"browser-select-multiple-options","query":"在网页多选下拉中同时选中两个选项，不用自由文本输入代替。","relevant_tool_ids":["playwright/browser_select_option"],"split":"dev","category":"boundary"}
+{"id":"q0389","intent_id":"browser-a11y-snapshot","query":"读取当前网页的可访问性结构和可点击元素引用。","relevant_tool_ids":["chrome-devtools/take_snapshot","playwright/browser_snapshot"],"split":"dev","category":"direct"}
+{"id":"q0390","intent_id":"browser-a11y-snapshot","query":"给我网页文字快照定位控件，不要输出图片。","relevant_tool_ids":["chrome-devtools/take_snapshot","playwright/browser_snapshot"],"split":"dev","category":"paraphrase"}
+{"id":"q0391","intent_id":"browser-fullpage-shot","query":"保存当前网页的整页截图，包含屏幕下方滚动内容。","relevant_tool_ids":["chrome-devtools/take_screenshot","playwright/browser_take_screenshot"],"split":"dev","category":"direct"}
+{"id":"q0392","intent_id":"browser-element-shot","query":"只截图这个已定位网页组件，不截整页。","relevant_tool_ids":["chrome-devtools/take_screenshot","playwright/browser_take_screenshot"],"split":"dev","category":"boundary"}
+{"id":"q0393","intent_id":"browser-search-fill","query":"向已定位的网页搜索框填入季度报告。","relevant_tool_ids":["chrome-devtools/fill","playwright/browser_type"],"split":"dev","category":"direct"}
+{"id":"q0394","intent_id":"p097-2","query":"逐字符键入测试文本以触发网页按键处理器，结束后按回车。","relevant_tool_ids":["playwright/browser_type"],"split":"dev","category":"boundary"}
+{"id":"q0395","intent_id":"browser-wait-success","query":"等待当前页面出现提交成功的文字。","relevant_tool_ids":["chrome-devtools/wait_for","playwright/browser_wait_for"],"split":"dev","category":"direct"}
+{"id":"q0396","intent_id":"browser-wait-spinner-gone","query":"等网页上的加载中提示消失再继续，不是等待它再次出现。","relevant_tool_ids":["playwright/browser_wait_for"],"split":"dev","category":"boundary"}
+{"id":"q0397","intent_id":"browser-tabs-list","query":"列出当前浏览器所有已打开的标签页。","relevant_tool_ids":["chrome-devtools/list_pages","playwright/browser_tabs"],"split":"test","category":"direct"}
+{"id":"q0398","intent_id":"browser-isolated-tab","query":"在独立浏览器上下文里新建测试标签，不共享原有登录状态。","relevant_tool_ids":["chrome-devtools/new_page","playwright/browser_tabs"],"split":"dev","category":"boundary"}
+{"id":"q0399","intent_id":"browser-set-offline","query":"给当前浏览器模拟断网，让所有网络请求失败。","relevant_tool_ids":["playwright/browser_network_state_set","chrome-devtools/emulate"],"split":"dev","category":"direct"}
+{"id":"q0400","intent_id":"browser-restore-online","query":"恢复浏览器在线状态，撤销刚才的离线设置，不修改接口模拟规则。","relevant_tool_ids":["playwright/browser_network_state_set","chrome-devtools/emulate"],"split":"dev","category":"boundary"}
