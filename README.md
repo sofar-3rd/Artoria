@@ -1,4 +1,4 @@
-# sagent
+# Artoria
 
 A small web agent chat: FastAPI + LangGraph react agent (Postgres memory) with a React UI.
 
