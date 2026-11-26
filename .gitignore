@@ -9,3 +9,7 @@ dist/
 # RAG: downloaded models and cloned knowledge base repositories
 models/
 .kb-cache/
+.pi/
+.vscode/
+.codegraph/
+.codebuddy/
